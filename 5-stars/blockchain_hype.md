@@ -1,55 +1,55 @@
-# Juice-Shop Write-up: Blockchain Hype
+# Juice-Shop Write-up: 区块链炒作
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** Blockchain Hype  
-**Category:** Security through Obscurity  
-**Difficulty:** ⭐⭐⭐⭐⭐ (5/6)
+**标题：** Blockchain Hype  
+**类别：** 通过隐蔽实现安全  
+**难度：** ⭐⭐⭐⭐⭐ (5/6)
 
-This challenge involves uncovering hidden paths related to a secretive initial coin offering (ICO) for the fictional 'JuicyCoin' within the Juice Shop application.
+本挑战要求在 Juice Shop 应用中找出与虚构的“JuicyCoin”秘密首次代币发行（ICO）相关的隐藏路径。
 
-## Tools Used
+## 使用工具
 
-- **Web Browser:** Main tool for accessing the Juice Shop application and interacting with its JavaScript files.
-- **Text Editor:** For analyzing and searching through the `main.js` file to uncover obscured paths.
+- **Web 浏览器：** 用于访问 Juice Shop 应用并查看其 JavaScript 文件。
+- **文本编辑器：** 用于分析和搜索 `main.js` 文件，以找出被隐藏的路径。
 
-## Methodology and Solution
+## 方法与解题过程
 
-### Step 1: Analyzing `main.js`
+### 步骤 1：分析 `main.js`
 
-Began by examining the `main.js` file, searching for any references that might pertain to an ICO or token sale. Used keywords like "token", "ICO", "sale", and "juicycoin" to filter through the contents.
+首先检查 `main.js` 文件，搜索可能与 ICO 或代币销售有关的引用。我使用“token”“ICO”“sale”和“juicycoin”等关键词筛选内容。
 
-I found the section related to the content of the page, but not the path himself :
+我找到了与页面内容相关的部分，但没有找到路径本身：
 
 <img src="../assets/difficulty5/blockchain_hype_3.png" alt="section coin" width="500px">
 
-### Step 2: Identifying Key Sections
+### 步骤 2：定位关键部分
 
-So, I go back to the section where all paths are defined. Following the hints of the challenges, I identified sections within `main.js` that included unusual obfuscation patterns or encrypted strings, suggesting possible links to hidden features or pathways. It's the only moment in paths definition where a path seems to no be in clear text, so I think that there is high chance to find something behind this obfuscation.
+于是我回到定义所有路径的部分。根据挑战提示，我在 `main.js` 中找到了包含异常混淆模式或加密字符串的部分，这些内容可能指向隐藏功能或路径。在路径定义中，只有这里的路径看起来不是明文，因此我认为这段混淆代码背后很可能隐藏着线索。
 
 <img src="../assets/difficulty5/blockchain_hype_4.png" alt="code obfuscated" width="500px">
 
-### Step 3: De-obfuscation
+### 步骤 3：反混淆
 
-Attempted to manually decode obfuscated JavaScript code snippets to reveal meaningful paths or URLs. Initially, the obfuscation seemed resistant to straightforward decoding methods.
+我尝试手动解码混淆的 JavaScript 代码片段，以找出有意义的路径或 URL。起初，常规解码方法似乎无法奏效。
 
-### Step 4: AI Assistance
+### 步骤 4：借助 AI
 
-Utilized AI-powered tool (GPT 4) to assist in de-obfuscating the strings. This was necessary due to the complexity of the obfuscation, which might involve multiple encoding layers or a custom obfuscation technique. There is potentially other way to resolve this challenge, but when code are obfuscated, I think AI are the best way to de-obfuscating things.
+我使用 AI 工具（GPT 4）协助对字符串进行反混淆。由于混淆较为复杂，可能包含多层编码或自定义混淆技术，因此需要借助 AI。也可能存在其他解法，但我认为面对混淆代码时，AI 是很好的反混淆工具。
 
-### Step 5: Discovering the Hidden Path
+### 步骤 5：发现隐藏路径
 
-Through the combination of manual efforts and AI-assisted decoding, discovered the path `tokensale-ico-ea`, leading to the speculation that this could be the secretive path for the ICO.
+结合手动分析和 AI 辅助解码，我发现了路径 `tokensale-ico-ea`，并推测它可能是 ICO 的秘密路径。
 
-### Step 6: Verification
+### 步骤 6：验证
 
-Navigated to `http://127.0.0.1:3000/juicycoin#/tokensale-ico-ea` in the browser. This path led to a hidden part of the application discussing the pre-launch details of the 'JuicyCoin' ICO, confirming the successful completion of the challenge.
+在浏览器中访问 `http://127.0.0.1:3000/juicycoin#/tokensale-ico-ea`。该路径打开了应用中介绍“JuicyCoin” ICO 预发布详情的隐藏页面，验证了挑战已成功完成。
 
-## Solution Explanation
+## 解题说明
 
-The solution to this challenge required a detailed analysis of the application's frontend JavaScript file, particularly focusing on sections that contained obfuscated or encrypted data. By using AI to assist in the de-obfuscation, the hidden ICO-related path was successfully uncovered and accessed.
+本挑战通过详细分析应用前端 JavaScript 文件，特别是其中包含混淆或加密数据的部分来解决。借助 AI 反混淆后，成功找到了并访问了与 ICO 相关的隐藏路径。
 
-## Remediation
+## 修复建议
 
-- **Code Transparency:** Avoid storing path in clear in the client code.
-- **Secure by Authentificatin:** Ensure that all sensitive or hidden features are protected by proper authentication and authorization mechanisms, not just by obscurity.
+- **代码透明度：** 避免在客户端代码中以明文形式存储路径。
+- **通过身份验证确保安全：** 所有敏感或隐藏功能都应通过适当的身份验证和授权机制保护，而不能仅依赖隐蔽性。

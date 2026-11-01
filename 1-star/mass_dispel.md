@@ -1,34 +1,30 @@
-# Juice Shop Write-up: Mass Dispel Challenge
+# Juice Shop Write-up：Mass Dispel Challenge
 
-## Challenge Overview
+## 挑战概述
 
 **Title:** Mass Dispel\
 **Category:** Miscellaneous\
 **Difficulty:** ⭐ (1/6)
 
-The "Mass Dispel" challenge requires participants to close multiple "Challenge solved" notifications in a single action. This challenge tests the ability to navigate and utilize application features efficiently, based on the documentation provided.
+“Mass Dispel”挑战要求一次操作关闭多条“Challenge solved”通知。本挑战依据提供的文档，考察高效浏览和使用应用功能的能力。
 
-## Tools Used
+## 使用的工具
 
 - Web browser
-- OWASP Juice Shop Companion Guide (Documentation)
+- OWASP Juice Shop Companion Guide（文档）
 
-## Methodology and Solution
+## 方法与解决方案
 
-To solve this challenge, the following steps were taken:
+解决本挑战的步骤如下：
 
-1. **Access the Companion Guide**: Visited the official OWASP Juice Shop companion guide available at the provided URL (https://pwning.owasp-juice.shop/companion-guide/latest/part1/challenges.html). This guide contains extensive documentation on the application, including how to interact with various features.
+1. **查阅 Companion Guide**：访问官方 OWASP Juice Shop Companion Guide：https://pwning.owasp-juice.shop/companion-guide/latest/part1/challenges.html。该指南详细介绍了应用程序及其各项功能的使用方法。
+2. **查看文档**：找到指南中有关处理多条通知的部分。文档说明，按住 `Shift` 键并点击某条通知的关闭按钮，即可同时关闭多条通知。
+3. **应用该技巧**：打开 OWASP Juice Shop Web 界面，完成多个挑战以生成多条“Challenge solved”通知，然后按照指南所述，使用 `Shift` 加点击的方式一次性关闭所有通知。
 
-  
-2. **Review the Documentation**: Located the section in the guide that describes handling multiple notifications. The documentation indicated that multiple notifications could be closed simultaneously by holding the `Shift` key and clicking the close button on one of the notifications.
+## 解决方案说明
 
+该方案利用了 OWASP Juice Shop 应用程序中一项有文档说明的功能，帮助用户更高效地管理界面。关闭通知时按住 `Shift` 键，应用程序便会同时关闭所有可见通知。
 
-3. **Apply the Technique**: Opened the OWASP Juice Shop web interface, completed several challenges to generate multiple "Challenge solved" notifications, then used the `Shift` click method to close all notifications at once as described in the guide.
+## 修复建议
 
-## Solution Explanation
-
-The solution leverages a documented feature of the OWASP Juice Shop application that allows users to manage their interface more efficiently. By using the `Shift` key while closing a notification, the application is programmed to close all visible notifications simultaneously. 
-
-## Remediation
-
-No remediation is necessary as this challenge is designed to teach the user about specific features of the Juice Shop application rather than expose a security vulnerability. However, understanding and utilizing documentation effectively is a critical skill in both CTF contexts and real-world application usage.
+无需修复，因为本挑战旨在让用户了解 Juice Shop 应用程序的特定功能，而非揭示安全漏洞。不过，无论是在 CTF 场景还是在实际应用中，有效利用文档都是一项重要技能。

@@ -1,59 +1,56 @@
-# Juice-Shop Write-up: Mint the Honey Pot
+# Juice-Shop 攻略：铸造蜂蜜罐 NFT
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** Mint the Honey Pot  
-**Category:** Improper Input Validation  
-**Difficulty:** ⭐⭐⭐ (3/6)
+**标题：** 铸造蜂蜜罐  
+**类别：** 输入验证不当  
+**难度：** ⭐⭐⭐ (3/6)
 
-This challenge involves accumulating a digital currency known as BEEs from the "Bee Haven" in the OWASP Juice Shop to mint a Honey Pot NFT.
+本挑战要求在 OWASP Juice Shop 的“Bee Haven”中积累一种名为 BEEs 的数字货币，以铸造蜂蜜罐 NFT。
 
-## Tools Used
+## 使用的工具
 
-- **MetaMask**: A browser extension used to manage Ethereum wallet, necessary for handling blockchain transactions.
-- **Web Browser**: Used to access and interact with the OWASP Juice Shop application.
+- **MetaMask**：用于管理 Ethereum 钱包的浏览器扩展，是处理区块链交易所必需的工具。
+- **Web 浏览器**：访问并使用 OWASP Juice Shop 应用。
 
-## Methodology and Solution
+## 方法与解决方案
 
-### Step 1: Accessing the "Bee Haven"
+### 步骤 1：访问“Bee Haven”
 
-1. **Navigate to the Bee Haven**:
-   - Find the page path by searching "bee" in main.js :
+1. **前往 Bee Haven**：
+   - 在 main.js 中搜索“bee”，找到页面路径：
 
-   <img src="../assets/difficulty3/mint_the_honey_pot_1.png" alt="path" width="500px">
+    <img src="../assets/difficulty3/mint_the_honey_pot_1.png" alt="path" width="500px">
 
-   - Access the Bee Haven within the OWASP Juice Shop by navigating to the `/bee-haven` path as discovered in the main.js routing setup.
+   - 按照 main.js 路由配置中发现的路径 `/bee-haven`，访问 OWASP Juice Shop 中的 Bee Haven。
 
-   <img src="../assets/difficulty3/mint_the_honey_pot_2.png" alt="bee haven page" width="500px">
+    <img src="../assets/difficulty3/mint_the_honey_pot_2.png" alt="bee haven page" width="500px">
 
-### Step 2: Gathering BEES
+### 步骤 2：收集 BEES
 
-2. **Claim BEES**:
-   - Initially, attempt to claim 1000 BEES by clicking the claim button on the Bee Haven page.
-   - The application prompts for depositing ETH from a testnet faucet to claim BEES, indicating the requirement of blockchain interaction.
+2. **领取 BEES**：
+   - 首先尝试点击 Bee Haven 页面上的领取按钮，领取 1000 BEES。
+   - 应用提示需要从测试网水龙头存入 ETH 才能领取 BEES，表明此操作需要与区块链交互。
 
-   <img src="../assets/difficulty3/mint_the_honey_pot_4.png" alt="error bee" width="500px">
+    <img src="../assets/difficulty3/mint_the_honey_pot_4.png" alt="error bee" width="500px">
 
-### Step 3: Overcoming Faucet Challenges
+### 步骤 3：解决水龙头问题
 
-3. **Obtaining Test ETH**:
-   - Since traditional faucets require prior wallet activity, I struggle to find a website that allow to get faucet ETH.
-   - I finally find a website that allows obtaining test ETH without prerequisites.
+3. **获取测试 ETH**：
+   - 由于传统水龙头要求钱包此前有过活动记录，我很难找到可获取水龙头 ETH 的网站。
+   - 最后，我找到一个无需前置条件即可获取测试 ETH 的网站。
 
-   <img src="../assets/difficulty3/mint_the_honey_pot_5.png" alt="faucet" width="500px">
+    <img src="../assets/difficulty3/mint_the_honey_pot_5.png" alt="faucet" width="500px">
 
-   - Execute transactions using the obtained test ETH to activate the ability to claim BEES.
+   - 使用获得的测试 ETH 执行交易，即可启用 BEES 领取功能。
 
-   <img src="../assets/difficulty3/mint_the_honey_pot_6.png" alt="obtained bee" width="500px">
+    <img src="../assets/difficulty3/mint_the_honey_pot_6.png" alt="obtained bee" width="500px">
 
-### Step 4: Minting the Honey Pot NFT
+### 步骤 4：铸造蜂蜜罐 NFT
 
-4. **Minting the NFT**:
-   - After accumulating 1000 BEES through the Bee Haven functionality and interacting with the blockchain, click on the Mint button to create the Honey Pot NFT.
+4. **铸造 NFT**：
+   - 通过 Bee Haven 功能积累 1000 BEES 并与区块链交互后，点击 Mint 按钮创建蜂蜜罐 NFT。
 
-   <img src="../assets/difficulty3/mint_the_honey_pot_7.png" alt="mint the pot" width="500px">
+    <img src="../assets/difficulty3/mint_the_honey_pot_7.png" alt="mint the pot" width="500px">
    
-   - Verify that the NFT has been successfully minted and added to your blockchain assets.
-
-
-
+   - 确认 NFT 已成功铸造并添加到你的区块链资产中。

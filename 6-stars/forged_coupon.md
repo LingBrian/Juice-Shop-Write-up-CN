@@ -1,24 +1,24 @@
-# Juice-Shop Write-up: Forged Coupon
+# Juice-Shop Write-up: 伪造优惠券
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** Forged Coupon  
-**Category:** Cryptography  
-**Difficulty:** ⭐⭐⭐⭐⭐⭐ (6/6)
+**标题：** Forged Coupon  
+**类别：** 密码学  
+**难度：** ⭐⭐⭐⭐⭐⭐ (6/6)
 
-This challenge tasks us to perform some reverse-engineering to find the algorithm used to create discount coupons and subsequently forge a valid coupon for use within the Juice Shop application.
+本挑战要求通过逆向分析找出优惠券的生成算法，并伪造可在 Juice Shop 应用中使用的有效优惠券。
 
-## Tools Used
+## 使用工具
 
-- **Web Browser:** For interaction with the Juice Shop.
-- **CyberChef:** Used for entropy analysis to evaluate the randomness of the coupons.
-- **Cryptii:** Online encoder/decoder used to confirm the encoding method of the coupons.
+- **Web 浏览器：** 用于与 Juice Shop 交互。
+- **CyberChef：** 用于熵分析，评估优惠券的随机性。
+- **Cryptii：** 用于确认优惠券编码方式的在线编码/解码工具。
 
-## Methodology and Solution
+## 方法与解题过程
 
-### Step 1: Analyzing Existing Coupons
+### 步骤 1：分析现有优惠券
 
-Initially, I started the challenge by examining a list of existing coupons retrieved from a previous challenge, which hinted at the use of cryptographic methods:
+最初，我检查了在先前挑战中获取的一组优惠券，这些优惠券暗示其中可能使用了密码学方法：
 
 ```
 n<MibgC7sn
@@ -34,40 +34,40 @@ pEw8ogC7sn
 pes[BgC7sn
 ```
 
-My idea was to retrieve a pattern to reproduce them, or decode them to understand how they work.
+我打算寻找规律来重现这些优惠券，或对其解码以了解其生成方式。
 
-### Step 2: Identifying the Encoding Library
+### 步骤 2：识别编码库
 
-So, since I hypothesis that there is an algorithm that create theses coupons, I started to use online crypto detector to find which algorithm is used. I didn't find something, which mean that it's maybe a custom algorithm, or a not very common one. 
+由于我推测这些优惠券由某种算法生成，于是使用在线密码算法检测工具查找所用算法，但没有找到结果。这可能意味着使用了自定义算法，或一种不太常见的算法。
 
-Knowing that, I started to review the `package.json` file, previously obtained from the FTP server, for any libraries related to cryptography or encoding. After analyzing one by one every packages, I identified the Z85 encoding library as a potential candidate due to its description on npm :
+随后，我检查了此前从 FTP 服务器获取的 `package.json`，寻找与密码学或编码有关的库。逐一分析软件包后，我认为 Z85 编码库可能是候选项，因为它在 npm 上的说明与此相符：
 
 <img src="../assets/difficulty6/forged_coupon_4.png" alt="npm package z85" width="500px">
 
-### Step 3: Decoding Coupons
+### 步骤 3：解码优惠券
 
-Used the Cryptii online tool to decode the coupons with the Z85 algorithm, which revealed a consistent format `{3 letters of MONTH}{2 digits of YEAR}-{DISCOUNT PERCENTAGE}`.
+使用 Cryptii 在线工具，通过 Z85 算法解码优惠券，发现其格式一致：`{月份的3个字母}{年份的2位数字}-{折扣百分比}`。
 
 <img src="../assets/difficulty6/forged_coupon_5.png" alt="decrypting coupons" width="500px">
 
-### Step 4: Generating Forged Coupon
+### 步骤 4：生成伪造优惠券
 
-Generated a new coupon code for the current date with a desired discount percentage using the same Z85 encoding:
+使用相同的 Z85 编码，为当前日期和指定折扣生成新的优惠券代码：
 
-- **Original Input:** `MAY24-80`
-- **Encoded Output:** `o*I]li4$`
+- **原始输入：** `MAY24-80`
+- **编码结果：** `o*I]li4$`
 
-### Step 5: Testing the Forged Coupon
+### 步骤 5：测试伪造优惠券
 
-Applied the newly forged coupon in a transaction within the Juice Shop. The system validated the coupon successfully, demonstrating that the forged coupon was indistinguishable from legitimate coupons.
+在 Juice Shop 中使用新伪造的优惠券完成交易。系统验证通过，说明伪造优惠券与合法优惠券无法区分。
 
 <img src="../assets/difficulty4/ephemeral_accountant_2.png" alt="decrypting coupons" width="500px">
 
-## Solution Explanation
+## 解题说明
 
-The use of a predictable and reversible encoding method (Z85) without additional checks or obfuscations allowed for the straightforward creation of valid coupons.
+由于使用了可预测且可逆的编码方法（Z85），又缺少额外校验或混淆，因此可以轻易生成有效优惠券。
 
-## Remediation
+## 修复建议
 
-- **Use Secure Randomization:** Ensure that coupon codes are generated using a cryptographically secure method that cannot be easily predicted or reversed.
-- **Limit Coupon Code Visibility:** Restrict the exposure of coupon algorithms or libraries in client-accessible files like `package.json` to avoid giving attackers hints about backend processes.
+- **使用安全随机数：** 使用密码学安全的方法生成优惠券代码，使其难以预测或逆向还原。
+- **限制优惠券算法的可见性：** 避免在 `package.json` 等客户端可访问文件中暴露优惠券算法或相关库，以免攻击者据此推断后端处理方式。

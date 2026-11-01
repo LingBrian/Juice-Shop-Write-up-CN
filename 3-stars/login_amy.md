@@ -1,62 +1,62 @@
-# Juice-Shop Write-up: Login Amy
+# Juice-Shop 攻略：登录 Amy 账户
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** Login Amy\
-**Category:** Brute Force / Cryptographic Issues\
-**Difficulty:** ⭐⭐⭐ (3/6)
+**标题：** 登录 Amy 账户\
+**类别：** 暴力破解 / 密码学问题\
+**难度：** ⭐⭐⭐ (3/6)
 
-The "Login Amy" challenge involves using clues related to a fictional character to determine the password and gain access to the account. 
+“登录 Amy 账户”挑战要求利用与虚构角色相关的线索推断密码并访问账户。
 
-## Tools Used
+## 使用的工具
 
-- **Web Browser**: For accessing the password strength estimation tool and manipulating password guesses.
-- **Password generator** : https://www.grc.com/haystack.htm?1
+- **Web 浏览器**：访问密码强度估算工具并尝试不同密码。
+- **密码生成器**：https://www.grc.com/haystack.htm?1
 
-## Methodology and Solution
+## 方法与解决方案
 
-### Understanding the Cultural Reference
+### 理解文化梗
 
-1. **Futurama Reference**:
-   - Amy Wong, a character from Futurama, dates a character named Kif Kroker. Knowing this relationship provides a clue that "Kif" could be part of her password.
+1. **Futurama 线索**：
+   - Futurama 中的角色 Amy Wong 与名叫 Kif Kroker 的角色交往。了解这段关系后，可以推测“Kif”可能是她密码的一部分。
 
-### Utilizing the Password Strength Estimation Tool
+### 使用密码强度估算工具
 
-2. **Estimating Password Strength**:
-   - Use the URL provided in the hint ([GRC's Haystack](https://www.grc.com/haystack.htm)) to input various iterations of a password based on the name "Kif" to gauge how long it would take to brute force it.
-   - Adjust the password length and characters, using digits and special characters alongside the name to match the hinted duration for brute force resistance.
+2. **估算密码强度**：
+   - 使用提示中提供的 URL（[GRC 的 Haystack](https://www.grc.com/haystack.htm)），输入以“Kif”为基础的不同密码变体，估算暴力破解所需时间。
+   - 调整密码长度和字符，在名字旁加入数字和特殊字符，使估算结果与提示的破解防护时长相符。
 
-### Crafting the Password
+### 构造密码
 
-3. **Formulating the Password**:
+3. **拟定密码**：
 
-   - We know by reading the hint of the challenge that she didn't follow the "one important final note" that states that people must not fill their password using dots : 
+   - 阅读挑战提示后可知，她没有遵循“最后一条重要建议”：人们不应该在密码中填入句点：
 
-   <img src="../assets/difficulty3/login_amy_1.png" alt="one important final note" width="500px">
+    <img src="../assets/difficulty3/login_amy_1.png" alt="one important final note" width="500px">
 
-   - Based on the tool's feedback and the challenge's hint about a significant brute force duration ("93 billion trillion trillion centuries"), incrementally increase the complexity and length of the password until reaching a calculation that closely matches this duration.
+   - 根据工具反馈和挑战中关于超长暴力破解时长的提示（“93 billion trillion trillion centuries”，即“九百三十亿兆兆世纪”），逐步增加密码的复杂度和长度，直到计算结果与该时长接近。
 
-   <img src="../assets/difficulty3/login_amy_3.png" alt="password generator" width="500px">
+    <img src="../assets/difficulty3/login_amy_3.png" alt="password generator" width="500px">
 
-   - Discover that a 24-character password matche this duration.
+   - 发现 24 个字符的密码与该时长相符。
 
-   - Starting by "K1f" (replacing 'i' with '1') and filled with additional dots provides the expected brute force resistance.
+   - 以“K1f”开头（用“1”替换“i”），再添加句点，可得到预期的暴力破解防护强度。
 
-   <img src="../assets/difficulty3/login_amy_2.png" alt="final password" width="500px">
+    <img src="../assets/difficulty3/login_amy_2.png" alt="final password" width="500px">
 
-### Attempting to Login
+### 尝试登录
 
-4. **Testing the Password**:
-   - Input the crafted password on the login page for Amy's account to see if it grants access.
+4. **测试密码**：
+   - 在登录页面为 Amy 的账户输入构造出的密码，检查是否能够成功登录。
 
-### Solution Explanation
+### 解决方案说明
 
-The challenge was solved by combining knowledge of Futurama, hints about password practices, and using a password strength calculator to approximate a highly secure password. The key was in using the name "Kif" appropriately modified and extended to reach the required security threshold, suggesting Amy's password was "K1f......................." (with 21 dots).
+结合 Futurama 相关知识、密码习惯提示和密码强度计算器，估算出高强度密码，从而完成挑战。关键是恰当地改写并扩展名字“Kif”，达到所需强度；由此推断 Amy 的密码是“K1f.......................”（后接 21 个句点）。
 
-## Remediation
+## 修复建议
 
-To secure against such vulnerabilities in real-world scenarios:
+在真实环境中，可采取以下措施防范此类漏洞：
 
-- **Educate Users on Password Security**: Inform users about creating strong, memorable passwords that do not simply rely on predictable patterns or easily guessed cultural references.
-- **Implement Rate Limiting and Account Lockout Mechanisms**: Prevent brute force attacks by limiting the number of failed login attempts.
-- **Use Multi-Factor Authentication (MFA)**: Enhance security by requiring additional verification beyond just a password.
+- **开展密码安全教育**：指导用户创建强度高且易记的密码，避免仅依赖可预测模式或容易猜到的文化梗。
+- **实施速率限制和账户锁定机制**：限制登录失败次数，防止暴力破解。
+- **使用多因素身份验证（MFA）**：要求除密码之外的额外验证，以增强安全性。

@@ -1,58 +1,58 @@
-# Juice-Shop Write-up: Database Schema
+# Juice-Shop 攻略：数据库架构
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** Database Schema\
-**Category:** Information Disclosure\
-**Difficulty:** ⭐⭐⭐ (3/6)
+**标题：** 数据库架构\
+**类别：** 信息泄露\
+**难度：** ⭐⭐⭐ (3/6)
 
-The "Database Schema" challenge tests skills in extracting the database schema through SQL injection, which can reveal sensitive structural details of the backend database.
+“数据库架构”挑战旨在测试通过 SQL 注入提取数据库架构的能力；这些信息可能暴露后端数据库的敏感结构细节。
 
-## Tools Used
+## 使用的工具
 
-- **Web Browser**: For accessing the web application.
-- **HTTP Interception Tool** (e.g., Burp Suite): To intercept and modify HTTP requests for SQL injection.
+- **Web 浏览器**：访问 Web 应用。
+- **HTTP 拦截工具**（例如 Burp Suite）：拦截并修改 HTTP 请求以进行 SQL 注入。
 
-## Methodology and Solution
+## 方法与解决方案
 
-### Identifying Injection Points
+### 找到注入点
 
-1. **Finding Vulnerable Endpoint**:
-   - Identify a parameter within the application that is susceptible to SQL injection. For this challenge, the product search functionality at `127.0.0.1:3000/rest/products/search?q=payload` is used, where the `q` parameter is vulnerable.
+1. **寻找存在漏洞的端点**：
+   - 找出应用中易受 SQL 注入影响的参数。本挑战使用产品搜索功能 `127.0.0.1:3000/rest/products/search?q=payload`，其中 `q` 参数存在漏洞。
 
-### Crafting the Injection Payload
+### 构造注入载荷
 
-2. **SQL Injection for Schema Extraction**:
-   - Utilize the SQL UNION operator to inject a query that will reveal the database schema. Because the product search results are displayed in a structured format, and it is known that product entries typically have multiple attributes (columns), the SQL injection payload must account for the correct number of columns.
-   - Use the payload: `test')) UNION SELECT 1, 2, 3, 4, 5, 6, 7, 8, sql FROM sqlite_schema--` to align with the expected number of columns in the original query and extract schema information from the `sqlite_schema` table.
+2. **通过 SQL 注入提取架构**：
+   - 利用 SQL UNION 运算符注入查询，以显示数据库架构。由于产品搜索结果以结构化形式显示，而且产品条目通常包含多个属性（列），SQL 注入载荷必须匹配正确的列数。
+   - 使用载荷：`test')) UNION SELECT 1, 2, 3, 4, 5, 6, 7, 8, sql FROM sqlite_schema--`，以匹配原查询所需的列数，并从 `sqlite_schema` 表中提取架构信息。
 
-   <img src="../assets/difficulty3/database_schema_1.png" alt="sql injection" width="500px">
+    <img src="../assets/difficulty3/database_schema_1.png" alt="sql injection" width="500px">
 
-### Extracting the Schema
+### 提取架构
 
-3. **Executing the Injection**:
-   - Submit the crafted payload via the vulnerable parameter. If the number of columns and data types expected by the original SQL query are correctly mirrored in the UNION SELECT injection, the application will display the contents of the database schema within the search results.
-   - This result includes critical information about table structures, column details, and sometimes even hints about relationships and constraints.
+3. **执行注入**：
+   - 通过存在漏洞的参数提交构造好的载荷。如果 UNION SELECT 注入中的列数和数据类型与原 SQL 查询的预期相匹配，应用就会在搜索结果中显示数据库架构内容。
+   - 结果包含表结构、列详情，有时还包括关系和约束信息等重要内容。
 
-### Documenting the Results
+### 记录结果
 
-4. **Recording Schema Information**:
-   - Capture and document the output from the SQL injection, which details the database schema. This information is invaluable for understanding the database's layout for further exploitation or analysis.
+4. **记录架构信息**：
+   - 捕获并记录 SQL 注入返回的数据库架构信息。这些信息有助于了解数据库布局，便于进一步利用或分析。
 
-### Solution Explanation
+### 解决方案说明
 
-The challenge was resolved by exploiting a SQL injection vulnerability to extract the schema of the database, a critical step in understanding the underlying structure of the application's data storage mechanism. This not only demonstrates a significant security flaw but also exposes potentially sensitive information that could be used to escalate attacks or breach data.
+通过利用 SQL 注入漏洞提取数据库架构，成功完成挑战。了解应用底层数据存储结构是重要的一步；这不仅揭示了严重的安全缺陷，也暴露了可能被用于升级攻击或窃取数据的敏感信息。
 
-## Remediation
+## 修复建议
 
-To prevent similar vulnerabilities:
+为防止类似漏洞：
 
-- **Use Prepared Statements**: Avoid SQL injection by using parameterized queries or prepared statements.
-- **Validate and Sanitize Inputs**: Ensure that all user inputs are validated and sanitized to prevent malicious data from affecting SQL queries.
+- **使用预处理语句**：使用参数化查询或预处理语句，避免 SQL 注入。
+- **验证并清理输入**：确保验证并清理所有用户输入，防止恶意数据影响 SQL 查询。
 
-## Database Schema
+## 数据库架构
 
-For future use in others challenges, here is the complete schema of the Juice Shop database :
+以下是 Juice Shop 数据库的完整架构，供后续挑战参考：
 
 <img src="../assets/difficulty3/database_schema_2.png" alt="database schema" width="500px">
 
@@ -67,4 +67,3 @@ For future use in others challenges, here is the complete schema of the Juice Sh
    <img src="../assets/difficulty3/database_schema_7.png" alt="database schema" width="500px">
 
    <img src="../assets/difficulty3/database_schema_8.png" alt="database schema" width="500px">
-

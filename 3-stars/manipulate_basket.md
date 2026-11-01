@@ -1,65 +1,65 @@
-# Juice-Shop Write-up: Manipulate Basket
+# Juice-Shop 攻略：操纵购物篮
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** Manipulate Basket\
-**Category:** Broken Access Control\
-**Difficulty:** ⭐⭐⭐ (3/6)
+**标题：** 操纵购物篮\
+**类别：** 访问控制失效\
+**难度：** ⭐⭐⭐ (3/6)
 
-The "Manipulate Basket" challenge involves adding an item to another user's shopping basket by exploiting potential insecure direct object references (IDOR) vulnerabilities in the application.
+“操纵购物篮”挑战要求利用应用中可能存在的不安全直接对象引用（IDOR）漏洞，将商品添加到其他用户的购物篮。
 
-## Tools Used
+## 使用的工具
 
-- **Web Browser**: Used to interact with the web application and inspect network requests.
-- **Burp Suite**: Used to intercept, modify, and resend HTTP requests.
+- **Web 浏览器**：与 Web 应用交互并检查网络请求。
+- **Burp Suite**：拦截、修改并重新发送 HTTP 请求。
 
-## Methodology and Solution
+## 方法与解决方案
 
-### Exploring the Basket Functionality
+### 探索购物篮功能
 
-1. **Initial Testing**:
-   - Add a product to the personal basket to observe the HTTP request structure and parameters involved.
-   - Identify that each basket operation (add, modify) is referenced by a specific basket ID, which is tied to an user.
+1. **初步测试**：
+   - 将商品添加到个人购物篮，观察 HTTP 请求结构及相关参数。
+   - 发现每项购物篮操作（添加、修改）都通过特定购物篮 ID 引用，该 ID 与某个用户关联。
 
-### Identifying the Vulnerability
+### 找出漏洞
 
-2. **Request Manipulation**:
-   - Intercept the request where a product is added to the basket using Burp Suite.
-   - Notice that the basket ID (BasketId) is included in the request body, indicating a potential vector for IDOR.
+2. **操纵请求**：
+   - 使用 Burp Suite 拦截添加商品到购物篮时发出的请求。
+   - 注意到请求正文中包含购物篮 ID（`BasketId`），这可能成为 IDOR 攻击入口。
 
-### Exploiting the IDOR Vulnerability
+### 利用 IDOR 漏洞
 
-3. **Manipulating the Basket ID**:
-   - I initially tried to change the `BasketId` in the intercepted request to another user's basket ID to test for direct object reference issues.
-   - But I encounter access control checks that prevent adding items to a basket not owned by the user.
+3. **操纵购物篮 ID**：
+   - 最初尝试将被拦截请求中的 `BasketId` 改为另一用户的购物篮 ID，以测试是否存在直接对象引用问题。
+   - 但访问控制检查会阻止用户向不属于自己的购物篮添加商品。
 
-   <img src="../assets/difficulty3/manipulate_basket_2.png" alt="error" width="500px">
+    <img src="../assets/difficulty3/manipulate_basket_2.png" alt="error" width="500px">
 
-### Bypassing the Security Check
+### 绕过安全检查
 
-4. **Double Parameter Injection**:
-   - Attempt to bypass the security mechanism by duplicating the `BasketId` parameter in the request body (overload).
-   - First encountered an error, but it means that something is happening :
+4. **注入重复参数**：
+   - 尝试在请求正文中重复 `BasketId` 参数（参数重载），以绕过安全机制。
+   - 起初遇到一个错误，但这说明请求处理流程确实受到影响：
 
-   <img src="../assets/difficulty3/manipulate_basket_4.png" alt="error foreign key" width="500px">
+    <img src="../assets/difficulty3/manipulate_basket_4.png" alt="error foreign key" width="500px">
 
-   - So I keep trying this way and I figured out that the server processes only the first `BasketId` for the security check but uses the second `BasketId` for the operation, successfully adding the item to another user's basket :
+   - 于是继续尝试，最终发现服务器在安全检查时只处理第一个 `BasketId`，却在执行操作时使用第二个 `BasketId`，从而成功将商品加入另一用户的购物篮：
 
-   <img src="../assets/difficulty3/manipulate_basket_3.png" alt="error foreign key" width="500px">
+    <img src="../assets/difficulty3/manipulate_basket_3.png" alt="error foreign key" width="500px">
 
-### Confirming the Exploit
+### 确认漏洞利用成功
 
-5. **Verification**:
-   - Send the manipulated request and receive a successful response.
-   - Verify by checking the targeted user's basket if the item was added successfully.
+5. **验证**：
+   - 发送经过操纵的请求，并收到成功响应。
+   - 检查目标用户的购物篮，确认商品已成功添加。
 
-### Solution Explanation
+### 解决方案说明
 
-The challenge was solved by identifying and exploiting a flaw in the handling of HTTP request parameters, where the application failed to properly secure basket operations against unauthorized modifications. By inserting a duplicated `BasketId` parameter, it was possible to bypass the server's initial security check and manipulate another user's basket contents.
+通过发现并利用 HTTP 请求参数处理缺陷，成功完成挑战。应用未能妥善防止未经授权的购物篮操作；插入重复的 `BasketId` 参数即可绕过服务器最初的安全检查，并操纵其他用户购物篮中的商品。
 
-## Remediation
+## 修复建议
 
-To prevent such vulnerabilities in real-world applications:
+在真实应用中，可采取以下措施防止此类漏洞：
 
-- **Ensure Proper Parameter Handling**: Servers should be designed to handle unexpected, duplicated, or out-of-order parameters securely.
-- **Implement Robust Access Controls**: Ensure that all sensitive operations verify the user's permission to perform the action on the specified resource.
+- **确保妥善处理参数**：服务器应安全处理意外、重复或顺序异常的参数。
+- **实施健全的访问控制**：确保所有敏感操作都验证用户是否有权对指定资源执行操作。

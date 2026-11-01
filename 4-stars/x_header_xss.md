@@ -1,34 +1,32 @@
-# Juice-Shop Write-up: HTTP-Header XSS
+# Juice-Shop 攻略：HTTP 标头 XSS
 
-## Challenge Overview
-**Title:** HTTP-Header XSS  
-**Category:** Cross-Site Scripting (XSS)  
-**Difficulty:** ⭐⭐⭐⭐ (4/6)  
+## 挑战概述
+**标题：** HTTP-Header XSS  
+**类别：** 跨站脚本（XSS）  
+**难度：** ⭐⭐⭐⭐ (4/6)  
 
-The objective of this challenge is to perform a persisted XSS attack using `<iframe src="javascript:alert('xss')">` via an HTTP header.
+本挑战的目标是通过 HTTP 标头使用 `<iframe src="javascript:alert('xss')">` 发起持久型 XSS 攻击。
 
-## Tools Used
-- **Web Browser:** For navigating the Juice Shop application and accessing developer tools.
-- **Burp Suite:** For intercepting and modifying HTTP requests to inject the XSS payload.
+## 使用的工具
+- **Web 浏览器：** 用于浏览 Juice Shop 应用并访问开发者工具。
+- **Burp Suite：** 用于拦截和修改 HTTP 请求，以注入 XSS 载荷。
 
-## Methodology and Solution
+## 方法与解法
 
-### Step 1: Identifying the Target Endpoint
-The challenge involves injecting an XSS payload through an HTTP header. We hypothesized that the IP address logging functionality in the admin panel might be a potential target because it's one of the only information that we can input using an header and that is clearly reflected somewhere. This functionality logs the IP address of users and displays it in the admin interface :
+### 步骤 1：确定目标端点
+本挑战要求通过 HTTP 标头注入 XSS 载荷。我们推测管理面板中的 IP 地址记录功能可能是目标，因为它是少数可通过标头输入、且显然会在某处显示的信息之一。该功能会记录用户的 IP 地址，并在管理界面中显示：
 
 <img src="../assets/difficulty4/x_header_xss_1.png" alt="Page that show IP of client" width="600px">
 
+1. **进入管理面板：** 访问 `http://localhost:3000/#/privacy-security/last-login-ip`。
 
-1. **Navigate to Admin Panel:** Go to `http://localhost:3000/#/privacy-security/last-login-ip`.
-
-### Step 2: Intercepting the Request
-1. **Log Out:** Perform a logout action and intercept the request using Burp Suite to analyze the headers sent to the server.
+### 步骤 2：拦截请求
+1. **退出登录：** 执行退出操作，并使用 Burp Suite 拦截请求，分析发送到服务器的标头。
 
 <img src="../assets/difficulty4/x_header_xss_2.png" alt="Last login IP request" width="600px">
 
-
-### Step 3: Finding the Relevant Header
-By inspecting the intercepted request, we identified that the `True-Client-IP` header could be manipulated to reflect arbitrary values:
+### 步骤 3：找到相关标头
+检查拦截到的请求后，我们发现 `True-Client-IP` 标头可以被篡改，以反映任意值：
 ```http
 POST /rest/user/logout HTTP/1.1
 Host: localhost:3000
@@ -37,35 +35,34 @@ True-Client-IP: 99.99.99.99
 ...
 ```
 
-Here is the state of last IP page after this request, confirming injection possibility: 
+该请求发出后，最后 IP 页面显示如下，证实可以进行注入：
 
 <img src="../assets/difficulty4/x_header_xss_3.png" alt="Last know IP" width="600px">
 
-### Step 4: Testing IP Reflection
-1. **Modify the Header:** Add a standard IP address in the `True-Client-IP` header to see if it is reflected in the admin panel.
-2. **Verify Reflection:** Confirm that the IP address appears in the admin panel as expected.
+### 步骤 4：测试 IP 反映
+1. **修改标头：** 在 `True-Client-IP` 标头中设置一个常规 IP 地址，观察其是否会显示在管理面板中。
+2. **确认反映：** 确认管理面板中出现了该 IP 地址。
 
-### Step 5: Crafting the XSS Payload
-To exploit this vulnerability, we need to craft an XSS payload that will be reflected in the admin panel:
-- **Payload:**
+### 步骤 5：构造 XSS 载荷
+要利用此漏洞，需要构造一个会在管理面板中反映的 XSS 载荷：
+- **载荷：**
   ```http
   True-Client-IP: <iframe src="javascript:alert('xss')">
   ```
 
-### Step 6: Injecting the Payload
-1. **Modify Header in Burp Suite:** Replace the `True-Client-IP` value with the XSS payload  : `<iframe src="javascript:alert('xss')"`>.
-2. **Send Request:** Log out and send the modified request through Burp Suite.
+### 步骤 6：注入载荷
+1. **在 Burp Suite 中修改标头：** 将 `True-Client-IP` 的值替换为 XSS 载荷：`<iframe src="javascript:alert('xss')"`>。
+2. **发送请求：** 通过 Burp Suite 退出登录并发送修改后的请求。
 
-### Step 7: Verifying the XSS Execution
-1. **Log In as Admin:** Log back in to access the IP panel.
-2. **Observe XSS Execution:** Check the interface for the execution of the XSS payload. If successful, an alert box with the message `xss` should appear.
+### 步骤 7：验证 XSS 执行
+1. **以管理员身份登录：** 重新登录以访问 IP 面板。
+2. **观察 XSS 执行：** 检查界面是否执行了 XSS 载荷。若成功，应出现内容为 `xss` 的警告框。
 
 <img src="../assets/difficulty4/x_header_xss_4.png" alt="XSS proof" width="600px">
 
-## Solution Explanation
-The challenge was solved by identifying a reflected XSS vulnerability in the `True-Client-IP` header. By injecting a payload that gets reflected in the admin panel, we successfully executed a persisted XSS attack.
+## 解法说明
+本挑战通过识别 `True-Client-IP` 标头中的反射型 XSS 漏洞完成。注入会在管理面板中反映的载荷后，我们成功执行了持久型 XSS 攻击。
 
-## Remediation
-- **Input Validation and Sanitization:** Ensure all user inputs, including HTTP headers, are properly validated and sanitized to prevent injection attacks.
-- **Escape Output:** Always escape user inputs when displaying them in the user interface to prevent XSS.
-
+## 修复建议
+- **输入验证和清理：** 正确验证并清理所有用户输入，包括 HTTP 标头，防止注入攻击。
+- **转义输出：** 在用户界面显示用户输入时始终进行转义，防止 XSS。

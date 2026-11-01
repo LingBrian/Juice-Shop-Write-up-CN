@@ -1,54 +1,54 @@
-# Juice-Shop Write-up: Access Log
+# Juice-Shop 攻略：访问日志
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** Access Log\
-**Category:** Sensitive Data Exposure\
-**Difficulty:** ⭐⭐⭐⭐ (4/6)
+**标题：** Access Log\
+**类别：** 敏感数据泄露\
+**难度：** ⭐⭐⭐⭐ (4/6)
 
-This challenge tasked us with gaining access to any of the server's access log files.
+本挑战要求我们获取服务器上的任意访问日志文件。
 
-## Tools Used
+## 使用的工具
 
-- **Browser**: Used to navigate the Juice-Shop application and attempt various URLs to find the logs.
-- **Text Editor**: For analyzing URLs and formulating strategies to access hidden files.
+- **浏览器**：用于浏览 Juice-Shop 应用并尝试各种 URL，以查找日志。
+- **文本编辑器**：用于分析 URL，并制定访问隐藏文件的策略。
 
-## Methodology and Solution
+## 方法与解法
 
-### Step 1: Initial Exploration
+### 步骤 1：初步探索
 
-1. **Initial Attempts**:
-   - Began by trying to locate the log files through commonly known SIEM endpoints and directory traversal methods. Initial efforts included trying to access well-known SIEM tool endpoints (such as Splunk's standard paths) directly through the browser but were met with HTTP errors or blank pages.
+1. **初次尝试**：
+   - 首先尝试通过常见 SIEM 端点和目录遍历方式定位日志文件。我们直接在浏览器中访问知名 SIEM 工具的常见路径（如 Splunk 的标准路径），但只得到 HTTP 错误或空白页面。
 
    <img src="../assets/difficulty4/access_log_1.png" alt="error in path" width="500px">
 
-### Step 2: Understanding Application Structure
+### 步骤 2：了解应用结构
 
-2. **Exploration Through Application**:
-   - Investigated various parts of the application to understand its structure better and hypothesized that sensitive data like access logs might be exposed through less secure or overlooked parts of the application.
+2. **通过应用进行探索**：
+   - 调查应用的各个部分，以进一步了解其结构，并推测访问日志等敏感数据可能通过应用中安全性较弱或容易被忽略的部分暴露。
 
-### Step 3: Gaining Elevated Access
+### 步骤 3：获取更高权限
 
-3. **Utilizing Elevated Access**:
-   - After gaining access to a support user account through a previous 6-stars level challenge (Login Support), re-evaluated available options for access paths that might be relevant to a support user.
+3. **利用更高权限**：
+   - 通过之前的 6 星级挑战（Login Support）获取支持用户账户后，重新评估该用户可能使用的访问途径。
 
-### Step 4: Finding the Log Access Path
+### 步骤 4：找到日志访问路径
 
-4. **Discovery of Log Access**:
-   - Accessed the URL `127.0.0.1:3000/support/logs` directly from the browser, which was a new path deduced based on the role and possible needs of a support user within the application. This method of guessing the url was highly encourage by hints of the challenge.
+4. **发现日志访问方式**：
+   - 在浏览器中直接访问 URL `127.0.0.1:3000/support/logs`。根据用户角色及其在应用中的潜在需求推断出了这一新路径。挑战提示强烈鼓励尝试猜测 URL。
 
-### Step 5: Accessing and Downloading Logs
+### 步骤 5：访问并下载日志
 
-5. **Downloading Logs**:
-   - Found and downloaded the logs listed on the `/support/logs` page. This confirmed that the correct log files were exposed and accessible, validating the challenge.
+5. **下载日志**：
+   - 在 `/support/logs` 页面找到并下载列出的日志。这证实了我们找到了正确且可访问的日志文件。
 
    <img src="../assets/difficulty4/access_log_2.png" alt="log page" width="500px">
 
-## Solution Explanation
+## 解法说明
 
-The specific URL to the logs was not directly linked or indicated from the main user interface and required speculative access based on our new role capabilities.
+日志的具体 URL 并未在主用户界面中直接链接或提示，需要根据新获得的角色能力进行推测访问。
 
-### Security Recommendations
+### 安全建议
 
-- **Restrict Sensitive Directory Access**: Ensure that directories containing sensitive information like logs are not accessible via simple URL changes or without appropriate authentication and authorization checks.
-- **Role-Based Access Controls**: Implement robust access control mechanisms that restrict access to sensitive functionalities based on user roles.
+- **限制敏感目录访问**：确保包含日志等敏感信息的目录无法通过简单修改 URL 或缺少适当身份验证与授权检查来访问。
+- **基于角色的访问控制**：实施健全的访问控制机制，根据用户角色限制对敏感功能的访问。

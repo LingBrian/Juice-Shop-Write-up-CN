@@ -1,28 +1,28 @@
-# Juice-Shop Write-up: NoSQL DoS
+# Juice-Shop 攻略：NoSQL 拒绝服务攻击
 
-## Challenge Overview
-**Title:** NoSQL DoS  
-**Category:** Denial of Service (DoS)  
-**Difficulty:** ⭐⭐⭐⭐ (4/6)  
+## 挑战概述
+**标题：** NoSQL DoS  
+**类别：** 拒绝服务（DoS）  
+**难度：** ⭐⭐⭐⭐ (4/6)  
 
-The objective of this challenge is to exploit a NoSQL injection vulnerability in the Juice Shop application to perform a Denial of Service (DoS) attack by making the server sleep.
+本挑战的目标是利用 Juice Shop 应用中的 NoSQL 注入漏洞，让服务器休眠，从而发动拒绝服务（DoS）攻击。
 
-## Tools Used
-- **Web Browser:** For navigating the Juice Shop application and accessing developer tools.
-- **Burp Suite:** For intercepting and modifying HTTP requests to test for injection points.
+## 使用的工具
+- **Web 浏览器：** 用于浏览 Juice Shop 应用并访问开发者工具。
+- **Burp Suite：** 用于拦截和修改 HTTP 请求，以测试注入点。
 
-## Methodology and Solution
+## 方法与解法
 
-### Step 1: Identifying the Vulnerable Endpoint
-In a previous challenge, we identified an endpoint that allows modifying comments, which is potentially vulnerable to NoSQL injection:
-- **Endpoint:** `/rest/products/[productId]/reviews`
+### 步骤 1：确定存在漏洞的端点
+之前的一个挑战中，我们发现了一个可修改评论的端点，该端点可能存在 NoSQL 注入漏洞：
+- **端点：** `/rest/products/[productId]/reviews`
 
-### Step 2: Intercepting the Request
-1. **Navigate to the Review Section:** Go to a product page on Juice Shop and submit a review.
-2. **Intercept the Request:** Use Burp Suite to intercept the request when submitting or modifying a review.
+### 步骤 2：拦截请求
+1. **进入评论区域：** 在 Juice Shop 中打开商品页面并提交评论。
+2. **拦截请求：** 使用 Burp Suite 拦截提交或修改评论时发出的请求。
 
-### Step 3: Analyzing the Request
-The intercepted request for modifying a comment looks like this:
+### 步骤 3：分析请求
+拦截到的评论修改请求如下：
 ```http
 PUT /rest/products/1/reviews HTTP/1.1
 Host: localhost:3000
@@ -36,34 +36,34 @@ Content-Type: application/json
 }
 ```
 
-### Step 4: Crafting the DoS Payload
-To exploit the NoSQL injection vulnerability, we need to craft a payload that will make the server sleep for a specified duration:
-- **Payload Attempt 1:** Injecting `sleep` function in the ID parameter:
+### 步骤 4：构造 DoS 载荷
+要利用 NoSQL 注入漏洞，需要构造能让服务器休眠指定时长的载荷：
+- **载荷尝试 1：** 在 ID 参数中注入 `sleep` 函数：
   ```json
   {"id":"sleep(10000)", "message": "test modify"}
   ```
-  - **Result:** This payload did not work as expected.
+  - **结果：** 此载荷未按预期生效。
 
-- **Payload Attempt 2:** Injecting the payload directly into the URL:
+- **载荷尝试 2：** 直接将载荷放入 URL：
   ```http
   PUT /rest/products/sleep(20000)/reviews HTTP/1.1
   Host: localhost:3000
   ```
 
-### Step 5: Executing the Payload
-1. **Access URL Directly:** The direct injection via Burp Suite did not yield results, so we accessed the URL directly:
+### 步骤 5：执行载荷
+1. **直接访问 URL：** 通过 Burp Suite 直接注入没有效果，因此我们直接访问该 URL：
    ```http
    http://localhost:3000/rest/products/sleep(20000)/reviews
    ```
-2. **Verify DoS:** The server should become unresponsive for the specified duration, indicating a successful DoS attack.
+2. **验证 DoS：** 服务器应在指定时长内无响应，表明 DoS 攻击成功。
 
-### Step 6: Observing the Results
-After injecting the payload, the server becomes unresponsive for the duration specified in the sleep function, confirming the successful DoS attack.
+### 步骤 6：观察结果
+注入载荷后，服务器在 `sleep` 函数指定的时长内无响应，确认攻击成功。
 
-## Solution Explanation
-The challenge was solved by identifying a NoSQL injection vulnerability in the `/rest/products/[productId]/reviews` endpoint. By crafting a payload that exploits the NoSQL injection, we made the server sleep for a specified duration, resulting in a Denial of Service (DoS) condition.
+## 解法说明
+通过识别 `/rest/products/[productId]/reviews` 端点中的 NoSQL 注入漏洞，并构造利用该漏洞的载荷，我们让服务器休眠指定时长，造成拒绝服务（DoS）状态。
 
-## Remediation
-- **Input Validation and Sanitization:** Ensure all user inputs are properly validated and sanitized to prevent injection attacks.
-- **Use Parameterized Queries:** Implement parameterized queries to prevent NoSQL injection by separating code and data.
-- **Rate Limiting and Timeouts:** Implement rate limiting and request timeouts to mitigate the impact of potential DoS attacks.
+## 修复建议
+- **输入验证和清理：** 确保对所有用户输入进行适当验证和清理，防止注入攻击。
+- **使用参数化查询：** 通过分离代码与数据，使用参数化查询防止 NoSQL 注入。
+- **速率限制和超时：** 实施速率限制和请求超时，以降低潜在 DoS 攻击的影响。

@@ -1,10 +1,10 @@
-# Planned Acquisitions
+# 计划中的收购
 
-> This document is confidential! Do not distribute!
+> 本文件为机密文件！请勿传播！
 
-Our company plans to acquire several competitors within the next year.
-This will have a significant stock market impact as we will elaborate in
-detail in the following paragraph:
+我公司计划在未来一年内收购数家竞争对手。
+这将对股票市场产生重大影响，具体情况将在下文中
+详细阐述：
 
 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy
 eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam
@@ -16,4 +16,4 @@ sed diam voluptua. At vero eos et accusam et justo duo dolores et ea
 rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem
 ipsum dolor sit amet.
 
-Our shareholders will be excited. It's true. No fake news.
+我们的股东一定会很高兴。确实如此。绝非假新闻。

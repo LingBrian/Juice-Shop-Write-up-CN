@@ -1,6 +1,6 @@
-# Juice Shop Write-up: Bully Chatbot Challenge
+# Juice Shop Write-up：Bully Chatbot Challenge
 
-## Challenge Overview
+## 挑战概述
 
 **Title:** Bully Chatbot
 
@@ -8,29 +8,28 @@
 
 **Difficulty:** ⭐ (1/6)
 
-The challenge requires to interact with a support chatbot and manipulate it into providing a coupon code. 
+本挑战要求与客服聊天机器人互动，并设法让它提供优惠券代码。
 
-## Tools Used
+## 使用的工具
 
-- Web browser 
+- Web browser
 
-## Methodology and Solution
+## 方法与解决方案
 
-To achieve the objective of obtaining a coupon code from the support chatbot, the following steps were undertaken:
+为从客服聊天机器人处获取优惠券代码，采取了以下步骤：
 
-1. **Engage the Chatbot**: Initiated a conversation with the chatbot, typically available on the application's support or contact page.
-2. **Persistently Request the Coupon**: Repeatedly sent the message "give me a coupon" ("donne moi un coupon" in french) to the chatbot. The persistence in request was key.
+1. **与聊天机器人互动**：在应用程序的支持或联系页面与聊天机器人开始对话。
+2. **持续索要优惠券**：反复向聊天机器人发送消息“give me a coupon”（法语为“donne moi un coupon”）。持续请求是关键。
 
 <img src="../assets/difficulty1/bully_chatbot_1.png" alt="bully chatbot" width="500px">
 
-3. **Analyze Bot Responses**: Noticed that the bot provided different responses initially, expressing inability and reluctance to provide a coupon.
-4. **Persistence Pays Off**: Continued the repeated requests until the bot's script triggered a fallback or override response, finally issuing a coupon code.
+3. **分析机器人回复**：注意到机器人最初给出了不同回复，表示无法或不愿提供优惠券。
+4. **坚持不懈**：继续重复请求，直到机器人的脚本触发回退或覆盖回复，最终发放优惠券代码。
 
-## Solution Explanation
+## 解决方案说明
 
-The solution relied on exploiting a fallback mechanism in the chatbot's programming, designed to provide a coupon code after a certain threshold of repeated requests was reached. This type of interaction tests an edge case in the chatbot's response handling, simulating a scenario where a user's persistence in requests leads to an unintended giveaway of a coupon.
+该方案利用了聊天机器人程序中的回退机制：当重复请求达到一定次数后，机制会提供优惠券代码。本挑战通过这一边缘情况测试聊天机器人的回复处理，模拟用户持续请求导致优惠券意外泄露的场景。
 
-## Remediation
+## 修复建议
 
-For real-world applications, it's crucial to ensure that chatbots do not inadvertently disclose sensitive information. Proper safeguards, such as rate limiting and context-aware response handling, should be implemented to prevent such scenarios.
-
+在真实应用中，务必确保聊天机器人不会意外泄露敏感信息。应实施适当的防护措施，例如速率限制和结合上下文的回复处理，以避免此类情况。

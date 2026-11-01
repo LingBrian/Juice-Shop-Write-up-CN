@@ -1,50 +1,50 @@
-# Juice-Shop Write-up: Nested Easter Egg
+# Juice-Shop 攻略：嵌套复活节彩蛋
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** Nested Easter Egg  
-**Category:** Cryptographic Issues  
-**Difficulty:** ⭐⭐⭐⭐ (4/6)
+**标题：** Nested Easter Egg  
+**类别：** 密码学问题  
+**难度：** ⭐⭐⭐⭐ (4/6)
 
-This challenge ask us to decrypt a hidden message located within another Easter egg, emphasizing advanced cryptographic analysis to uncover the real Easter egg within the application.
+本挑战要求解密另一个复活节彩蛋中隐藏的信息，通过高级密码分析发现应用中真正的复活节彩蛋。
 
-## Tools Used
+## 使用的工具
 
-- **Base64 Decoder**: Used to decode encoded strings.
-- **ROT13 Cipher Tool**: Employed to decrypt messages encoded with the ROT13 substitution cipher.
+- **Base64 解码器**：用于解码编码字符串。
+- **ROT13 密码工具**：用于解密采用 ROT13 替换密码编码的消息。
 
-## Methodology and Solution
+## 方法与解法
 
-### Step 1: Decoding Base64
+### 步骤 1：解码 Base64
 
-1. **Initial Decoding**:
-   - The Easter Egg challenge provided a Base64 encoded string `L2d1ci9xcmlmL25lci9mYi9zaGFhbC9ndXJsL3V2cS9uYS9ybmZncmUvcnR0L2p2Z3V2YS9ndXIvcm5mZ3JlL3J0dA==`.
-   - Decode this string using a Base64 decoder to reveal another obscured message: `/gur/qrif/ner/fb/shaal/gurl/uvq/na/rnfgre/rtt/jvguva/gur/rnfgre/rtt`.
+1. **初步解码**：
+   - Easter Egg 挑战提供了 Base64 编码字符串 `L2d1ci9xcmlmL25lci9mYi9zaGFhbC9ndXJsL3V2cS9uYS9ybmZncmUvcnR0L2p2Z3V2YS9ndXIvcm5mZ3JlL3J0dA==`。
+   - 使用 Base64 解码器解码后，得到另一段被隐藏的信息：`/gur/qrif/ner/fb/shaal/gurl/uvq/na/rnfgre/rtt/jvguva/gur/rnfgre/rtt`。
 
-### Step 2: Applying ROT13 Cipher
+### 步骤 2：应用 ROT13 密码
 
-2. **ROT13 Decryption**:
-   - Recognize that the decoded message appears to be gibberish, suggesting the use of a simple cipher.
-   - Apply the most common cipher, ROT13 cipher, which shifts letters by 13 positions in the alphabet, to the decoded message.
-   - The resulting plaintext reads: `/the/devs/are/so/funny/they/hid/an/easter/egg/within/the/easter/egg`.
+2. **ROT13 解密**：
+   - 解码后的信息看起来像乱码，说明可能使用了简单密码。
+   - 尝试最常见的 ROT13 密码，将字母在字母表中移动 13 位。
+   - 最终明文为：`/the/devs/are/so/funny/they/hid/an/easter/egg/within/the/easter/egg`。
 
-### Step 3: Accessing the Nested Easter Egg
+### 步骤 3：访问嵌套复活节彩蛋
 
-3. **Finding the Nested Easter Egg**:
-   - Use the decrypted path to navigate to `127.0.0.1:3000/the/devs/are/so/funny/they/hid/an/easter/egg/within/the/easter/egg` in a web browser.
+3. **找到嵌套彩蛋**：
+   - 在浏览器中使用解密得到的路径访问 `127.0.0.1:3000/the/devs/are/so/funny/they/hid/an/easter/egg/within/the/easter/egg`。
 
    <img src="../assets/difficulty4/nested_easter_egg_1.png" alt="nested easter egg" width="500px">
 
-   - Successfully access the true nested Easter egg, fulfilling the challenge’s objective.
+   - 成功访问真正的嵌套复活节彩蛋，完成挑战目标。
 
-## Solution Explanation
+## 解法说明
 
-The Nested Easter Egg challenge was an exercise in decryption that required both technical and creative thinking. Starting with a Base64 encoded string, we first had to decode it to a seemingly nonsensical message, which then needed further decryption using the ROT13 cipher, a simple but common text transformation.
+Nested Easter Egg 挑战要求结合技术与创造性进行解密。首先解码 Base64 字符串，得到看似无意义的文本；然后使用 ROT13 密码进一步解密这一简单但常见的文本转换。
 
-This challenge exemplifies the use of multi-layered security measures where information is obscured through more than one method, increasing the difficulty of unauthorized access. 
+本挑战展示了多层信息隐藏的方式：使用不止一种方法遮蔽信息，从而增加未经授权访问的难度。
 
-## Remediation
+## 修复建议
 
-To protect against unauthorized data decryption:
-- **Multi-factor Encryption**: Use multiple encryption layers with different keys or methods to enhance security.
-- **Encryption Best Practices**: Regularly update encryption methods and use strong, non-standard algorithms where possible.
+为防止数据被未经授权地解密：
+- **多因子加密**：使用不同密钥或方法进行多层加密，以增强安全性。
+- **加密最佳实践**：定期更新加密方法，并尽可能使用强度高且非标准的算法。

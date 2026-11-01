@@ -1,49 +1,48 @@
-# Juice-Shop Write-up: Login Admin
+# Juice-Shop Write-up：Login Admin
 
-## Challenge Overview
+## 挑战概述
 
 **Title:** Login Admin\
 **Category:** SQL Injection\
 **Difficulty:** ⭐⭐ (2/6)
 
-This challenge, titled "Login Admin," requires exploiting an SQL Injection vulnerability within the authentication process of a web application to gain unauthorized access to the administrator's account.
+“Login Admin”挑战要求利用 Web 应用身份验证流程中的 SQL Injection 漏洞，未授权访问管理员账户。
 
-## Tools Used
+## 使用的工具
 
-- **Web Browser**: For interacting with the login interface of the application.
-- **Burp Suite**: Utilized for intercepting and modifying the HTTP requests to inject SQL code.
+- **Web Browser**：用于与应用登录界面交互。
+- **Burp Suite**：用于拦截和修改 HTTP 请求，以注入 SQL 代码。
 
-## Methodology and Solution
+## 方法与解决方案
 
-### Identifying the Vulnerability
+### 识别漏洞
 
-Upon analyzing the login mechanism, it was noted that inserting special characters such as quotes (`'`) into the input fields caused SQL errors to be displayed, indicating the potential for an SQL Injection attack.
+分析登录机制时发现，在输入字段中插入引号（`'`）等特殊字符会显示 SQL 错误，这表明可能存在 SQL Injection 漏洞。
 
-### Steps Taken to Solve the Challenge
+### 挑战解决步骤
 
-1. **Intercept Login Request**:
-   - Using Burp Suite, the HTTP POST request sent during a normal login attempt was intercepted. This request included user credentials in the form of JSON data.
+1. **拦截登录请求**：
+   - 使用 Burp Suite 拦截正常登录时发送的 HTTP POST 请求。该请求以 JSON 数据形式包含用户凭据。
 
    <img src="../assets/difficulty2/login_admin_1.png" alt="normal login" width="500px">
 
-2. **Modify the SQL Query**:
-   - Modified the email field in the JSON payload to `admin@juice-sh.op' OR '1'='1' --`, effectively turning the SQL command into a statement that always returns true, bypassing the need for a password.
+2. **修改 SQL 查询**：
+   - 将 JSON 负载中的 email 字段改为 `admin@juice-sh.op' OR '1'='1' --`，从而将 SQL 命令变为始终返回 true 的语句，绕过密码验证。
 
    <img src="../assets/difficulty2/login_admin_2.png" alt="modified request" width="500px">
-    
-3. **Execute the Injected Request**:
-   - The modified request was sent to the server. Due to the injected SQL code, the condition `OR '1'='1'` always evaluates as true, allowing unauthorized access to the administrator's account.
 
-### Solution Explanation
+3. **执行注入请求**：
+   - 将修改后的请求发送到服务器。由于注入的 SQL 代码，条件 `OR '1'='1'` 始终成立，因此可以未授权访问管理员账户。
 
-The SQL Injection was successful due to improper input sanitization and lack of prepared statements in handling SQL queries. The injected code altered the logical structure of the SQL command, thereby bypassing authentication and logging in as the administrator without needing the actual password.
+### 解决方案说明
 
-## Remediation
+SQL Injection 得以成功，是因为输入净化不当，且处理 SQL 查询时未使用预处理语句。注入代码改变了 SQL 命令的逻辑结构，从而绕过身份验证，无需真实密码即可作为管理员登录。
 
-To prevent such vulnerabilities in real applications, it is crucial to implement the following security measures:
+## 修复建议
 
-- **Use of Prepared Statements**: Utilize prepared statements with parameterized queries to prevent SQL injection. This technique ensures that the SQL interpreter recognizes the code and data separately.
-- **Input Validation**: Implement strict validation for all user inputs to ensure only expected data types and formats are processed.
-- **Error Handling**: Configure error messages to avoid revealing details about the database structure or any SQL syntax errors.
-- **Security Testing**: Regularly conduct security assessments and penetration testing to identify and mitigate vulnerabilities like SQL injection.
+为防止真实应用中出现此类漏洞，必须实施以下安全措施：
 
+- **使用预处理语句**：使用带参数的预处理语句，防止 SQL Injection。该技术确保 SQL 解释器能够区分代码和数据。
+- **输入验证**：对所有用户输入进行严格验证，确保只处理预期的数据类型和格式。
+- **错误处理**：配置错误消息，避免泄露数据库结构或 SQL 语法错误的详细信息。
+- **安全测试**：定期开展安全评估和渗透测试，以发现并缓解 SQL Injection 等漏洞。

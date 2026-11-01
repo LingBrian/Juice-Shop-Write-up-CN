@@ -1,59 +1,59 @@
-# Juice-Shop Write-up: Expired Coupon
+# Juice-Shop 攻略：过期优惠券
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** Expired Coupon  
-**Category:** Improper Input Validation  
-**Difficulty:** ⭐⭐⭐⭐ (4/6)
+**标题：** Expired Coupon  
+**类别：** 输入验证不当  
+**难度：** ⭐⭐⭐⭐ (4/6)
 
-This challenge required successfully applying an expired coupon code by manipulating client-side parameters to bypass time validation.
+本挑战要求通过篡改客户端参数绕过时间验证，成功使用已过期的优惠券代码。
 
-## Tools Used
+## 使用的工具
 
-- **Browser Developer Tools**: For inspecting network requests and JavaScript code.
-- **Text Editor**: For writing and analyzing JavaScript code.
+- **浏览器开发者工具**：用于检查网络请求和 JavaScript 代码。
+- **文本编辑器**：用于编写和分析 JavaScript 代码。
 
-## Methodology and Solution
+## 方法与解法
 
-### Step 1: Identifying the Mechanism for Coupon Application
+### 步骤 1：确定优惠券使用机制
 
-1. **Code Inspection**:
-   - Initially, searching "coupon" into the JavaScript code of main.js revealed the function responsible for applying coupons. This function checks the coupon's validity against a client-side timestamp and a hardcoded list of valid campaigns.
+1. **检查代码**：
+   - 最初在 `main.js` 的 JavaScript 代码中搜索“coupon”，找到了负责应用优惠券的函数。该函数通过客户端时间戳和硬编码的有效活动列表检查优惠券有效性。
 
    <img src="../assets/difficulty4/expired_coupon_1.png" alt="coupon code" width="500px">
 
-### Step 2: Understanding Coupon Validity
+### 步骤 2：了解优惠券有效性
 
-2. **Coupon Details Analysis**:
-   - The function fetched the coupon code from the user input and verified it against a list of campaign codes stored within the application. Each campaign had an associated timestamp (`validOn`) and discount percentage.
+2. **分析优惠券详情**：
+   - 函数从用户输入中获取优惠券代码，并与应用内保存的活动代码列表进行比对。每项活动都包含对应的时间戳（`validOn`）和折扣比例。
 
-### Step 3: Extracting Campaign Data
+### 步骤 3：提取活动数据
 
-3. **Extracting Campaign Information**:
-   - Found the list of campaigns by using CTRL+F in the JavaScript code, with their respective expiration timestamps and discounts.
+3. **提取活动信息**：
+   - 在 JavaScript 代码中使用 CTRL+F，找到包含各活动及其过期时间戳和折扣的信息列表。
 
    <img src="../assets/difficulty4/expired_coupon_2.png" alt="campaigns" width="500px">
 
-### Step 4: Bypassing Time Validation
+### 步骤 4：绕过时间验证
 
-4. **Manipulating System Time**:
-   - We can select a valid coupon randomly from the list that we get, and then, we use an online converter to convert the value of the timestamp, which is in miliseconds, in a valid date :
+4. **篡改系统时间**：
+   - 从列表中随机选择一个有效优惠券，然后使用在线转换工具将以毫秒为单位的时间戳换算成日期：
 
    <img src="../assets/difficulty4/expired_coupon_4.png" alt="conversion" width="500px">
 
-   - Adjusted the computer's system time to match the timestamp of a chosen expired coupon (for instance, `WMNSDY2019`) that originally expired on a specific date converted from its `validOn` timestamp.
+   - 将计算机系统时间调整为所选过期优惠券（例如 `WMNSDY2019`）原本有效的时间。
 
-### Step 5: Applying the Coupon
+### 步骤 5：使用优惠券
 
-5. **Coupon Application**:
-   - The system accepted the coupon as valid because the client-side JavaScript used the manipulated system time to validate the coupon's expiration.
+5. **应用优惠券**：
+   - 系统接受了该优惠券，因为客户端 JavaScript 使用篡改后的系统时间进行了验证。
 
-## Solution Explanation
+## 解法说明
 
-The key to solving this challenge was understanding that the coupon application mechanism was vulnerable to client-side time manipulation. By adjusting the system's clock to a date valid for the coupon, it bypassed the expiry check implemented in JavaScript, which only validated the coupon against the client's current date and time.
+解题关键是发现优惠券使用机制易受客户端时间篡改影响。将系统时钟调到优惠券有效期内，即可绕过 JavaScript 中的过期检查；该检查只使用客户端当前日期和时间进行校验。
 
-### Security Recommendations
+### 安全建议
 
-- **Server-side Validation**: Always validate coupon codes server-side against the expiration date to prevent client-side tampering.
-- **Secure Campaign Storage**: Do not store sensitive campaign details, such as expiration times and discount rates, directly within client-accessible scripts.
-- **Robust Time Synchronization**: Ensure that critical time-dependent operations are validated against a reliable server-side timestamp.
+- **服务器端验证**：始终在服务器端根据过期时间验证优惠券代码，避免客户端篡改。
+- **安全存储活动信息**：不要将过期时间、折扣率等敏感活动详情直接保存在客户端可访问的脚本中。
+- **可靠的时间同步**：确保关键的时间相关操作使用可靠的服务器端时间戳进行验证。

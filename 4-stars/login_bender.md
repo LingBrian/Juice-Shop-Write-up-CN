@@ -1,42 +1,42 @@
-# Juice-Shop Write-up: Reset Bender's Password
+# Juice-Shop 攻略：重置 Bender 的密码
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** Reset Bender's Password  
-**Category:** Broken Authentication  
-**Difficulty:** ⭐⭐⭐⭐ (4/6)
+**标题：** Reset Bender's Password  
+**类别：** 身份验证失效  
+**难度：** ⭐⭐⭐⭐ (4/6)
 
-This challenge ask us to reset the password for the user "Bender" using the "Forgot Password" mechanism by answering his security question correctly.
+本挑战要求通过“忘记密码”机制正确回答安全问题，重置用户“Bender”的密码。
 
-## Tools Used
+## 使用的工具
 
-- **Web Browser**: For accessing the Juice Shop web application and its password reset functionality.
+- **Web 浏览器**：用于访问 Juice Shop Web 应用及其密码重置功能。
 
-## Methodology and Solution
+## 方法与解法
 
-### Step 1: Gathering Initial Information
+### 步骤 1：收集初始信息
 
-1. **Identifying User Details**:
-   - The email for Bender is identified as `bender@juice-sh.op`.
-   - Security question revealed: “Company you first work as adult”.
+1. **确定用户信息**：
+   - Bender 的邮箱为 `bender@juice-sh.op`。
+   - 安全问题是：“你成年后的第一份工作所在公司是什么？”
 
-### Step 2: Answering the Security Question
+### 步骤 2：回答安全问题
 
-2. **Initial Attempts**:
-   - Based on OSINT and known details from the "Futurama" series, Bender's original employment at "Suicide Booth Incorporation" was tried first, which did not succeed.
+2. **初步尝试**：
+   - 根据 OSINT 和《Futurama》中的已知信息，我首先尝试了 Bender 最初工作的公司“Suicide Booth Incorporation”，但未成功。
 
-### Step 3: OSINT and Cross-referencing Show Details
+### 步骤 3：通过 OSINT 交叉核对剧集信息
 
-3. **Finding the Correct Answer**:
-   - After re-evaluating the series details and additional OSINT, it was found that the nickname used for Bender's company in the series was “Stop’n’Drop”.
-   - Upon entering "Stop'n'Drop" as the answer to the security question, the password reset was successfully triggered.
+3. **找到正确答案**：
+   - 重新核对剧集内容并进行更多 OSINT 调查后，发现剧中该公司的昵称是“Stop’n’Drop”。
+   - 将 "Stop'n'Drop" 作为安全问题答案后，成功触发密码重置。
 
-## Solution Explanation
+## 解法说明
 
-The successful reset was achieved by using the known nickname of Bender's first employer from the "Futurama" series, demonstrating the potential security flaw in using easily guessable or widely known facts as security question answers.
+通过使用《Futurama》中 Bender 第一家雇主的昵称成功重置密码。这说明使用容易猜测或广为人知的事实作为安全问题答案存在潜在风险。
 
-### Security Recommendations
+### 安全建议
 
-- **Use Strong Security Questions**: Avoid questions that can be answered through public or easily accessible information. Instead, use questions that have subjective or less predictable answers.
-- **Don't use Security Questions**: Best security practice is to not use security questions for ressettings password, but rather send an email to user to confirm that he want to change his password.
-- **Multi-Factor Authentication**: Implement multi-factor authentication (MFA) to strengthen the account recovery process, reducing reliance on security questions alone.
+- **使用更可靠的安全问题**：避免使用可通过公开或容易获取的信息回答的问题；应选择主观或不易预测的答案。
+- **不要使用安全问题**：最佳安全实践是不使用安全问题重置密码，而是向用户发送电子邮件，确认其确实希望更改密码。
+- **多因素身份验证**：实施多因素身份验证（MFA），加强账户恢复流程，减少对安全问题的依赖。

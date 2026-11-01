@@ -1,53 +1,52 @@
-# Juice-Shop Write-up: Steganography Challenge
+# Juice-Shop 攻略：隐写术挑战
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** Steganography\
-**Category:** Security through Obscurity\
-**Difficulty:** ⭐⭐⭐⭐ (4/6)
+**标题：** Steganography\
+**类别：** 通过隐匿实现安全\
+**难度：** ⭐⭐⭐⭐ (4/6)
 
-This challenge tests ability to uncover hidden data within files, specifically images. The task was to discover a notable character hidden within an image on the website, utilizing various steganography detection tools.
+本挑战考查从文件（尤其是图像）中发现隐藏数据的能力。任务是利用各种隐写检测工具，找出网站某张图片中隐藏的知名角色。
 
-## Tools Used
+## 使用的工具
 
-- Web browser
+- Web 浏览器
 - OpenStego
 - Aperisolve
-- Google Lens (or any other image recognition tool)
+- Google Lens（或其他图像识别工具）
 
-## Methodology and Solution
+## 方法与解法
 
-The process to solve the Steganography challenge involved multiple steps focusing on analysis and extraction:
+解决隐写术挑战需要进行多个步骤的分析和提取：
 
-1. **Identify Potential Sources**: Based on the hint provided in the challenge description, focused on the images from the 'About' page (`http://127.0.0.1:3000/#/about`) where a gallery of images was located.
+1. **确定潜在来源**：根据挑战描述中的提示，重点检查“关于”页面（`http://127.0.0.1:3000/#/about`）中的图片，其中包含一个图片库。
 
-2. **Download Images**:
-   - Accessed the photo wall and downloaded all images available at `127.0.0.1:3000/assets/public/images/carousel/[n]` where `n` ranged from 1 to 7.
-   - Noted that only the fifth image was in PNG format, which often supports higher quality and more complex steganography techniques compared to JPG.
+2. **下载图片**：
+   - 访问照片墙，并下载 `127.0.0.1:3000/assets/public/images/carousel/[n]` 中的所有图片，其中 `n` 从 1 到 7。
+   - 注意到只有第五张图片是 PNG 格式；与 JPG 相比，PNG 通常支持更高画质和更复杂的隐写技术。
 
-3. **Initial Analysis with Aperisolve**:
-   - Used Aperisolve, a web-based tool for analyzing and uncovering hidden data within images. Checked each image for common steganography signs such as LSB (Least Significant Bit) changes or hidden ZIP files.
-   - Found no significant hidden data with this approach.
+3. **使用 Aperisolve 初步分析**：
+   - 使用基于 Web 的工具 Aperisolve 分析并查找图片中的隐藏数据。检查了 LSB（最低有效位）变化、隐藏 ZIP 文件等常见隐写迹象。
+   - 这种方法没有发现明显的隐藏数据。
 
-4. **Deeper Analysis with OpenStego**:
-   - Employed OpenStego specifically on the PNG image to check for embedded data. OpenStego is known for its effectiveness with PNG files due to their lossless nature.
-   - Successfully extracted hidden data from the fifth image.
+4. **使用 OpenStego 深入分析**：
+   - 专门使用 OpenStego 检查 PNG 图片中的嵌入数据。由于 PNG 是无损格式，OpenStego 对其处理效果较好。
+   - 成功从第五张图片中提取出隐藏数据。
 
    <img src="../assets/difficulty4/steganography.png" alt="open stego" width="500px">
 
-5. **Identify the Character**:
-   - Used Google Lens to identify the extracted image, which was found to be Pickle Rick from the animated show "Rick and Morty".
+5. **识别角色**：
+   - 使用 Google Lens 识别提取出的图片，确认其中是动画节目《Rick and Morty》中的 Pickle Rick。
 
-6. **Submit the Character for Challenge Completion**:
-   - Entered the character name "Pickle Rick" in the required field on the website to complete the challenge.
+6. **提交角色名称以完成挑战**：
+   - 在网站的指定输入框中输入角色名称 "Pickle Rick"，完成挑战。
 
-## Solution Explanation
+## 解法说明
 
-This challenge utilized steganography to hide information within an image file. The correct approach required not only the right tools but also selecting the appropriate image format for analysis. OpenStego was crucial for extracting the hidden data due to its robust handling of PNG files, which can contain more complex forms of hidden data compared to other image formats.
+本挑战使用隐写术在图像文件中隐藏信息。成功解题不仅需要合适的工具，还需选对图像格式进行分析。OpenStego 对 PNG 文件处理能力较强，因此在提取隐藏数据时发挥了关键作用；与其他图像格式相比，PNG 可以包含更复杂的隐藏数据。
 
-## Remediation
+## 修复建议
 
-While this challenge was designed for educational purposes, it highlights important considerations in real-world scenarios:
-- **Monitoring and Filtering**: Implement monitoring to detect unusual uploads or access to sensitive areas, and filter out potentially harmful content.
-- **Education and Policies**: Establish clear policies regarding data handling and educate staff about data security risks, including steganography.
-
+尽管本挑战旨在用于教育，但它也提醒我们现实场景中的一些重要事项：
+- **监控和过滤**：实施监控以检测异常上传或敏感区域访问，并过滤潜在有害内容。
+- **教育和政策**：制定明确的数据处理政策，并教育员工了解包括隐写术在内的数据安全风险。

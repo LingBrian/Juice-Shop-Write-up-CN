@@ -1,71 +1,71 @@
-# Juice-Shop Write-up: Payback Time Challenge
+# Juice-Shop 攻略：报复时刻挑战
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** Payback Time\
-**Category:** Business Logic Errors\
-**Difficulty:** ⭐⭐⭐ (3/6)
+**标题：** 报复时刻\
+**类别：** 业务逻辑错误\
+**难度：** ⭐⭐⭐ (3/6)
 
-This challenge involves exploiting a business logic flaw to achieve unauthorized financial gain through manipulating product pricing in an e-commerce application.
+本挑战通过操纵电商应用中的商品定价，利用业务逻辑缺陷非法获利。
 
-## Tools Used
+## 使用的工具
 
-- Web browser
-- Burp Suite or Developper Tool for requests 
+- Web 浏览器
+- Burp Suite 或用于发送请求的开发者工具
 
-## Methodology and Solution
+## 方法与解决方案
 
-### Initial Steps and Discovery
+### 初步步骤与发现
 
-1. **Inspect Application Code**: Started by examining the `main.js` file, which often contains paths and client-side logic. Discovered a path `/accounting` which seemed promising for administrative actions.
+1. **检查应用代码**：首先检查 `main.js` 文件，其中通常包含路径和客户端逻辑。发现路径 `/accounting`，看起来可能与管理操作有关。
 
-2. **Attempt to Access Accounting Page**: Accessed `http://127.0.0.1:3000/#/accounting` directly in the browser, leading to an authorization error page.
+2. **尝试访问会计页面**：在浏览器中直接访问 `http://127.0.0.1:3000/#/accounting`，结果进入授权错误页面。
 
 <img src="../assets/difficulty3/payback_time_1.png" alt="403" width="500px">
 
-3. **Identify Account with Necessary Permissions**:
+3. **找出具备所需权限的账户**：
 
-   - Found the email of a user likely to have necessary permissions (`accountant@juice-sh.op`) from product comments.
+   - 从商品评论中找到可能拥有所需权限的用户邮箱（`accountant@juice-sh.op`）。
 
-   <img src="../assets/difficulty3/payback_time_2.png" alt="email of accountant" width="500px">
+    <img src="../assets/difficulty3/payback_time_2.png" alt="email of accountant" width="500px">
 
-   - Used an SQL injection vulnerability previously identified to gain access to this account. The correct syntax involved using `AND` instead of `OR` in the SQL injection to specifically target the accountant's account.
+   - 利用先前发现的 SQL 注入漏洞获取该账户的访问权限。要准确定位会计账户，SQL 注入语法应使用 `AND` 而不是 `OR`。
 
-   <img src="../assets/difficulty3/payback_time_3.png" alt="SQL Injection" width="500px">
+    <img src="../assets/difficulty3/payback_time_3.png" alt="SQL Injection" width="500px">
 
-### Exploiting the Business Logic
+### 利用业务逻辑
 
-1. **Access Accounting Page as the Accountant**:
-   - Logged in as the accountant, re-accessed the accounting page which now displayed product pricing and allowed modifications.
+1. **以会计身份访问会计页面**：
+   - 以会计身份登录后，重新访问会计页面，此时页面会显示商品价格并允许修改。
 
-   <img src="../assets/difficulty3/payback_time_4.png" alt="accoutant panel" width="500px">
+    <img src="../assets/difficulty3/payback_time_4.png" alt="accoutant panel" width="500px">
 
-2. **Attempt to Modify Product Prices**:
-   - Tried to set a negative price directly through the user interface, which the system corrected to zero.
-   - Intercepted the price update request using Burp Proxy.
+2. **尝试修改商品价格**：
+   - 尝试直接在用户界面中设置负数价格，系统会将其修正为零。
+   - 使用 Burp Proxy 拦截价格更新请求。
 
-   <img src="../assets/difficulty3/payback_time_5.png" alt="update price request" width="500px">
+    <img src="../assets/difficulty3/payback_time_5.png" alt="update price request" width="500px">
 
-3. **Manipulate Product Pricing**:
-   - Modified the intercepted request, setting the price parameter to a negative value.
-   - The server accepted this modified request, updating the product price to the negative value.
+3. **操纵商品定价**：
+   - 修改被拦截的请求，将价格参数设为负值。
+   - 服务器接受了修改后的请求，并将商品价格更新为负值。
 
-   <img src="../assets/difficulty3/payback_time_6.png" alt="updated product" width="500px">
+    <img src="../assets/difficulty3/payback_time_6.png" alt="updated product" width="500px">
 
-4. **Exploit Negative Pricing**:
-   - Purchased the product with the negative price.
-   - As the system processed the negative amount, it resulted in a credit to the account rather than a charge, effectively leading to a payout.
+4. **利用负数定价**：
+   - 以负数价格购买商品。
+   - 系统处理负金额时，不是扣款而是向账户记入余额，最终实现返款。
 
-   <img src="../assets/difficulty3/payback_time_7.png" alt="purchase" width="500px">
+    <img src="../assets/difficulty3/payback_time_7.png" alt="purchase" width="500px">
 
-## Solution Explanation
+## 解决方案说明
 
-This challenge exploited a series of vulnerabilities and misconfigurations:
-- **Authorization Flaw**: Improper access controls allowed for unauthorized access via SQL injection.
-- **Business Logic Error**: The system failed to adequately handle improper inputs for product pricing, allowing for negative values to be submitted through backend manipulation.
+本挑战利用了一系列漏洞和配置错误：
+- **授权缺陷**：不当的访问控制允许通过 SQL 注入获得未授权访问。
+- **业务逻辑错误**：系统未能妥善处理商品定价输入，允许通过操纵后端提交负数。
 
-## Remediation
+## 修复建议
 
-To prevent such vulnerabilities in real applications:
-- **Proper Input Validation**: Ensure that all inputs, especially those related to financial transactions, are validated both client-side and server-side to prevent manipulation.
-- **Use Prepared Statements for SQL**: Avoid SQL injection by using prepared statements with parameterized queries.
+在真实应用中，可采取以下措施防止此类漏洞：
+- **正确验证输入**：确保对所有输入（尤其是与金融交易相关的输入）在客户端和服务器端都进行验证，防止遭到操纵。
+- **使用 SQL 预处理语句**：使用带参数的预处理语句，避免 SQL 注入。

@@ -1,63 +1,62 @@
-# Juice-Shop Write-up: Visual Geo Stalking
+# Juice-Shop Write-up：Visual Geo Stalking
 
-## Challenge Overview
+## 挑战概述
 
 **Title:** Visual Geo Stalking\
 **Category:** Sensitive Data Exposure\
 **Difficulty:** ⭐⭐ (2/6)
 
-This challenge, "Visual Geo Stalking," involves using publicly available visual data to deduce the answer to a security question and then using that information to reset a user's password. It tests abilities in image analysis, OSINT techniques, and creative thinking to link seemingly unrelated data for accessing sensitive information.
+“Visual Geo Stalking”挑战通过公开的视觉信息推断安全问题答案，并利用该信息重置用户密码。本挑战考察图像分析、OSINT 技术，以及将看似无关的数据联系起来以访问敏感信息的创造性思维。
 
-## Tools Used
+## 使用的工具
 
-- **Google Lens**: For identifying locations and objects within an image.
-- **Google Maps**: To explore the surroundings of a pinpointed location and gather additional information.
-- **Web Browser**: For general research.
+- **Google Lens**：用于识别图片中的地点和物体。
+- **Google Maps**：用于探索定位地点的周边环境并收集更多信息。
+- **Web Browser**：用于一般研究。
 
-## Methodology and Solution
+## 方法与解决方案
 
-### Initial Clue Analysis
+### 初步线索分析
 
-1. **Photo Examination**:
-   - Emma's post on a social media-like platform includes a photo of a building with a caption referencing a past workplace.
-   - The challenge involves identifying Emma's former workplace through the image provided.
+1. **检查照片**：
+   - Emma 在类似社交媒体的平台上发布了一张建筑物照片，说明中提到了她以前的工作地点。
+   - 本挑战要求通过提供的图片识别 Emma 以前的工作地点。
 
    <img src="../assets/difficulty2/visual_geostaking_1.png" alt="post" width="500px">
 
-### Detailed Image Analysis
+### 详细图像分析
 
-2. **Utilizing Google Lens**:
-   - The image was analyzed using Google Lens, which identified the location as the "Kenau Park area in Haarlem."
+2. **使用 Google Lens**：
+   - 使用 Google Lens 分析图片，识别出地点是“Kenau Park area in Haarlem”。
 
    <img src="../assets/difficulty2/visual_geostaking_2.png" alt="lens" width="500px">
 
-3. **Google Maps Exploration**:
-   - Using Google Maps to virtually visit the location, various business signs and plaques were examined to match potential answers to security questions.
+3. **探索 Google Maps**：
+   - 使用 Google Maps 虚拟访问该地点，检查各种商家标牌和牌匾，以便将可能的答案与安全问题对应起来。
 
    <img src="../assets/difficulty2/visual_geostaking_3.png" alt="signs" width="500px">
 
-4. **Identifying Key Details**:
-   - A close inspection of another part of the image revealed a sign for "ITsec" on a window. This detail seemed crucial but was initially overlooked.
+4. **识别关键信息**：
+   - 仔细查看图片的另一部分后，在窗户上发现了“ITsec”标牌。这一细节似乎非常关键，但最初被忽略了。
 
-### Answering the Security Question and Resetting the Password
+### 回答安全问题并重置密码
 
-5. **Security Question Answering**:
-   - The term "ITsec" was attempted as an answer to a security question regarding Emma's former workplace, based on the context provided by the visual clues in the photo and the information deduced from online tools.
+5. **回答安全问题**：
+   - 根据照片中的视觉线索和在线工具推断出的信息，尝试用“ITsec”回答有关 Emma 以前工作地点的安全问题。
 
    <img src="../assets/difficulty2/visual_geostaking_4.png" alt="itsec" width="500px">
 
-6. **Password Reset**:
-   - Successfully using "ITsec" as the security question answer allowed the password for Emma's account to be reset.
+6. **重置密码**：
+   - 成功使用“ITsec”作为安全问题答案，重置了 Emma 账户的密码。
 
-### Solution Explanation
+### 解决方案说明
 
-The challenge was successfully resolved by combining visual data from a user-generated post with online mapping tools and image recognition technology. This approach highlights the potential privacy risks associated with sharing detailed visual information publicly.
+本挑战结合了用户发布内容中的视觉信息、在线地图工具和图像识别技术，成功推断出答案。这种方法凸显了公开分享详细视觉信息可能带来的隐私风险。
 
-## Remediation
+## 修复建议
 
-To prevent sensitive data exposure through visual or other publicly accessible information:
+为防止通过视觉或其他公开信息泄露敏感数据：
 
-- **Educate Users**: Inform users about the risks associated with sharing detailed photos or information that could inadvertently reveal answers to security questions or other sensitive data.
-- **Privacy Settings**: Encourage the use of strict privacy settings on social media and other platforms to control who can view personal information and posts.
-- **Security Question Choices**: Advise against using easily discoverable information as answers to security questions. Encourage more personal and less predictable answers.
-
+- **教育用户**：告知用户分享详细照片或信息的风险，因为这些内容可能无意中暴露安全问题答案或其他敏感数据。
+- **隐私设置**：鼓励用户在社交媒体及其他平台使用严格的隐私设置，控制个人信息和帖子对谁可见。
+- **安全问题选择**：建议不要使用容易被发现的信息作为安全问题答案，鼓励选择更个人化且不易预测的答案。

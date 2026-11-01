@@ -1,62 +1,62 @@
-# Juice-Shop Write-up: Admin Registration
+# Juice-Shop 攻略：管理员注册
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** Admin Registration\
-**Category:** Improper Input Validation\
-**Difficulty:** ⭐⭐⭐ (3/6)
+**标题：** 管理员注册\
+**类别：** 输入验证不当\
+**难度：** ⭐⭐⭐ (3/6)
 
-The "Admin Registration" challenge tests ability to exploit vulnerabilities related to user registration processes, specifically focusing on input validation issues that allow elevating privileges during account creation.
+“管理员注册”挑战用于测试利用用户注册流程相关漏洞的能力，重点是输入验证问题：这些问题可能允许在创建账户时提升权限。
 
-## Tools Used
+## 使用的工具
 
-- **Web Browser**: To access the registration page and interact with the web application.
-- **Burp Suite**: To intercept and modify HTTP requests during the registration process.
+- **Web 浏览器**：访问注册页面并与 Web 应用交互。
+- **Burp Suite**：在注册过程中拦截并修改 HTTP 请求。
 
-## Methodology and Solution
+## 方法与解决方案
 
-### Exploiting the Registration Process
+### 利用注册流程
 
-1. **Registering a New User**:
-   - Navigated to the registration page at `http://127.0.0.1:3000/#/register` and filled out the form to create a new user account with standard user details.
+1. **注册新用户**：
+   - 前往 `http://127.0.0.1:3000/#/register` 注册页面，并填写标准用户信息以创建新账户。
 
-   <img src="../assets/difficulty3/admin_registration_1.png" alt="register form" width="500px">
+    <img src="../assets/difficulty3/admin_registration_1.png" alt="register form" width="500px">
 
-### Interception and Modification of Request
+### 拦截并修改请求
 
-2. **Intercepting the Registration Request**:
-   - Used Burp Suite to intercept the outgoing registration request after submitting the form. This allowed for detailed examination and modification of the HTTP request data sent to the server.
+2. **拦截注册请求**：
+   - 提交表单后，使用 Burp Suite 拦截发出的注册请求，以便详细检查和修改发送到服务器的 HTTP 请求数据。
 
-   <img src="../assets/difficulty3/admin_registration_2.png" alt="request" width="500px">
+    <img src="../assets/difficulty3/admin_registration_2.png" alt="request" width="500px">
 
-### Privilege Escalation
+### 提升权限
 
-3. **Modifying User Role**:
-   - Examined the captured HTTP request and noticed that the user role was defined within the payload as `"role": "customer"`.
+3. **修改用户角色**：
+   - 检查捕获的 HTTP 请求，发现载荷中定义了用户角色：`"role": "customer"`。
 
-   <img src="../assets/difficulty3/admin_registration_3.png" alt="role highlight" width="500px">
+    <img src="../assets/difficulty3/admin_registration_3.png" alt="role highlight" width="500px">
 
-   - Modified the role parameter from `"customer"` to `"admin"` directly in the HTTP request, altering the intended behavior of the registration process.
+   - 直接在 HTTP 请求中将角色参数从 `"customer"` 修改为 `"admin"`，改变注册流程原本的行为。
    
-   <img src="../assets/difficulty3/admin_registration_4.png" alt="modified request" width="500px">
+    <img src="../assets/difficulty3/admin_registration_4.png" alt="modified request" width="500px">
 
-4. **Submitting the Modified Request**:
-   - Sent the modified request through Burp Suite, effectively trying to bypass the normal user role assignment logic.
+4. **提交修改后的请求**：
+   - 通过 Burp Suite 发送修改后的请求，尝试绕过正常的用户角色分配逻辑。
 
-### Verification of Admin Access
+### 验证管理员访问权限
 
-5. **Checking the Registration Outcome**:
-   - The response from the server confirmed that the account was successfully created with the role of an administrator.
-   - Verified by logging into the application with the new credentials and accessed admin-specific functionalities to ensure that the role was correctly assigned.
+5. **检查注册结果**：
+   - 服务器响应确认账户已成功创建，并具有管理员角色。
+   - 使用新凭据登录应用，并访问管理员专属功能，以确认角色分配正确。
 
-### Solution Explanation
+### 解决方案说明
 
-The challenge was successfully completed by identifying and exploiting an improper input validation flaw within the registration process. By modifying the user role in the registration request, it was possible to bypass the application's normal security measures and grant administrative privileges to a newly created account.
+通过发现并利用注册流程中的输入验证缺陷，成功完成了挑战。修改注册请求中的用户角色即可绕过应用的常规安全措施，为新账户授予管理员权限。
 
-## Remediation
+## 修复建议
 
-To prevent such vulnerabilities in real-world applications:
+在真实应用中，可采取以下措施防止此类漏洞：
 
-- **Strict Backend Validation**: Ensure that all user input, especially relating to user roles and privileges, is rigorously validated on the server side to prevent unauthorized modifications.
-- **Role Management**: Assign roles based on secure server-side logic rather than relying on client-side input.
-- **Use of Role-Based Access Control (RBAC)**: Implement robust RBAC mechanisms that properly segregate user privileges and prevent unauthorized elevation.
+- **严格的后端验证**：确保在服务器端严格验证所有用户输入，尤其是与用户角色和权限相关的输入，以防止未经授权的修改。
+- **角色管理**：依据安全的服务器端逻辑分配角色，而非依赖客户端输入。
+- **采用基于角色的访问控制（RBAC）**：实施健全的 RBAC 机制，妥善隔离用户权限并防止未经授权的权限提升。

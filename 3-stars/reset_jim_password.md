@@ -1,60 +1,59 @@
-# Juice-Shop Write-up: Reset Jim's Password
+# Juice-Shop 攻略：重置 Jim 的密码
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** Reset Jim's Password\
-**Category:** OSINT\
-**Difficulty:** ⭐⭐⭐ (3/6)
+**标题：** 重置 Jim 的密码\
+**类别：** OSINT\
+**难度：** ⭐⭐⭐ (3/6)
 
-The "Login Jim" challenge tasks us to reset the Jim's password using the answer of his security question.
+“登录 Jim 账户”挑战要求使用 Jim 安全问题的答案重置其密码。
 
-## Tools Used
+## 使用的工具
 
-- **Web Browser**: For conducting online searches to gather information about the character.
+- **Web 浏览器**：在线搜索并收集与该角色有关的信息。
 
-## Methodology and Solution
+## 方法与解决方案
 
-### Researching the Character
+### 调查角色背景
 
-1. **Identifying Jim's Identity**:
-   - Given that the challenge hint refers to Jim as a celebrity whose answer to his security question can be found publicly.
-   - In a comment, Jim quote a line from Star Trek.
-   - So we know that there's maybe a connection to "Star Trek", so we search for "Jim Star Trek".
-   - Discover that Jim refers to James Tiberius Kirk from "Star Trek".
+1. **确认 Jim 的身份**：
+   - 挑战提示称 Jim 是一位名人，其安全问题的答案可以在公开信息中找到。
+   - Jim 在一条评论中引用了《Star Trek》中的台词。
+   - 因此可以推测他可能与《Star Trek》有关，于是搜索“Jim Star Trek”。
+   - 发现 Jim 指的是《Star Trek》中的 James Tiberius Kirk。
 
-### Analyzing Security Question
+### 分析安全问题
 
-2. **Security Question Details**:
-   - here is the security question of Jim :
+2. **查看安全问题详情**：
+   - 以下是 Jim 的安全问题：
    
-   <img src="../assets/difficulty3/reset_jim_password_1.png" alt="security question of jim" width="500px">
+    <img src="../assets/difficulty3/reset_jim_password_1.png" alt="security question of jim" width="500px">
 
-### Gathering Relevant Information
+### 收集相关信息
 
-3. **Exploring Family Connections**:
+3. **查找家庭关系**：
 
-   - Search for information about James T. Kirk's family to find relevant answers for the security question.
+   - 搜索 James T. Kirk 的家庭信息，找到安全问题的答案。
 
-   <img src="../assets/difficulty3/reset_jim_password_2.png" alt="security question of jim" width="500px">
+    <img src="../assets/difficulty3/reset_jim_password_2.png" alt="security question of jim" width="500px">
 
-   - Find that his brother's name is George Samuel Kirk
+   - 查明他的兄弟名叫 George Samuel Kirk。
 
+### 访问账户
 
-### Accessing the Account
+4. **测试安全问题答案**：
+   - 在账户恢复或登录流程中，将“George Samuel Kirk”用作安全问题的答案：
 
-4. **Testing the Security Answer**:
-   - Use the name "George Samuel Kirk" as the answer to the security question in the account recovery or login process :
+    <img src="../assets/difficulty3/reset_jim_password_3.png" alt="security question of jim" width="500px">
 
-   <img src="../assets/difficulty3/reset_jim_password_3.png" alt="security question of jim" width="500px">
+### 解决方案说明
 
-### Solution Explanation
+通过识别 Jim 的虚构身份——《Star Trek》中的 James T. Kirk 船长——成功完成挑战。
 
-This challenge was resolved by recognizing the fictional identity of Jim as Captain James T. Kirk from "Star Trek".
+## 修复建议
 
-## Remediation
+在真实应用中，可采取以下措施防止类似安全问题：
 
-To prevent similar security issues in real-world applications:
-
-- **Choose Robust Security Questions**: Avoid questions where answers are easily guessed or found. Use questions that have safe, unpredictable answers. If possible, remove security question and replaces them by an email sended to users when they want to reset their password.
-- **Educate Users**: Guide users in selecting security questions and answers that are secure, emphasizing the risk of using easily accessible information.
-- **Implement Multiple Authentication Factors**: Enhance security by requiring multiple methods of authentication beyond security questions.
+- **选择健全的安全问题**：避免使用答案容易被猜到或查到的问题。应选择答案安全且难以预测的问题。如有可能，应取消安全问题，并在用户需要重置密码时向其发送电子邮件。
+- **教育用户**：指导用户选择安全问题及答案，并强调使用容易获取的信息所带来的风险。
+- **实施多重身份验证**：要求使用安全问题之外的多种身份验证方式，增强安全性。

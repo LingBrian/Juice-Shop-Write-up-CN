@@ -1,62 +1,61 @@
-# Juice-Shop Write-up: Deluxe Fraud
+# Juice-Shop 攻略：豪华会员欺诈
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** Deluxe Fraud
+**标题：** 豪华会员欺诈
 
-**Category:** Improper Input Validation
+**类别：** 输入验证不当
 
-**Difficulty:** ⭐⭐⭐ (3/6)
+**难度：** ⭐⭐⭐ (3/6)
 
-The "Deluxe Fraud" challenge involves manipulating the web application to obtain a Deluxe Membership without proper payment. This challenge tests skills in identifying and exploiting vulnerabilities related to payment and authorization mechanisms.
+“豪华会员欺诈”挑战要求操纵 Web 应用，在未正常付款的情况下获得豪华会员资格。本挑战旨在测试识别并利用支付与授权机制漏洞的能力。
 
-## Tools Used
+## 使用的工具
 
-- **Web Browser**: For navigating to the membership and payment pages and interacting with the application.
-- **HTTP Interception Tool** (e.g., Burp Suite): To capture and modify HTTP requests sent from the browser to the server.
+- **Web 浏览器**：浏览会员和支付页面并与应用交互。
+- **HTTP 拦截工具**（例如 Burp Suite）：捕获并修改从浏览器发送到服务器的 HTTP 请求。
 
-## Methodology and Solution
+## 方法与解决方案
 
-### Initial Access Attempt
+### 首次尝试访问
 
-1. **Navigating to Deluxe Membership Page**:
-   - Accessed the Deluxe Membership page at `http://127.0.0.1:3000/#/deluxe-membership` and was presented with an error message stating the user is not eligible for the membership.
+1. **前往豪华会员页面**：
+   - 访问 `http://127.0.0.1:3000/#/deluxe-membership` 豪华会员页面，页面显示错误信息，称用户不符合会员资格条件。
 
-   <img src="../assets/difficulty3/deluxe_fraud_1.png" alt="error message" width="500px">
+    <img src="../assets/difficulty3/deluxe_fraud_1.png" alt="error message" width="500px">
 
+### 分析会员资格请求
 
-### Analyzing the Membership Eligibility Request
+2. **拦截 API 请求**：
+   - 使用 Burp Suite 捕获并分析尝试访问豪华会员页面时发送的 HTTP 请求。注意到响应为“Bad Request”，表示请求参数缺失或不正确。
 
-2. **Intercepting API Requests**:
-   - Used Burp Suite to capture and analyze the HTTP request sent when trying to access the Deluxe Membership. Noticed the response was a "Bad Request" indicating missing or incorrect request parameters.
+### 操纵支付流程
 
-### Manipulating Payment Process
+3. **探索支付网关**：
+   - 前往支付页面 `http://127.0.0.1:3000/#/payment/deluxe`。
+   - 尝试发起付款，但由于支付信息不正确或不完整而再次出错。
 
-3. **Exploring Payment Gateway**:
-   - Proceeded to the payment page at `http://127.0.0.1:3000/#/payment/deluxe`.
-   - Tried to initiate a payment which resulted in another error due to improper or incomplete payment details.
+4. **修改支付信息**：
+   - 分析支付所需的请求参数，其中包括 `paymentMode` 和 `paymentId`。
+   - 尝试以各种方式修改 `paymentMode` 和 `paymentId`，绕过实际的支付验证流程。
 
-4. **Modifying Payment Details**:
-   - Analyzed the request parameters required for the payment which included `paymentMode` and `paymentId`.
-   - Experimented with various modifications to `paymentMode` and `paymentId` to bypass the actual payment verification process.
+### 成功绕过支付
 
-### Successfully Bypassing Payment
+5. **绕过支付验证**：
+   - 将 `paymentMode` 设置为“none”，并将 `paymentId` 设置为随机值或不存在的值，以测试应用逻辑是否会不当验证这些输入。
+   - 成功绕过支付流程，模拟在未实际付款的情况下完成豪华会员购买。
 
-5. **Bypassing Payment Verification**:
-   - Set `paymentMode` to "none" and `paymentId` to a random or non-existent value to test if the application logic improperly validates these inputs.
-   - Successfully bypassed the payment process, simulating the completion of a Deluxe Membership purchase without actual payment.
+### 解决方案说明
 
-### Solution Explanation
+通过发现 Web 应用支付和会员验证流程中的弱点，成功完成挑战。操纵支付过程中的请求参数，可以在未满足常规支付要求的情况下模拟成功交易。
 
-The challenge was completed by identifying weaknesses in the payment and membership verification processes of the web application. By manipulating request parameters during the payment process, it was possible to simulate a successful transaction without fulfilling the usual payment requirements.
+## 修复建议
 
-## Remediation
+在真实应用中，可采取以下措施防止此类漏洞：
 
-To prevent such vulnerabilities in real-world applications:
+- **加强输入验证**：确保对所有输入，尤其是与支付操作相关的输入，在客户端和服务器端都进行严格验证。
+- **保障支付逻辑安全**：在处理交易前，实施健全的服务器端检查，验证支付信息正确且完整。
+- **使用安全的支付网关**：集成信誉良好的支付网关，以获得额外的安全检查和验证。
+- **定期进行安全审计**：定期开展安全审计和渗透测试，发现并缓解与金融交易和用户访问控制有关的漏洞。
 
-- **Enhance Input Validation**: Ensure that all inputs, especially those related to payment operations, are rigorously validated both on the client-side and server-side.
-- **Secure Payment Logic**: Implement robust checks on the server-side to verify that payment details are correct and complete before processing transactions.
-- **Use Secure Payment Gateways**: Integrate with reputable payment gateways that provide additional security checks and validations.
-- **Regular Security Audits**: Conduct periodic security audits and penetration tests to identify and mitigate vulnerabilities related to financial transactions and user access controls.
-
-This challenge underscores the importance of robust input validation and secure payment processing mechanisms to prevent fraudulent activities and ensure the integrity of financial transactions within web applications.
+本挑战凸显了健全输入验证和安全支付处理机制的重要性，有助于防止欺诈行为并确保 Web 应用中金融交易的完整性。

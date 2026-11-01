@@ -1,39 +1,39 @@
-# Juice-Shop Write-up: Login Support Team
+# Juice-Shop Write-up: 登录支持团队账户
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** Login Support Team  
-**Category:** Security Misconfiguration  
-**Difficulty:** ⭐⭐⭐⭐⭐⭐ (6/6)
+**标题：** Login Support Team  
+**类别：** 安全配置错误  
+**难度：** ⭐⭐⭐⭐⭐⭐ (6/6)
 
-This challenge ask us to accessing the account of the support team using their original credentials, without resorting to SQL injection or other bypass methods.
+本挑战要求使用支持团队的原始凭据访问其账户，不得使用 SQL 注入或其他绕过方法。
 
-## Tools Used
+## 使用工具
 
-- **Web Browser**: Used to access the Juice Shop platform and various functionality.
-- **KeePass**: A free open source password manager which helps you to manage your passwords in a secure way.
-- **John the Ripper**: A popular password cracking software tool.
-- **keepass2john**: A tool to extract hash values from KeePass databases for password cracking.
+- **Web 浏览器**：用于访问 Juice Shop 平台及其各项功能。
+- **KeePass**：免费开源密码管理器，可帮助安全地管理密码。
+- **John the Ripper**：常用的密码破解软件。
+- **keepass2john**：用于从 KeePass 数据库提取哈希值以供破解的工具。
 
-## Methodology and Solution
+## 方法与解题过程
 
-### Step 1: Identify and Download Key Files
+### 步骤 1：识别并下载关键文件
 
-For the completion of the challenges, hints are important :
+完成挑战时，提示很重要：
 
 <img src="../assets/difficulty6/login_support_team_1.png" alt="alt text" width="500px">
 
-- We discover that the team use an external secret manager to store their credentials. The most used worldwide is KeePass.
-- We can't use SQL Injection
-- We can't brute force the password
+- 我们发现团队使用外部密钥管理器存储凭据，最常用的此类工具之一是 KeePass。
+- 不能使用 SQL 注入。
+- 不能暴力破解密码。
 
-Since it appears that we probably need to find the password, I started to think that he might be in a file. In the Juice Shop FTP server, I located and downloaded the `incident-support.kdbx` file, which is the KeePass database for the support team. In case if you don't know what a KBDX file is, it's the database of a KeePass Secret Manager (KBD mean Keepass DataBase). For your personal knowledge, KeePass have made a major update fex years ago, but before, rather to use .kbdx file, they used .kbd. To access this database, which is encrypted with the Twofish algorithm, we must obtain the master key.
+既然看起来需要找到密码，我开始考虑它可能存储在某个文件中。在 Juice Shop FTP 服务器上，我找到了并下载了 `incident-support.kdbx` 文件，这是支持团队的 KeePass 数据库。如果你不知道 KDBX 文件是什么，它就是 KeePass 密钥管理器的数据库（KDB 表示 KeePass Database）。供参考，KeePass 几年前进行过重大更新；在此之前使用的是 .kbd 文件，而非 .kdbx。该数据库使用 Twofish 算法加密，因此要访问它，我们必须先获取主密钥。
 
-### Step 2: Convert the KeePass Database
+### 步骤 2：转换 KeePass 数据库
 
-Hopefully, Keepass database can be cracked by an offline bruteforce (which is very very fast). To do this, we will use John The Reaper. First, we have to convert the file into another file that can be use in john the reaper.
+幸运的是，可以对 KeePass 数据库进行离线暴力破解（速度非常快）。这里使用 John the Ripper。首先要将文件转换成 John the Ripper 可接受的格式。
 
-Using `keepass2john`, I converted the `.kdbx` file to a hash format that is acceptable by John the Ripper:
+使用 `keepass2john` 将 `.kdbx` 文件转换为哈希格式：
 
 ```bash
 keepass2john incident-support.kdbx > keepasshash.txt
@@ -41,59 +41,59 @@ keepass2john incident-support.kdbx > keepasshash.txt
 
 <img src="../assets/difficulty6/login_support_team_6.png" alt="oupout" width="500px">
 
-The output provided a hash which is ready to be cracked.
+输出提供了可供破解的哈希：
 ```bash
 incident-support:$keepass$*2*1*0*2360b9f8557b8c25a0dbb36a1610958a083caf96fddf7ee3a164e3659b80e136*34e52e0601bbd92ed7b65f2d86a6832b81368cbdfc6125b5639134f98911ab93*2231292f58a92775b0c08b7a46c682b6*38c10e8133656d9c5d10c4bc9c8829449749b526732ea88eb72e2c327b9ea4de*1f1098d8a24cc7bf23f0a58542fd1851662a4cab8f2422d6541658521f199bd5
 ```
 
-### Step 3: Crack the Password
+### 步骤 3：破解密码
 
-Utilized John the Ripper with the `rockyou.txt` wordlist to attempt to crack the password from the hash extracted:
+使用 John the Ripper 和 `rockyou.txt` 字典尝试破解提取出的哈希：
 
 ```bash
 john --wordlist=rockyou.txt keepasshash.txt
 ```
 
-This attempt was not sucessful, it looks like the password is not included in the wordlist. I tried to obtain more information about the password by searching "support" in the main.js, and I find a section related to resetting password for support team. 
+这次尝试未成功，看来密码不在该字典中。我尝试在 main.js 中搜索“support”，以了解更多密码线索，并找到一个与支持团队密码重置相关的部分。
 
 <img src="../assets/difficulty6/login_support_team_8.png" alt="support reset section" width="500px">
 
-We also find an error message that can show up on console if user doing something wrong. The error message is obfuscated :
+我们还发现一条用户操作错误时可能出现在控制台中的错误消息。这条消息经过了混淆：
 
 <img src="../assets/difficulty6/login_support_team_9.png" alt="error message obfusacted" width="500px">
 
-It's writed in Romanian, we use google translator : "The support team password does not comply with the corporate policy for privileged accounts! Please change your password accordingly!"
+消息为罗马尼亚语，使用 Google 翻译后内容是：“支持团队密码不符合特权账户的公司策略！请相应地更改密码！”
 
-We search in code for this policy, and in the same line we find a regex expression that specificy what the new password for support team must contains or not :
+我们在代码中搜索该策略，并在同一行找到一个正则表达式，说明支持团队新密码必须包含或不能包含哪些字符：
 
 ```
 /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,30}/
 ```
 
-We can create a script python to create a wordlist accordingly, with syntax: {Majuscule letter}{letters}{number}{char}
+我们可以编写 Python 脚本，根据 `{大写字母}{字母}{数字}{字符}` 的形式生成字典。
 
-We find that the password is `Support2022!`
+最终找到密码 `Support2022!`。
 
-### Step 4: Extract the Credentials
+### 步骤 4：提取凭据
 
-Once the password was cracked, I used it to unlock the KeePass database and retrieve the credentials for the support team account.
+破解密码后，我用它解锁 KeePass 数据库，提取支持团队账户的凭据。
 
 <img src="../assets/difficulty6/login_support_team_11.png" alt="opened keepass" width="500px">
 
-Here is the credentials : 
+凭据如下：
 
 <img src="../assets/difficulty6/login_support_team_12.png" alt="credentials" width="500px">
 
-### Step 5: Log in to the Support Team Account
+### 步骤 5：登录支持团队账户
 
-Using the credentials extracted from the KeePass database : J6aVjTg0pRs@?5l!Zkq2AYnCE@RF$P
-I logged into the Juice Shop platform as the support team member.
+使用从 KeePass 数据库中提取的凭据：J6aVjTg0pRs@?5l!Zkq2AYnCE@RF$P
+我以支持团队成员身份登录了 Juice Shop 平台。
 
-## Solution Explanation
+## 解题说明
 
-The credentials for the support team were securely stored in a KeePass database, which was protected by a strong password. By utilizing password cracking techniques with John the Ripper and a custom wordlist, I was able to unlock the database and retrieve the necessary credentials to complete this challenge.
+支持团队凭据安全地存储在 KeePass 数据库中，并由强密码保护。通过使用 John the Ripper 和自定义字典进行密码破解，我解锁了数据库并获取了完成挑战所需的凭据。
 
-## Remediation
+## 修复建议
 
-- **Secure Sensitive Files**: Ensure that sensitive files such as password databases are not accessible through public or less-secure means like an FTP server.
-- **Use Strong Access Controls**: Implement robust access controls and monitor access logs to prevent unauthorized access to sensitive information.
+- **保护敏感文件**：确保密码数据库等敏感文件不会通过 FTP 服务器等公开或安全性较低的渠道访问。
+- **使用强访问控制**：实施健全的访问控制，并监控访问日志，防止未经授权访问敏感信息。

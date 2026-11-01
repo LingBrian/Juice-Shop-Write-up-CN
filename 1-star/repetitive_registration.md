@@ -1,49 +1,49 @@
-# Juice-Shop Write-up: Repetitive Registration Challenge
+# Juice-Shop Write-up：Repetitive Registration Challenge
 
-## Challenge Overview
+## 挑战概述
 
 **Title:** Repetitive Registration\
 **Category:** Improper Input Validation\
 **Difficulty:** ⭐ (1/6)
 
-The "Repetitive Registration" challenge explores the improper validation of user input during the registration process, specifically focusing on the handling of password confirmation fields.
+“Repetitive Registration”挑战探讨注册过程中用户输入验证不当的问题，重点关注密码确认字段的处理。
 
-## Tools Used
+## 使用的工具
 
 - Web browser
 - Developer tools
 
-## Methodology and Solution
+## 方法与解决方案
 
-### Analysis of the Registration Form
+### 注册表单分析
 
-Upon examining the registration form, it was noted that users are required to enter their password twice, a common practice intended to prevent typing mistakes. However, the challenge hint suggests exploiting the "Don't Repeat Yourself" (DRY) principle, which in this context implies that the system should not rely on redundant user input to function correctly.
+检查注册表单时发现，用户需要输入两次密码。这是一种常见做法，目的是避免输入错误。不过，挑战提示建议利用“Don't Repeat Yourself”（DRY）原则；在此语境下，这意味着系统不应依赖冗余的用户输入才能正常工作。
 
-### Steps Taken to Solve the Challenge
+### 挑战解决步骤
 
-1. **Fill Out the Registration Form**:
-   - Entered all required information including the email, password, and security question.
-   - Intentionally provided different inputs for the "Password" and "Re-type your password" fields.
+1. **填写注册表单**：
+   - 输入所有必需信息，包括电子邮件、密码和安全问题。
+   - 故意让“Password”和“Re-type your password”字段的内容不同。
 
    <img src="../assets/difficulty1/repetitive_registration_1.png" alt="incorrect" width="500px">
 
-2. **Modify Form Behavior**:
-   - Used the browser’s developer tools to inspect the 'Sign Up' button, which was disabled due to the mismatch in passwords.
-   - Manually removed the `disabled` attribute from the button in the HTML code via the developer tools.
+2. **修改表单行为**：
+   - 使用浏览器开发者工具检查“Sign Up”按钮，发现密码不一致时该按钮处于禁用状态。
+   - 通过开发者工具手动从 HTML 中移除按钮的 `disabled` 属性。
 
    <img src="../assets/difficulty1/repetitive_registration_2.png" alt="code" width="500px">
 
-3. **Submit the Form**:
-   - After enabling the button, submitted the form. Despite the passwords not matching, the registration succeeded, indicating a lack of server-side validation for this condition.
+3. **提交表单**：
+   - 启用按钮后提交表单。尽管密码不匹配，注册仍然成功，说明服务器端没有对此条件进行验证。
 
-### Solution Explanation
+### 解决方案说明
 
-The challenge was resolved by exploiting the lack of server-side validation for the password confirmation field. While the client-side of the application did initially prevent form submission when passwords did not match, this check was easily bypassed by modifying HTML attributes client-side, highlighting a critical security flaw.
+本挑战通过利用服务器端未验证密码确认字段的缺陷而解决。应用客户端最初会阻止密码不匹配时提交表单，但通过修改客户端 HTML 属性即可轻易绕过检查，暴露出严重的安全问题。
 
-## Remediation
+## 修复建议
 
-To prevent such vulnerabilities in real applications, it is essential to enforce server-side checks in addition to client-side validations. Here are some recommendations:
+为防止真实应用中出现此类漏洞，除了客户端验证外，还必须实施服务器端检查。建议如下：
 
-- **Server-Side Validation**: Ensure that all input validations performed on the client side are also enforced on the server side. This includes matching password fields, input length restrictions, format requirements, and more.
-- **Secure Form Handling**: Forms should be designed to reject submissions where critical fields have been tampered with or do not meet the application’s requirements.
-- **Regular Security Audits**: Conduct thorough security audits that include testing for common vulnerabilities like improper input validation, especially in authentication mechanisms.
+- **服务器端验证**：确保客户端执行的所有输入验证也在服务器端强制执行，包括密码字段匹配、输入长度限制、格式要求等。
+- **安全的表单处理**：表单应拒绝关键字段遭到篡改或不符合应用要求的提交。
+- **定期安全审计**：开展全面的安全审计，测试常见漏洞，包括身份验证机制中的输入验证不当问题。

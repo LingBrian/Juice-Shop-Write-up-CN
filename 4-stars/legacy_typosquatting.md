@@ -1,46 +1,46 @@
-# Juice-Shop Write-up: Legacy Typosquatting
+# Juice-Shop 攻略：旧版拼写仿冒
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** Legacy Typosquatting  
-**Category:** Cryptographic Issues  
-**Difficulty:** ⭐⭐⭐⭐ (4/6)
+**标题：** Legacy Typosquatting  
+**类别：** 密码学问题  
+**难度：** ⭐⭐⭐⭐ (4/6)
 
-This challenge requires identifying a typosquatted library used by Juice Shop, a form of cyber threat where attackers exploit common typographical errors to push malicious or deceptive packages.
+本挑战要求识别 Juice Shop 使用的拼写仿冒库。拼写仿冒是一种网络威胁，攻击者利用常见拼写错误发布恶意或具有欺骗性的程序包。
 
-## Tools Used
+## 使用的工具
 
-- **GNU grep**: For searching through files and directories.
-- **Web Browser**: For accessing package repositories and reading documentation.
+- **GNU grep**：用于搜索文件和目录。
+- **Web 浏览器**：用于访问程序包仓库和阅读文档。
 
-## Methodology and Solution
+## 方法与解法
 
-### Step 1: Review Hint and Background Information
+### 步骤 1：查看提示和背景信息
 
-The challenge hint suggests reading about npm malicious packages, focusing on typosquatting issues. Typosquatting involves packages named similarly to popular libraries, intended to trick developers into installing malicious versions.
+挑战提示建议阅读有关 npm 恶意程序包的资料，重点关注拼写仿冒问题。拼写仿冒是指恶意程序包使用与流行库相似的名称，诱使开发者安装恶意版本。
 
-### Step 2: Inspecting Developer's Backup
+### 步骤 2：检查开发者备份
 
-An examination of the developers' backup file (`package.json.bak`) reveals a list of dependencies used by Juice Shop. This file is crucial for identifying potential typosquatted packages by comparing the listed package names with their legitimate counterparts. I tried to obtain a quick win by comparing all library with most common typosquatted library but I don't obtained any result using this method :
+检查开发者的备份文件（`package.json.bak`），可看到 Juice Shop 使用的依赖项列表。通过将列表中的程序包名称与其正版对应项比较，可以识别潜在的拼写仿冒程序包。我尝试通过对照常见拼写仿冒程序包快速找到答案，但没有成功：
 
 <img src="../assets/difficulty4/legacy_typosquatting_1.png" alt="quick win failed" width="500px">
 
-### Step 3: Investigate Packages on npm
+### 步骤 3：在 npm 上调查程序包
 
-Each package from the backup file is checked on the npm repository. The search is to ensure that each package is legitimate, not a typosquatted version.
+逐一在 npm 仓库中检查备份文件里的程序包，确认其为正版，而非拼写仿冒版本。
 
-### Step 4: Identifying the Typosquatted Package
+### 步骤 4：识别拼写仿冒程序包
 
-Upon detailed scrutiny, the package `epilogue-js` on npm raises suspicion. The real and widely-used package should be `epilogue`. The `epilogue-js` package on npm is flagged with a warning:
-- It directs users to use another repository and highlights its existence solely for security awareness and training, indicating it's a demonstration of typosquatting.
+仔细检查后，发现 npm 上的程序包 `epilogue-js` 可疑。真正且广泛使用的程序包应为 `epilogue`。npm 上的 `epilogue-js` 带有警告：
+- 它引导用户使用另一个仓库，并说明其存在仅用于安全意识和培训，表明这是拼写仿冒的演示。
 
 <img src="../assets/difficulty4/legacy_typosquatting_2.png" alt="typosquatted library" width="500px">
 
-### Solution Explanation
+### 解法说明
 
-The package `epilogue-js` was identified as a typosquatted version of the legitimate `epilogue` package. Installation of such a package could lead to potential security vulnerabilities within an application. The challenge was resolved by searching package names on npm.
+我们识别出 `epilogue-js` 是正版 `epilogue` 程序包的拼写仿冒版本。安装这类程序包可能会给应用带来安全漏洞。通过在 npm 上搜索程序包名称，完成了本挑战。
 
-### Security Recommendations
+### 安全建议
 
-- **Regular Audits**: Perform regular audits of all third-party packages used in projects to ensure they are from trusted sources.
-- **Use of Verified Sources**: Only use packages from verified sources and maintain a list of approved packages for development use.
+- **定期审计**：定期审计项目使用的所有第三方程序包，确保其来源可信。
+- **使用经过验证的来源**：只使用经过验证来源中的程序包，并维护开发环境的已批准程序包列表。

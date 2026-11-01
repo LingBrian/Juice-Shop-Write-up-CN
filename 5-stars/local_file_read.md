@@ -1,30 +1,30 @@
-# Juice-Shop Write-up: Local File Read (LFI)
+# Juice-Shop Write-up: 本地文件读取（LFI）
 
-## Challenge Overview
-**Title:** Local File Read (LFI)  
-**Category:** Server-Side Injection  
-**Difficulty:** ⭐⭐⭐⭐⭐ (5/6)  
+## 挑战概述
+**标题：** Local File Read (LFI)  
+**类别：** 服务端注入  
+**难度：** ⭐⭐⭐⭐⭐ (5/6)  
 
-The objective of this challenge is to exploit a local file read (LFI) vulnerability in the Juice Shop application to read sensitive files from the server.
+本挑战的目标是利用 Juice Shop 应用中的本地文件读取（LFI）漏洞，读取服务器上的敏感文件。
 
-## Tools Used
-- **Web Browser:** For navigating the Juice Shop application and accessing developer tools.
-- **Burp Suite:** For intercepting and modifying HTTP requests to test for injection points.
-- **Fuzzer:** For automated testing of potential parameters and values.
+## 使用工具
+- **Web 浏览器：** 用于浏览 Juice Shop 应用并访问开发者工具。
+- **Burp Suite：** 用于拦截和修改 HTTP 请求，以测试注入点。
+- **Fuzzer：** 用于自动测试潜在参数和值。
 
-## Methodology and Solution
+## 方法与解题过程
 
-### Step 1: Identifying the Vulnerable Endpoint
-In a previous challenge, the endpoint `http://localhost:3000/dataerasure` was identified as potentially vulnerable. This endpoint is responsible for handling GDPR data erasure requests.
+### 步骤 1：定位易受攻击的端点
+在之前的挑战中，我们发现端点 `http://localhost:3000/dataerasure` 可能存在漏洞。该端点负责处理 GDPR 数据擦除请求。
 
 <img src="../assets/difficulty5/local_file_read_1.png" alt="basic request" width="600px">
 
-### Step 2: Sending a Test Request
-1. **Navigate to Data Erasure Page:** Go to `http://localhost:3000/dataerasure` and submit a random GDPR erasure request.
-2. **Intercept the Request:** Use Burp Suite to capture the HTTP POST request.
+### 步骤 2：发送测试请求
+1. **访问数据擦除页面：** 前往 `http://localhost:3000/dataerasure` 并提交一个随机的 GDPR 擦除请求。
+2. **拦截请求：** 使用 Burp Suite 捕获 HTTP POST 请求。
 
-### Step 3: Analyzing the Request
-The intercepted request looks like this:
+### 步骤 3：分析请求
+拦截到的请求如下：
 ```http
 POST /dataerasure HTTP/1.1
 Host: localhost:3000
@@ -36,24 +36,24 @@ Cookie: [Your authentication cookies]
 email=admin%40juice-sh.op&securityAnswer=test
 ```
 
-### Step 4: Fuzzing the Parameters
-To find the vulnerable parameter, use a fuzzer to test different parameter values. The goal is to identify any parameter that causes the server to access files from the filesystem.
+### 步骤 4：模糊测试参数
+使用 fuzzer 测试不同参数值以找到易受攻击的参数。目标是找出会导致服务器访问文件系统中文件的参数。
 
-### Step 5: Identifying the Vulnerable Parameter
-After fuzzing, the parameter `layout` was found to be existent. A request with an invalid value for `layout` resulted in:
+### 步骤 5：识别易受攻击的参数
+模糊测试后发现存在 `layout` 参数。为 `layout` 提供无效值时，得到如下结果：
 ```http
 500 Internal Server Error
 Error: ENOENT: no such file or directory
 ```
-This error indicates that the server attempted to access a file based on the `layout` parameter.
+该错误表明服务器尝试根据 `layout` 参数访问文件。
 
 <img src="../assets/difficulty5/local_file_read_2.png" alt="response error example" width="600px">
 
-### Step 6: Crafting the Exploit
-The error message suggests the server accesses files from the path `<root_directory>/juice-shop/views/<value_of_layout_parameter>`. To exploit this, we can try to read known files on the server by manipulating the `layout` parameter.
+### 步骤 6：构造利用请求
+错误消息表明服务器会访问 `<root_directory>/juice-shop/views/<value_of_layout_parameter>` 路径中的文件。我们可以操纵 `layout` 参数，尝试读取服务器上已知的文件。
 
-1. **Target File:** One commonly known file is `package.json`.
-2. **Manipulate Parameter:** Modify the `layout` parameter to `../package.json`:
+1. **目标文件：** 常见文件之一是 `package.json`。
+2. **操纵参数：** 将 `layout` 参数修改为 `../package.json`：
 ```http
 POST /dataerasure HTTP/1.1
 Host: localhost:3000
@@ -65,18 +65,17 @@ Cookie: [Your authentication cookies]
 email=admin%40juice-sh.op&securityAnswer=test&layout=../package.json
 ```
 
-### Step 7: Sending the Exploit
-1. **Send the Request:** Use Burp Suite to send the crafted request.
+### 步骤 7：发送利用请求
+1. **发送请求：** 使用 Burp Suite 发送构造好的请求。
 
 <img src="../assets/difficulty5/nosql_exfiltration_3.png" alt="final request" width="600px">
 
-2. **Verify Response:** The response should include the contents of the `package.json` file, confirming the successful LFI exploit.
+2. **验证响应：** 响应应包含 `package.json` 文件内容，证实 LFI 利用成功。
 
-## Solution Explanation
-The challenge was solved by identifying a local file inclusion (LFI) vulnerability in the `layout` parameter of the `dataerasure` endpoint. By manipulating this parameter to point to a known file on the server, we were able to read the contents of the file, demonstrating the vulnerability.
+## 解题说明
+通过发现 `dataerasure` 端点 `layout` 参数中的本地文件包含（LFI）漏洞，并将该参数修改为服务器上的已知文件路径，成功读取了文件内容，展示了该漏洞。
 
-## Remediation
-- **Input Validation and Sanitization:** Ensure all user inputs are properly validated and sanitized to prevent path traversal and file inclusion attacks.
-- **Use Safe File Paths:** Avoid using user-supplied data directly in file paths. Use a whitelist of allowed files or directories.
-- **Error Handling:** Improve error handling to avoid revealing detailed error messages that can help attackers craft their payloads.
-
+## 修复建议
+- **输入验证与清理：** 验证和清理所有用户输入，防止路径遍历和文件包含攻击。
+- **使用安全文件路径：** 避免直接将用户提供的数据用于文件路径。使用允许文件或目录的白名单。
+- **错误处理：** 改进错误处理，避免泄露可帮助攻击者构造载荷的详细错误信息。

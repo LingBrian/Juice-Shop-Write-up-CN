@@ -1,52 +1,51 @@
-# Juice-Shop Write-up: GDPR Data Erasure
+# Juice-Shop 攻略：GDPR 数据擦除
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** GDPR Data Erasure\
-**Category:** Broken Authentication\
-**Difficulty:** ⭐⭐⭐ (3/6)
+**标题：** GDPR 数据擦除\
+**类别：** 身份验证失效\
+**难度：** ⭐⭐⭐ (3/6)
 
-The "GDPR Data Erasure" challenge requires to access an account that has been marked as deleted in compliance with GDPR requirements, which stipulates the right to erasure. 
+“GDPR 数据擦除”挑战要求访问一个因遵守 GDPR（《通用数据保护条例》）的删除权要求而被标记为已删除的账户。
 
-## Tools Used
+## 使用的工具
 
-- **Web Browser**: For interacting with the login page.
-- **HTTP Interception Tool** (e.g., Burp Suite): To capture and modify HTTP requests to inject SQL commands.
+- **Web 浏览器**：与登录页面交互。
+- **HTTP 拦截工具**（例如 Burp Suite）：捕获并修改 HTTP 请求，以注入 SQL 命令。
 
-## Methodology and Solution
+## 方法与解决方案
 
-### Identifying Vulnerability
+### 识别漏洞
 
-1. **SQL Injection Discovery**:
-   - Initially, attempt to log in with a normal user email and password. Notice that introducing a single quote in the email field (`'`) triggers a SQL error, indicating potential for SQL injection.
+1. **发现 SQL 注入**：
+   - 首先使用普通用户的电子邮箱和密码尝试登录。注意在电子邮箱字段中输入单引号（`'`）会触发 SQL 错误，这表明可能存在 SQL 注入漏洞。
 
-### Crafting the Injection
+### 构造注入
 
-2. **Analyzing SQL Error Output**:
-   - The error message leaked by the SQL server hints at the query structure, specifically showing how the application checks for a non-null `DeletedAt` field to determine if an account is considered deleted.
+2. **分析 SQL 错误输出**：
+   - SQL 服务器泄露的错误信息揭示了查询结构，具体显示应用如何通过检查非空的 `DeletedAt` 字段来判断账户是否已删除。
 
-   <img src="../assets/difficulty3/gdpr_data_erasure_1.png" alt="error message" width="500px">
+    <img src="../assets/difficulty3/gdpr_data_erasure_1.png" alt="error message" width="500px">
 
-3. **Injecting SQL to Target Deleted Accounts**:
-   - Modify the login request to include an SQL injection payload that alters the query logic to return an account where `DeletedAt` is NOT NULL. This payload could look like: `' OR DeletedAt IS NOT NULL --`.
+3. **注入 SQL 以定位已删除账户**：
+   - 修改登录请求，加入 SQL 注入载荷，改变查询逻辑，使其返回 `DeletedAt` 不为空的账户。载荷示例：`' OR DeletedAt IS NOT NULL --`。
 
-   <img src="../assets/difficulty3/gdpr_data_erasure_2.png" alt="sql injection" width="500px">
+    <img src="../assets/difficulty3/gdpr_data_erasure_2.png" alt="sql injection" width="500px">
 
+### 获得未授权访问
 
-### Gaining Unauthorized Access
+4. **执行注入**：
+   - 在电子邮箱字段中输入构造好的载荷，观察服务器行为。
+   - 被操纵的查询绕过应用正常的用户身份验证和授权流程，登录到首个 `DeletedAt` 字段非空的账户；该账户是 Chris 的账户。
 
-4. **Executing the Injection**:
-   - Input the crafted payload into the email field and observe the server's behavior.
-   - The manipulated query effectively bypasses the application's normal user authentication and authorization process, logging into the first account it finds with a non-null `DeletedAt` field, which turns out to be Chris's account.
+### 解决方案说明
 
-### Solution Explanation
+通过利用登录表单中的 SQL 注入漏洞，成功完成挑战。构造查询以忽略仅允许访问 `DeletedAt` 为空账户的预期逻辑后，便能访问标记为已删除的账户，暴露了严重的安全缺陷。
 
-The challenge was successfully resolved by exploiting an SQL injection vulnerability in the login form. By crafting a query that ignored the intended logic of only allowing access to accounts with a null `DeletedAt` field, access was gained to an account marked as deleted, demonstrating a critical security flaw.
+## 修复建议
 
-## Remediation
+为防止此类漏洞并保护用户数据（尤其是在遵守 GDPR 的情况下）：
 
-To prevent such vulnerabilities and secure user data, especially in compliance with GDPR:
-
-- **Prepared Statements**: Use prepared statements with bound, typed parameters to prevent SQL injection.
-- **Enhanced Login Security**: Implement multi-factor authentication to reduce the risk of unauthorized access.
-- **Proper Account Handling**: Ensure that account deletion or deactivation processes are robust and do not leave loopholes that could allow deleted accounts to be accessed.
+- **预处理语句**：使用带有绑定且类型明确的参数的预处理语句，防止 SQL 注入。
+- **加强登录安全性**：实施多因素身份验证，降低未授权访问风险。
+- **妥善处理账户**：确保账户删除或停用流程健全，不留下可能导致已删除账户被访问的漏洞。

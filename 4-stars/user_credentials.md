@@ -1,81 +1,77 @@
-# Juice-Shop Write-up: Users Credentials
+# Juice-Shop 攻略：用户凭据
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** Users Credentials\
-**Category:** Injection\
-**Difficulty:** ⭐⭐⭐⭐ (4/6)
+**标题：** Users Credentials\
+**类别：** 注入\
+**难度：** ⭐⭐⭐⭐ (4/6)
 
-This challenge was about exploiting an SQL Injection vulnerability to extract sensitive user credentials from the application's database.
+本挑战要求利用 SQL 注入漏洞，从应用数据库中提取敏感用户凭据。
 
-## Tools Used
+## 使用的工具
 
-- **Web Browser**: Used to interact with the application and manipulate URL parameters.
-- **Developer Tools**: Employed to inspect network traffic and modify HTTP requests.
+- **Web 浏览器**：用于与应用交互并篡改 URL 参数。
+- **开发者工具**：用于检查网络流量并修改 HTTP 请求。
 
-## Methodology and Solution
+## 方法与解法
 
-### Step 1: Identifying the Injection Point
+### 步骤 1：确定注入点
 
-1. **Exploration**:
-   - Initially, I tried various inputs such as the login form were tested for SQL Injection vulnerabilities but did not yield results.
+1. **探索**：
+   - 最初尝试在登录表单中输入各种内容来测试 SQL 注入漏洞，但没有成功。
 
    <img src="../assets/difficulty4/user_credentials_1.png" alt="sql injection" width="500px">
 
-   - Attention was redirected towards the endpoint of product search feature which appeared to interact directly with the database. I find this endpoint in requests :
+   - 随后转而调查商品搜索功能的端点，因为它看起来会直接与数据库交互。我在请求中找到了该端点：
 
    <img src="../assets/difficulty4/user_credentials_2.png" alt="request product using burp" width="500px">
 
+### 步骤 2：测试 SQL 注入
 
-### Step 2: Testing for SQL Injection
+2. **利用搜索功能**：
+   - 基本搜索会返回 JSON 结果，这意味着我们可以在客户端与该 API 交互：
 
-2. **Exploiting the Search Feature**:
-   - Basic search produce a JSON result which mean that we can interact with this API client side :
-   
    <img src="../assets/difficulty4/user_credentials_3.png" alt="endpoint search" width="500px">
 
-   - An attempt to perform a basic SQL injection was made using the search functionality by appending `' OR 1=1 /**/` to the search term, which successfully bypassed the initial search logic.
+   - 尝试在搜索词后附加 `' OR 1=1 /**/` 进行基本 SQL 注入，成功绕过了初始搜索逻辑。
 
    <img src="../assets/difficulty4/user_credentials_4.png" alt="full search" width="500px">
 
+### 步骤 3：构造注入查询
 
-### Step 3: Crafting the Injection Query
-
-3. **Determining Table Structure**:
-   - Initially, a basic union query was attempted to retrieve data from the `USERS` table: `test' UNION SELECT * FROM USERS /**/`. This resulted in an error indicating a mismatch in the number of columns.
+3. **确定表结构**：
+   - 最初尝试使用基本联合查询提取 `USERS` 表数据：`test' UNION SELECT * FROM USERS /**/`。结果报错，指出列数不匹配。
 
    <img src="../assets/difficulty4/user_credentials_5.png" alt="endpoint syntax error" width="500px">
 
    <img src="../assets/difficulty4/user_credentials_6.png" alt="select union error" width="500px">
 
+   - 经过进一步测试，确定了正确的列数，并将查询改为：`test')) UNION SELECT username, password, role, deletedAt, isActive, createdAt, id, deluxeToken, profileImage FROM USERS--`。
 
-   - Through further experimentation, the correct number of columns was determined, and the query was refined to: `test')) UNION SELECT username, password, role, deletedAt, isActive, createdAt, id, deluxeToken, profileImage FROM USERS--`.
+### 步骤 4：最终载荷和数据提取
 
-### Step 4: Final Payload and Data Retrieval
-
-4. **Successful Data Extraction**:
-   - Adjusting the query to match the column structure of the `Products` table allowed for the successful extraction of user credentials.
+4. **成功提取数据**：
+   - 调整查询，使其列结构与 `Products` 表匹配后，成功提取出用户凭据。
 
    <img src="../assets/difficulty4/user_credentials_7.png" alt="payload result" width="500px">
 
-   - To trigger the challenge flag, it was necessary to include the `email` field in the injection query, resulting in the final payload: `test')) UNION SELECT username, password, role, deletedAt, isActive, createdAt, id, email, profileImage FROM USERS--`.
+   - 为触发挑战标记，注入查询必须包含 `email` 字段，最终载荷为：`test')) UNION SELECT username, password, role, deletedAt, isActive, createdAt, id, email, profileImage FROM USERS--`。
 
    <img src="../assets/difficulty4/user_credentials_8.png" alt="new payload result" width="500px">
 
+## 解法说明
 
-## Solution Explanation
+我们利用商品搜索 API 端点中的 SQL 注入漏洞，直接从数据库中提取了用户名、密码和电子邮件地址等用户凭据。
 
-The challenge was overcome by exploiting an SQL Injection vulnerability within the product search API endpoint. This vulnerability was used to extract user credentials, including usernames, passwords, and email addresses, directly from the database.
+解法包含几个关键步骤：
+- 找到存在漏洞的端点。
+- 测试并确认 SQL 注入漏洞。
+- 构造与原始查询预期结构相匹配的查询，以避免错误。
+- 确保输出包含所有必要的用户字段，以满足挑战条件。
 
-The solution involved several key steps:
-- Identifying a vulnerable endpoint.
-- Testing and confirming the SQL Injection vulnerability.
-- Crafting a query that matched the expected structure of the original query to avoid errors.
-- Ensuring all necessary user fields were included in the output to meet the challenge criteria.
+### 安全措施
 
-### Security Measures
-
-To prevent such vulnerabilities:
-- **Input Sanitization**: Ensure all inputs are sanitized to prevent injection of malicious SQL code.
-- **Use of Prepared Statements**: Utilize prepared statements with parameterized queries to prevent SQL injection.
-- **Least Privilege**: Limit database permissions for applications to only those necessary for their function.
+为防止此类漏洞：
+- **输入清理**：清理所有输入，防止注入恶意 SQL 代码。
+- **使用预处理语句**：使用带参数的预处理语句防止 SQL 注入。
+- **最小权限原则**：将应用的数据库权限限制在其功能所需的最小范围内。

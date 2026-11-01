@@ -1,50 +1,50 @@
-# Juice-Shop Write-up: Forged Feedback Challenge
+# Juice-Shop 攻略：伪造反馈
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** Forged Feedback\
-**Category:** Broken Access Control\
+**标题：** 伪造反馈\
+**类别：** 访问控制失效\
 
-**Difficulty:** ⭐⭐⭐ (3/6)
+**难度：** ⭐⭐⭐ (3/6)
 
-This challenge involves exploiting insufficient access controls to post feedback under another user's name, illustrating vulnerabilities related to user identity management within a web application.
+本挑战利用访问控制不足的问题，以其他用户的名义发布反馈，体现了 Web 应用中用户身份管理相关的漏洞。
 
-## Tools Used
+## 使用的工具
 
-- Burp Suite (for intercepting and manipulating HTTP requests)
+- Burp Suite（用于拦截和修改 HTTP 请求）
 
-## Methodology and Solution
+## 方法与解决方案
 
-### Understanding the Application's Feedback Mechanism
+### 了解应用的反馈机制
 
-1. **Submit Feedback**: Initially, submit feedback normally through the application's interface to understand how the feedback submission process works.
+1. **提交反馈**：先通过应用界面正常提交反馈，了解反馈提交流程。
 
 <img src="../assets/difficulty3/forged_feedback_1.png" alt="normal feedback" width="500px">
 
-2. **Intercept the Request**: Using Burp Suite, capture the HTTP request sent when feedback is submitted. Analyze the request to understand its structure and the parameters it includes.
+2. **拦截请求**：使用 Burp Suite 捕获提交反馈时发送的 HTTP 请求，并分析请求结构及其包含的参数。
 
-### Exploiting the Vulnerability
+### 利用漏洞
 
-1. **Identify User Identification Mechanism**: Note that the feedback submission request includes a user identifier, likely an "user_id" or similar parameter, which the application uses to attribute the feedback to a specific user.
+1. **识别用户标识机制**：注意反馈提交请求包含用户标识符，可能是 `user_id` 或类似参数，应用会用它将反馈归属到特定用户。
 
-2. **Manipulate User Identifier**:
-   - Modify the "user_id" parameter in the intercepted request to the ID of another user, preferably a user with higher privileges like an admin, to test if the application enforces proper authorization checks.
+2. **操纵用户标识符**：
+   - 将被拦截请求中的 `user_id` 参数修改为另一位用户的 ID，最好选择权限较高的用户（例如管理员），以检验应用是否实施了正确的授权检查。
 
-   <img src="../assets/difficulty3/forged_feedback_2.png" alt="modified request" width="500px">
+<img src="../assets/difficulty3/forged_feedback_2.png" alt="modified request" width="500px">
    
-   - Resend the modified request to see if the feedback gets posted under the changed user ID.
+   - 重新发送修改后的请求，查看反馈是否以更改后的用户 ID 发布。
 
-3. **Verify the Outcome**: Check the application to confirm whether the feedback appears under the other user's profile or feedback history.
+3. **验证结果**：检查应用，确认反馈是否出现在另一位用户的个人资料或反馈历史中。
 
-## Solution Explanation
+## 解决方案说明
 
-The challenge was successfully resolved by manipulating the user identifier in the feedback submission process. This was possible because the server failed to validate whether the user submitting the feedback was the same as the user ID specified in the request. This type of vulnerability is indicative of broken access control mechanisms where the application does not adequately verify the user's identity or permissions before performing actions on their behalf.
+通过操纵反馈提交过程中的用户标识符，成功完成挑战。服务器没有验证提交反馈的用户是否与请求中指定的用户 ID 相同，因此可以实施此操作。这类漏洞表明访问控制失效：应用在代替用户执行操作前，没有充分验证其身份或权限。
 
-## Remediation
+## 修复建议
 
-To prevent such issues in real applications, consider the following security measures:
+为防止真实应用中出现此类问题，可考虑采取以下安全措施：
 
-- **Enhanced Server-Side Validation**: Ensure that all sensitive actions, such as posting feedback, include server-side checks to confirm that the user associated with the session is the same as the user the action is being performed for.
-- **Use Session Management**: Implement secure session management practices that map session IDs to user IDs securely. Actions should be authorized based on session ownership rather than relying on user-provided data like user IDs in the request.
-- **Audit and Monitoring**: Regularly audit user activities and access controls to detect and respond to unauthorized actions, ensuring that any anomalies are quickly identified and mitigated.
-- **Role-Based Access Control (RBAC)**: Enforce RBAC to ensure that users can only perform actions that correspond to their roles and permissions.
+- **加强服务器端验证**：确保所有敏感操作（例如发布反馈）都通过服务器端检查，确认会话用户与操作所针对的用户相同。
+- **使用会话管理**：实施安全的会话管理实践，将会话 ID 与用户 ID 安全关联。应依据会话归属授权操作，而不是依赖请求中由用户提供的用户 ID 等数据。
+- **审计与监控**：定期审计用户活动和访问控制，以发现并响应未经授权的操作，及时识别并缓解异常。
+- **基于角色的访问控制（RBAC）**：实施 RBAC，确保用户只能执行符合其角色和权限的操作。

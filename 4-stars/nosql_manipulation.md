@@ -1,23 +1,23 @@
-# Juice-Shop Write-up: NoSQL Manipulation
+# Juice-Shop 攻略：NoSQL 操纵
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** NoSQL Manipulation  
-**Category:** Injection  
-**Difficulty:** ⭐⭐⭐⭐ (4/6)
+**标题：** NoSQL Manipulation  
+**类别：** 注入  
+**难度：** ⭐⭐⭐⭐ (4/6)
 
-This challenge involves exploiting a NoSQL injection vulnerability to update multiple product reviews simultaneously in a NoSQL database.
+本挑战要求利用 NoSQL 注入漏洞，在 NoSQL 数据库中同时更新多条商品评论。
 
-## Tools Used
+## 使用的工具
 
-- **Interception Proxy (e.g., Burp Suite):** To capture and modify the HTTP requests.
-- **Knowledge of NoSQL Injection Techniques:** Understanding of MongoDB query operators.
+- **拦截代理（如 Burp Suite）：** 用于捕获和修改 HTTP 请求。
+- **NoSQL 注入技术知识：** 了解 MongoDB 查询运算符。
 
-## Methodology and Solution
+## 方法与解法
 
-### Step 1: Analyzing the Normal Update Request
+### 步骤 1：分析正常更新请求
 
-Initially, I captured a normal HTTP PATCH request by using Burp Suite. This request meant for updating a single product review. The request looked something like this:
+最初，我使用 Burp Suite 捕获了一个正常的 HTTP PATCH 请求。该请求用于更新单条商品评论，内容大致如下：
 
 ```http
 PATCH /rest/products/reviews HTTP/1.1
@@ -30,18 +30,17 @@ Content-Type: application/json
 }
 ```
 
-In Burp suite, looks like this :
+在 Burp suite 中，请求如下：
 
 <img src="../assets/difficulty4/nosql_manipulation_1.png" alt="burp suite request" width="500px">
 
+### 步骤 2：构造 NoSQL 注入载荷
 
-### Step 2: Crafting the NoSQL Injection Payload
+要利用 NoSQL 注入一次更新多条评论，需要篡改 JSON 载荷中的 `id` 参数。底层 NoSQL 数据库 MongoDB 会以特定方式解释某些模式。本次使用 `$ne`（不等于）运算符，它用于选择字段值不等于指定值的文档。使用 `{"$ne": null}` 可确保条件对所有条目成立（因为所有 `id` 都不为 `null`）。
 
-To exploit the NoSQL injection, the challenge was to update multiple reviews at once. This required manipulating the `id` parameter in the JSON payload. MongoDB, the underlying NoSQL database, interprets certain patterns in a specific way. For this task, I used the `$ne` (not equal) operator, which is a MongoDB operator to select the documents where the value of the field is not equal to the specified value. Using `{"$ne": null}` ensures that the condition is true for all entries (as none of the `id`s are `null`).
+### 步骤 3：发送修改后的请求
 
-### Step 3: Sending the Modified Request
-
-I modified the request to include the injection in the `id` field:
+我修改了请求，在 `id` 字段中加入注入内容：
 
 ```http
 PATCH /rest/products/reviews HTTP/1.1
@@ -54,15 +53,15 @@ Content-Type: application/json
 }
 ```
 
-Upon sending this request, the server processed it as a valid query, updating all reviews to have the same `message` due to the condition applied through NoSQL injection.
+发送请求后，服务器将其作为有效查询处理。由于 NoSQL 注入施加的条件，所有评论都被更新为相同的 `message`。
 
-### Solution Explanation
+### 解法说明
 
-The challenge was completed successfully by manipulating the product review update functionality using a NoSQL injection. The payload `{"$ne": null}` effectively bypassed the intended functionality of updating only specified entries, leading to an unauthorized bulk update of all entries in the database.
+我们通过利用商品评论更新功能中的 NoSQL 注入完成了挑战。载荷 `{"$ne": null}` 绕过了原本仅更新指定条目的限制，导致数据库中的所有条目被未授权批量更新。
 
-This kind of vulnerability arises from improper handling of user inputs in the application's backend, specifically when inputs are directly used in database queries without proper sanitation or parameterization, which is a common issue in applications using NoSQL databases like MongoDB.
+这种漏洞源于后端未正确处理用户输入，尤其是直接将输入用于数据库查询而不进行清理或参数化；使用 MongoDB 等 NoSQL 数据库的应用中也常见此类问题。
 
-### Security Recommendations
+### 安全建议
 
-- **Input Validation and Sanitization:** Ensure all inputs are validated and sanitized on the server side before being processed.
-- **Use of Parameterized Queries:** Always use parameterized queries or the equivalent provided by database management libraries to handle data input, especially in a NoSQL environment.
+- **输入验证和清理：** 在服务器端处理前验证并清理所有输入。
+- **使用参数化查询：** 始终使用参数化查询或数据库管理库提供的等效方式处理输入，尤其是在 NoSQL 环境中。

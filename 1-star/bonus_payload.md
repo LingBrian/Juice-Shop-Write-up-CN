@@ -1,39 +1,39 @@
-# Juice-Shop Write-up: Bonus Payload
+# Juice-Shop Write-up：Bonus Payload
 
-## Challenge Overview
+## 挑战概述
 
 **Title:** Bonus Payload\
 **Category:** Cross-Site Scripting (XSS)\
 **Difficulty:** ⭐ (1/6)
 
-Following the previous DOM XSS challenge, this "Bonus Payload" challenge requires to inject a more complex XSS payload involving an iframe that embeds a SoundCloud player. 
+继前一个 DOM XSS 挑战之后，本挑战要求注入更复杂的 XSS payload，其中包含嵌入 SoundCloud 播放器的 iframe。
 
-## Tools Used
+## 使用的工具
 
-- **Web Browser**: For executing the attack and observing its effects.
+- **Web Browser**：用于执行攻击并观察其效果。
 
-## Methodology and Solution
+## 方法与解决方案
 
-### Understanding the Payload
+### Payload 解析
 
-The given payload is an iframe designed to embed a SoundCloud music player into the application's DOM dynamically. This payload, while not malicious in nature, illustrates the potential for embedding arbitrary third-party content via XSS, which could lead to phishing attacks, unwanted advertisements, or malicious scripts.
+给定的 payload 是一个 iframe，用于将 SoundCloud 音乐播放器动态嵌入应用程序的 DOM。该 payload 本身并无恶意，但它展示了通过 XSS 嵌入任意第三方内容的可能性，而这可能导致钓鱼攻击、不需要的广告或恶意脚本。
 
-### Steps Taken to Solve the Challenge
+### 挑战解决步骤
 
-1. **Craft and Encode the Payload**:
-   - The provided iframe code was URL-encoded to ensure it would be processed correctly by the web browser when passed as a query parameter.
-   - The complete URL with the injected payload looked like this: `http://127.0.0.1:3000/#/search?q=%3Ciframe%20width%3D%22100%25%22%20height%3D%22166%22%20scrolling%3D%22no%22%20frameborder%3D%22no%22%20allow%3D%22autoplay%22%20src%3D%22https:%2F%2Fw.soundcloud.com%2Fplayer%2F%3Furl%3Dhttps%253A%2F%2Fapi.soundcloud.com%2Ftracks%2F771984076%26color%3D%2523ff5500%26auto_play%3Dtrue%26hide_related%3Dfalse%26show_comments%3Dtrue%26show_user%3Dtrue%26show_reposts%3Dfalse%26show_teaser%3Dtrue%22%3E%3C%2Fiframe%3E`
+1. **构造并编码 Payload**：
+   - 对提供的 iframe 代码进行 URL 编码，以确保其作为查询参数传递时能被 Web Browser 正确处理。
+   - 注入 payload 后的完整 URL 如下：`http://127.0.0.1:3000/#/search?q=%3Ciframe%20width%3D%22100%25%22%20height%3D%22166%22%20scrolling%3D%22no%22%20frameborder%3D%22no%22%20allow%3D%22autoplay%22%20src%3D%22https:%2F%2Fw.soundcloud.com%2Fplayer%2F%3Furl%3Dhttps%253A%2F%2Fapi.soundcloud.com%2Ftracks%2F771984076%26color%3D%2523ff5500%26auto_play%3Dtrue%26hide_related%3Dfalse%26show_comments%3Dtrue%26show_user%3Dtrue%26show_reposts%3Dfalse%26show_teaser%3Dtrue%22%3E%3C%2Fiframe%3E`
 
-2. **Execute the Attack**:
-   - By navigating to the manipulated URL, the iframe successfully rendered within the web application, embedding the SoundCloud player as intended.
+2. **执行攻击**：
+   - 访问修改后的 URL 后，iframe 在 Web 应用中成功渲染，并按预期嵌入 SoundCloud 播放器。
 
-### Solution Explanation
+### 解决方案说明
 
-The challenge was completed by demonstrating that it was possible to inject a complex iframe element into the web application via an XSS vulnerability. The iframe, in this case, embedded a SoundCloud player, showing how attackers could utilize XSS to insert almost any content into a vulnerable web application.
+本挑战通过证明可以利用 XSS 漏洞向 Web 应用注入复杂的 iframe 元素而完成。此处的 iframe 嵌入了 SoundCloud 播放器，说明攻击者可以利用 XSS 向易受攻击的 Web 应用插入几乎任意内容。
 
-## Remediation
+## 修复建议
 
-To protect against such XSS attacks, particularly those involving complex payloads like the one used in this challenge, follow these recommendations:
+为防范此类 XSS 攻击，尤其是包含复杂 payload 的攻击，请参考以下建议：
 
-- **Content Security Policy (CSP)**: Implement a CSP that restricts the sources from which scripts and iframes can be loaded. This policy helps prevent the execution of unauthorized scripts and embedding of undesired external content.
-- **Input Sanitization**: Ensure all user inputs are sanitized before being included in the DOM. This includes encoding or stripping out HTML elements from user inputs.
+- **Content Security Policy (CSP)**：实施 CSP，限制可加载脚本和 iframe 的来源。该策略有助于阻止未授权脚本执行，以及不需要的外部内容嵌入。
+- **输入净化**：确保在将所有用户输入加入 DOM 前都进行净化。这包括对 HTML 元素进行编码或移除。

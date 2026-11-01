@@ -1,49 +1,49 @@
-# Juice-Shop Write-up: Vulnerable Library
+# Juice-Shop 攻略：存在漏洞的程序库
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** Vulnerable Library\
-**Category:** Vulnerable Components  
-**Difficulty:** ⭐⭐⭐⭐ (4/6)
+**标题：** Vulnerable Library\
+**类别：** 易受攻击的组件  
+**难度：** ⭐⭐⭐⭐ (4/6)
 
-This challenge requires identifying a vulnerable library used in the Juice Shop application, highlighting the importance of maintaining updated dependencies to prevent security vulnerabilities.
+本挑战要求识别 Juice Shop 应用使用的存在漏洞的程序库，强调及时更新依赖项以避免安全漏洞的重要性。
 
-## Tools Used
+## 使用的工具
 
-- **Developer's backup file (`package.json.bak`)**: To review the dependencies used by Juice Shop.
-- **Online Vulnerability Databases (Snyk, NPM advisories)**: To check for known vulnerabilities in the listed libraries.
+- **开发者备份文件（`package.json.bak`）**：用于检查 Juice Shop 使用的依赖项。
+- **在线漏洞数据库（Snyk、NPM advisories）**：用于检查所列程序库是否存在已知漏洞。
 
-## Methodology and Solution
+## 方法与解法
 
-### Step 1: Analyzing the Developer's Backup
+### 步骤 1：分析开发者备份
 
-Starting with the developer's backup file, I reviewed all dependencies. Each library version was compared against known vulnerabilities documented in various security databases like Snyk and NPM advisories.
+首先检查开发者备份文件中的所有依赖项，并将每个程序库版本与 Snyk、NPM advisories 等安全数据库中记录的已知漏洞进行比对。
 
-### Step 2: Identifying the Vulnerable Library
+### 步骤 2：识别存在漏洞的程序库
 
-The `express-jwt` library, used for JWT authentication, was found to have significant vulnerabilities:
+发现用于 JWT 身份验证的 `express-jwt` 程序库存在重大漏洞：
 
-- **Library:** express-jwt
-- **Version:** < 6.0.0
-- **Vulnerability:** Authorization Bypass
-- **Details:** The configuration was not enforcing the `alg` algorithms entry, allowing bypass if `algorithms` was not explicitly set in conjunction with `jwks-rsa`.
+- **程序库：** express-jwt
+- **版本：** < 6.0.0
+- **漏洞：** 授权绕过
+- **详情：** 配置未强制要求 `alg` 算法条目；如果与 `jwks-rsa` 配合时未明确设置 `algorithms`，就可能被绕过。
 
 <img src="../assets/difficulty4/vulnerable_library_1.png" alt="vulnerability" width="500px">
 
-### Step 3: Reporting the Vulnerability
+### 步骤 3：报告漏洞
 
-After identifying the vulnerability, it was necessary to report it to the simulated shop's management through their platform, mimicking responsible disclosure practices.
+发现漏洞后，需要通过模拟商店管理平台向其管理方报告，以模拟负责任的漏洞披露流程。
 
-## Solution Explanation
+## 解法说明
 
-The express-jwt library below version 6.0.0 was vulnerable due to its handling of JWT configurations, particularly the lack of enforced algorithm checking. This could lead to authorization bypass if the attacker exploited the JWT algorithm header. Updating the library to version 6.0.0 or above would remediate the vulnerability, as these versions include patches that enforce stricter handling of JWT settings.
+6.0.0 之前版本的 express-jwt 在处理 JWT 配置时存在漏洞，尤其是没有强制检查算法。这可能使攻击者利用 JWT 算法头绕过授权。升级到 6.0.0 或更高版本可修复该漏洞，因为这些版本加强了 JWT 配置处理。
 
-Note : This vulnerability will be exploited in JWT challenges later ! 
+注意：后续的 JWT 挑战会利用此漏洞！
 
-## Remediation
+## 修复建议
 
-- **Regular Dependency Audits:** Regularly scan and audit software dependencies for known vulnerabilities and apply updates or patches promptly.
-- **Automated Security Tools:** Implement automated security tools like Snyk in the development pipeline to detect vulnerabilities early.
-- **Security Awareness:** Ensure that developers are aware of the risks associated with using outdated or vulnerable libraries and encourage secure coding practices.
+- **定期审计依赖项：** 定期扫描并审计软件依赖项中的已知漏洞，及时应用更新或补丁。
+- **自动化安全工具：** 在开发流水线中使用 Snyk 等自动化安全工具，尽早发现漏洞。
+- **安全意识：** 让开发者了解使用过时或存在漏洞程序库的风险，并鼓励安全编码实践。
 
-This challenge underscores the critical need to maintain an up-to-date library inventory to safeguard applications from known security threats.
+本挑战强调了维护最新程序库清单对于保护应用免受已知安全威胁的重要性。

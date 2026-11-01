@@ -1,64 +1,62 @@
-# Juice-Shop Write-up: GDPR Data Theft Challenge
+# Juice-Shop 攻略：GDPR 数据窃取挑战
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** GDPR Data Theft\
-**Category:** Sensitive Data Exposure\
-**Difficulty:** ⭐⭐⭐⭐ (4/6)
+**标题：** GDPR Data Theft\
+**类别：** 敏感数据泄露\
+**难度：** ⭐⭐⭐⭐ (4/6)
 
-This challenge requires exploiting a feature without using SQL injection or other common injection techniques to steal personal data in compliance with GDPR constraints.
+本挑战要求利用某项功能，在不使用 SQL 注入或其他常见注入技术的情况下，窃取个人数据，同时遵循 GDPR 相关限制。
 
-## Tools Used
+## 使用的工具
 
-- Web browser
-- Developer tools for inspecting JavaScript and network requests
+- Web 浏览器
+- 用于检查 JavaScript 和网络请求的开发者工具
 
-## Methodology and Solution
+## 方法与解法
 
-### Understanding the Functionality
+### 了解功能
 
-The web application has a feature that allows users to export their data. The process checks the last export time and if the attempt is made within five minutes of the last, it triggers a captcha. The application tracks this using a cookie or a session storage entry. To understand this workflow, I had analyzed the code in main.js :
-
+Web 应用提供了导出用户数据的功能。该流程会检查上次导出时间；如果两次尝试间隔不足五分钟，则会触发验证码。应用通过 cookie 或 session storage 条目跟踪此信息。为了解该流程，我分析了 `main.js` 中的代码：
 
 <img src="../assets/difficulty4/gdpr_data_theft_1.png" alt="code" width="500px">
 
-### Steps Taken to Solve the Challenge
+### 解题步骤
 
-1. **Review Application Behavior**: 
-   - Analyzed in how the application handles data exports and how it uses cookies to store the last export time.
-   - Noted that the server side strictly validates the time elapsed since the last export before allowing another.
+1. **查看应用行为**：
+   - 分析应用如何处理数据导出，以及如何使用 cookie 保存上次导出时间。
+   - 注意到服务器端会严格验证距上次导出的时间，之后才允许再次导出。
 
-2. **Initial Attempts**:
-   - Tried changing the client-side time to bypass the time check, which failed due to server-side validation.
-   - Considered using XSS to bypass or manipulate session storage but recalled the challenge hint against using injections.
+2. **初次尝试**：
+   - 尝试修改客户端时间绕过时间检查，但因服务器端验证而失败。
+   - 考虑利用 XSS 绕过或篡改 session storage，但想起挑战提示要求不要使用注入手段。
 
    <img src="../assets/difficulty4/gdpr_data_theft_2.png" alt="xss" width="500px">
 
-3. **Exploring User Identification**:
-   - Noticed from others challenges that the application obfuscates email addresses in certain requests by replacing parts of the email with asterisks, likely as a privacy measure.
-   - Speculated that the application might use a simplistic method to match these obfuscated emails to user accounts.
-   - For example, when creating an order on Juice Shop : 
-   
+3. **探索用户识别方式**：
+   - 从其他挑战中注意到，应用会在某些请求中混淆电子邮件地址，将部分字符替换为星号，这可能是隐私保护措施。
+   - 推测应用可能使用简单的方法，将这些混淆后的邮箱与用户账户匹配。
+   - 例如，在 Juice Shop 中创建订单时：
+
    <img src="../assets/difficulty4/gdpr_data_theft_3.png" alt="order" width="500px">
 
-4. **Exploiting Email Obfuscation**:
-   - Created a new account with an email address that, when obfuscated, would closely resemble the pattern of another user's obfuscated email.
-   - This was done based on the observed pattern from a previous order or interaction within the application where only parts of the email were visible, and asterisks replaced the rest.
+4. **利用邮箱混淆**：
+   - 创建一个新账户，其邮箱经过混淆后与另一用户的混淆邮箱模式相似。
+   - 这是根据之前订单或交互中观察到的邮箱显示模式进行的，其中部分字符可见，其余部分被星号替代。
 
-5. **Testing Access**:
-   - Asked for my data under the newly created email.
-   - Successfully accessed data that should have been restricted to the original user, indicating that the application matches users based on the obfuscated pattern rather than the full, actual email.
+5. **测试访问**：
+   - 使用新创建的邮箱请求导出我的数据。
+   - 成功访问了原本应限制给原用户的数据，这表明应用根据混淆后的模式而非完整真实邮箱匹配用户。
 
    <img src="../assets/difficulty4/gdpr_data_theft_4.png" alt="data" width="500px">
 
-### Solution Explanation
+### 解法说明
 
-This challenge was resolved by taking advantage of the flawed logic used to identify users based on partially obfuscated email addresses. By crafting an email that matched the obfuscated version, it was possible to access data intended for another user, thereby circumventing the intended data protection mechanisms without direct injection attacks.
+本挑战利用了按部分混淆邮箱识别用户的逻辑缺陷。构造一个与目标邮箱混淆形式相匹配的邮箱后，就可能访问原本属于另一用户的数据，从而在不直接使用注入攻击的情况下绕过预期的数据保护机制。
 
-## Remediation
+## 修复建议
 
-To prevent such vulnerabilities in real applications:
-- **Enhance Email Handling**: Ensure that internal mechanisms use complete and accurate identifiers rather than relying on partially visible or obfuscated data for critical operations.
-- **Secure Data Access Controls**: Implement robust access control checks that do not rely solely on user-provided data, especially data that could be easily mimicked or spoofed.
-- **Regular Security Audits**: Conduct thorough security audits and penetration testing to uncover and mitigate logic flaws that could lead to data exposure.
-
+为避免真实应用出现此类问题：
+- **改进邮箱处理**：关键操作的内部机制应使用完整、准确的标识符，而不能依赖部分可见或混淆的数据。
+- **保护数据访问**：实施健全的访问控制，不能仅依赖用户提供的数据，尤其是容易被仿冒的数据。
+- **定期进行安全审计**：开展全面的安全审计和渗透测试，以发现并缓解可能导致数据泄露的逻辑缺陷。

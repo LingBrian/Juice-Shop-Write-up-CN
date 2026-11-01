@@ -1,50 +1,50 @@
-# Juice-Shop Write-up: Empty User Registration
+# Juice-Shop Write-up：Empty User Registration
 
-## Challenge Overview
+## 挑战概述
 
 **Title:** Empty User Registration\
 **Category:** Improper Input Validation\
 **Difficulty:** ⭐⭐ (2/6)
 
-The "Empty User Registration" challenge requires to exploit vulnerabilities related to improper input validation by registering a user with no email and password. This challenge tests the robustness of the application's user input validation mechanisms.
+“Empty User Registration”挑战要求利用输入验证不当相关漏洞，在没有电子邮件和密码的情况下注册用户。本挑战用于测试应用的用户输入验证机制是否健全。
 
-## Tools Used
+## 使用的工具
 
-- **Web Browser**: For interacting with the registration interface.
-- **Burp Suite**: Used to intercept and modify HTTP requests.
+- **Web Browser**：用于与注册界面交互。
+- **Burp Suite**：用于拦截和修改 HTTP 请求。
 
-## Methodology and Solution
+## 方法与解决方案
 
-### Challenge Setup
+### 挑战准备
 
-We are tasked with creating an account but must find a way to bypass the normal validation checks that prevent registering with empty credentials.
+任务是创建账户，但需要找到绕过常规验证的方法，因为常规验证会阻止使用空凭据注册。
 
 <img src="../assets/difficulty2/empty_user_registration_1.png" alt="normal user registration" width="500px">
 
-### Steps Taken to Solve the Challenge
+### 挑战解决步骤
 
-1. **Intercept the Registration Request**:
-   - Using Burp Suite, the registration request was intercepted during a normal registration attempt. This captured the POST request sent to `/api/Users/`.
+1. **拦截注册请求**：
+   - 使用 Burp Suite，在正常注册过程中拦截注册请求。由此捕获发送到 `/api/Users/` 的 POST 请求。
 
    <img src="../assets/difficulty2/empty_user_registration_2.png" alt="request" width="500px">
 
-2. **Modify the Request Payload**:
-   - Initially, attempts were made to set the `email` and `password` fields to empty strings ("") or `null` values, which resulted in a "Bad Request" error or undesired normal user creation, respectively.
-   - The breakthrough came when these fields were completely removed from the JSON payload. Instead of setting the fields to an empty string or `null`, the entire key-value pairs for `email` and `password` were deleted from the request.
+2. **修改请求负载**：
+   - 最初尝试将 `email` 和 `password` 字段设为空字符串（`""`）或 `null`，结果分别是收到“Bad Request”错误，或意外创建了普通用户。
+   - 突破点是将这些字段从 JSON 负载中完全删除。也就是说，不设置为空字符串或 `null`，而是直接删除 `email` 和 `password` 的整个键值对。
 
-3. **Submit the Modified Request**:
-   - After removing the `email` and `password` entries entirely from the JSON payload, the modified request was forwarded. This resulted in the server processing the request without these fields, leading to the creation of a user with no email and password.
+3. **提交修改后的请求**：
+   - 从 JSON 负载中删除 `email` 和 `password` 条目后，转发修改后的请求。服务器在缺少这些字段的情况下仍处理了请求，并创建了没有电子邮件和密码的用户。
 
    <img src="../assets/difficulty2/empty_user_registration_3.png" alt="request" width="500px">
 
-### Solution Explanation
+### 解决方案说明
 
-The challenge was solved by identifying a flaw in the server's input validation process where the absence of key fields (`email` and `password`) was not adequately checked. By removing these fields entirely from the POST data, the application failed to enforce input validation rules that should have rejected such requests.
+本挑战发现了服务器输入验证流程中的缺陷：系统没有充分检查关键字段（`email` 和 `password`）缺失的情况。从 POST 数据中完全删除这些字段后，应用未能执行本应拒绝该请求的输入验证规则。
 
-## Remediation
+## 修复建议
 
-To prevent such vulnerabilities in real applications, the following measures should be implemented:
+为防止真实应用中出现此类漏洞，应实施以下措施：
 
-- **Strict Input Validation**: Ensure that all necessary fields are validated both in terms of existence and content. Requests lacking essential data should be outright rejected.
-- **Mandatory Field Checks**: Backend logic should include mandatory checks to verify that all required data fields are present and non-empty before processing.
-- **Use Schema Validation**: Implement schema validation for incoming data, which can automatically enforce rules about data presence, type, and format.
+- **严格的输入验证**：确保对所有必需字段进行存在性和内容验证。应直接拒绝缺少必要数据的请求。
+- **必填字段检查**：后端逻辑应包含必要的检查，确认所有必填数据字段均存在且非空，然后再处理请求。
+- **使用 Schema 验证**：对传入数据实施 schema 验证，以自动强制执行数据存在性、类型和格式规则。

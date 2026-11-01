@@ -1,42 +1,41 @@
-# Juice-Shop Write-up: Kill Chatbot
+# Juice-Shop Write-up: 关闭聊天机器人
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** Kill Chatbot  
-**Category:** Application Logic  
-**Difficulty:** ⭐⭐⭐⭐⭐ (5/6)
+**标题：** Kill Chatbot  
+**类别：** 应用逻辑  
+**难度：** ⭐⭐⭐⭐⭐ (5/6)
 
-This challenge involves disabling the chatbot feature on the Juice Shop platform without directly attacking the server or service, but rather through manipulating the chatbot's behavior via application vulnerabilities.
+本挑战要求通过利用应用漏洞操纵聊天机器人的行为，从而禁用 Juice Shop 平台上的聊天机器人功能，而不是直接攻击服务器或服务。
 
-## Tools Used
+## 使用工具
 
-- **Web Browser:** For interacting with the chatbot and inspecting web elements.
-- **Developer Tools:** To analyze the client-side code and network requests.
+- **Web 浏览器：** 用于与聊天机器人交互并检查网页元素。
+- **开发者工具：** 用于分析客户端代码和网络请求。
 
-## Methodology and Solution
+## 方法与解题过程
 
-### Step 1: Understanding the Chatbot Implementation
+### 步骤 1：了解聊天机器人的实现
 
-Upon initial analysis of the web page and its functionalities, the chatbot, identified as "juicy-chat-bot," seemed to operate based on a script loaded from an external source. Observations and code reviews suggested that the bot's operation might be controlled by conditions or flags that could potentially be manipulated.
+初步分析网页及其功能后，我发现名为“juicy-chat-bot”的聊天机器人似乎由外部来源加载的脚本驱动。观察和代码审查结果表明，机器人的运行可能受一些可操纵的条件或标志控制。
 
 <img src="../assets/difficulty5/kill_chatbot_4.png" alt="hint to external" width="500px">
 
+### 步骤 2：代码分析
 
-### Step 2: Code Analysis
-
-The JavaScript code managing the chatbot included functions that controlled its online status and response mechanisms. It appeared to manage sessions and user interactions using tokens and possibly evaluated conditions for active responses.
+管理聊天机器人的 JavaScript 代码中包含控制其在线状态和响应机制的函数。它似乎通过 token 管理会话和用户交互，并可能通过条件判断决定是否响应。
 
 <img src="../assets/difficulty5/kill_chatbot_3.png" alt="js code" width="500px">
 
-We found some pre-answered questions (irrevelant for this challenge, but might be useful later) : 
+我们还发现了一些预设问题（与本挑战无关，但之后可能有用）：
 
 <img src="../assets/difficulty5/kill_chatbot_6.png" alt="hint to external" width="500px">
 
-### Step 3: Exploiting Script Evaluation
+### 步骤 3：利用脚本执行
 
-Key discovery was that the chatbot used `vm2`'s `VM` module for executing dynamic scripts. This module, while designed to provide sandboxed execution of JavaScript code, could be prone to certain types of injection if not properly handled.
+关键发现是聊天机器人使用 `vm2` 的 `VM` 模块执行动态脚本。该模块虽然旨在提供 JavaScript 沙箱执行环境，但如果处理不当，可能容易受到某些注入攻击。
 
-We find a possible entry point here : 
+我们在这里找到一个可能的入口点：
 
 ```javascript
 addUser (token, name) {
@@ -44,7 +43,7 @@ addUser (token, name) {
   }
 ```
 
-This code really looks like an equivalent to "exec" function. Even if execution code does not appear in the repositority, I found on internet that in general it can be something like this : 
+这段代码看起来很像“exec”函数。虽然仓库中没有显示执行代码，但我在网上了解到，它通常可能类似于：
 
 ```javascript
 const { VM } = require('vm2');
@@ -54,36 +53,35 @@ this.factory.run = function(script) {
 };
 ```
 
-### Step 4: Code Injection
+### 步骤 4：代码注入
 
-The chatbot prompted users for their name, which was then processed by the `factory.run()` method, executing a script that included the user-provided name. This interaction provided an opportunity for injection if user input was incorporated into the script unsanitized. As mentionned before, we can guess that this function may work like an "exec" call in JS, meaning that we can try all related exploit.
+聊天机器人会要求用户输入姓名，然后由 `factory.run()` 方法处理，并执行包含用户输入姓名的脚本。如果用户输入未经清理就嵌入脚本，就可能存在注入机会。如前所述，我们可以推测此函数在 JS 中类似于“exec”调用，因此可以尝试相关利用方式。
 
-### Successful Payload Execution
+### 成功执行载荷
 
-By manipulating the input for the bot's name prompt, an injection was crafted to disrupt the process handling the chatbot:
+通过操纵机器人姓名提示的输入，我构造了一个注入内容，干扰了处理聊天机器人的进程：
 
 ```plaintext
 testname"); process=null; users.addUser("1234", "malicioususer")
 ```
 
-We put this payload into :
+将此载荷放入：
 ```plaintext
 this.factory.run(‘users.addUser(“${token}”, “${name}”)’)
 ```
 
-Which finally give us :
+最终得到：
 ```plaintext
-this.factory.run(‘users.addUser(“blabla”, “testname”); process=null; users.addUser(“1234”, "malicioususer")’)
+this.factory.run(‘users.addUser(“blabla”, “testname”); process=null; users.addUser(“1234”, "malicioususer”)’)
 ```
 
+该载荷试图取消关键进程变量或改变沙箱中的执行流程，从而停止聊天机器人的运行或破坏其状态。
 
-This payload aimed to unset critical process variables or alter the flow within the sandbox environment, effectively "killing" the chatbot by stopping its execution or corrupting its state.
+### 解题说明
 
-### Solution Explanation
+通过利用聊天机器人脚本处理逻辑中的脚本执行漏洞，成功干扰了聊天机器人。注入破坏进程状态的代码片段后，聊天机器人停止响应，达成挑战要求。这类漏洞凸显了使用未经清理的输入动态构造脚本并执行的风险。
 
-The successful disruption of the chatbot was achieved by exploiting the script execution vulnerability within the chatbot's script handling logic. By injecting a code segment that corrupted the process state, the chatbot ceased to respond, fulfilling the challenge's requirements. This type of vulnerability highlights the risks associated with executing dynamically constructed scripts with unsanitized input.
+### 安全建议
 
-### Security Recommendations
-
-- **Sanitize Inputs:** Always sanitize user inputs before including them in dynamically executed scripts or database queries.
-- **Secure Script Execution:** Utilize secure coding practices when implementing features like dynamic script execution. Libraries like `vm2` must be configured correctly to prevent escapes from the sandbox environment.
+- **清理输入：** 将用户输入放入动态执行脚本或数据库查询前，务必进行清理。
+- **安全执行脚本：** 实现动态脚本执行等功能时，应遵循安全编码实践。必须正确配置 `vm2` 等库，防止逃逸沙箱。

@@ -1,44 +1,40 @@
-# Juice Shop Write-up: Missing Encoding Challenge
+# Juice Shop Write-up：Missing Encoding Challenge
 
-## Challenge Overview
+## 挑战概述
 
 **Title:** Missing Encoding\
 **Category:** Improper Input Validation\
 **Difficulty:** ⭐ (1/6)
 
-This challenge ask us to retrieve a specific image from a web application that fails to load due to encoding issues in its URL. This involves understanding how web browsers handle URLs and the importance of proper URL encoding.
+本挑战要求获取 Web 应用中一张因 URL 编码问题而无法加载的特定图片。解决过程需要了解 Web browser 如何处理 URL，以及正确进行 URL 编码的重要性。
 
-## Tools Used
+## 使用的工具
 
-- Web browser with developer tools
-- Online URL encoding tool
+- 带开发者工具的 Web browser
+- 在线 URL 编码工具
 
-## Methodology and Solution
+## 方法与解决方案
 
-To address the "Missing Encoding" challenge, I followed these steps:
+为解决“Missing Encoding”挑战，我采取了以下步骤：
 
-1. **Identify the Issue**: Noticed an image that was not loading on the photo wall of the application. Inspecting the element using browser developer tools showed that the `src` attribute of the image tag contained special characters (emoji) which were not URL encoded.
-
-2. **Understand the Problem**: Realized that the lack of proper URL encoding for the special characters in the image source URL caused the browser to fail in fetching the image.
+1. **发现问题**：注意到应用照片墙上有一张图片无法加载。使用浏览器开发者工具检查该元素后发现，图片标签的 `src` 属性中含有未进行 URL 编码的特殊字符（emoji）。
 
 <img src="../assets/difficulty1/missing_encoding_1.png" alt="code image" width="500px">
 
-3. **Use URL Encoding Tool**: Accessed an online URL encoding tool to properly encode the URL that includes special characters. This involved encoding characters such as emojis which are not normally handled correctly by browsers if not properly encoded. This is the URL that I obtained : assets%2Fpublic%2Fimages%2Fuploads%2F%F0%9F%98%BC-%23zatschi-%23whoneedsfourlegs-1572600969477.jpg
-
-4. **Replace the URL**: Copied the encoded URL and replaced the original URL in the `src` attribute of the image tag using the browser's developer tools.
-
-5. **Reload and Verify**: Refreshed the page or reloaded the image to verify that the image now displayed correctly.
+2. **理解问题**：图片源 URL 中的特殊字符没有正确进行 URL 编码，导致浏览器无法获取图片。
+3. **使用 URL 编码工具**：使用在线 URL 编码工具，对含特殊字符的 URL 进行正确编码。需要编码的字符包括 emoji 等；如果未正确编码，浏览器通常无法正确处理它们。得到的 URL 是：assets%2Fpublic%2Fimages%2Fuploads%2F%F0%9F%98%BC-%23zatschi-%23whoneedsfourlegs-1572600969477.jpg
+4. **替换 URL**：复制编码后的 URL，并使用浏览器开发者工具将图片标签 `src` 属性中的原 URL 替换掉。
+5. **重新加载并验证**：刷新页面或重新加载图片，确认图片现在可以正常显示。
 
 <img src="../assets/difficulty1/missing_encoding_2.png" alt="image loaded" width="500px">
 
-## Solution Explanation
+## 解决方案说明
 
-The original URL of the image included emojis and other special characters that should have been URL encoded. Web browsers expect URLs to be properly encoded to interpret them correctly. The solution required encoding the URL so that the browser could correctly parse and locate the image on the server.
+图片的原始 URL 包含 emoji 和其他特殊字符，但这些字符应当进行 URL 编码。Web browser 需要正确编码的 URL 才能解析它们。解决方法是对 URL 进行编码，使浏览器能够正确解析并在服务器上定位图片。
 
-## Remediation
+## 修复建议
 
-The primary remediation step here is to ensure that all URLs, especially those that might contain non-standard characters, are properly URL encoded before being embedded in web pages. This can generally be handled in two ways:
+主要的修复措施是确保所有 URL，尤其是可能包含非标准字符的 URL，在嵌入网页之前都进行正确的 URL 编码。通常可以通过以下方式实现：
 
-- **Backend Solution**: Ensure that the server-side code that generates URLs encodes them before sending them to the client.
-- **Client-Side Checks**: Implement client-side checks or functions that encode URLs as needed before using them in an HTML document.
-
+- **后端方案**：确保服务器端代码在向客户端发送 URL 前先对其编码。
+- **客户端检查**：在 HTML 文档中使用 URL 前，实施客户端检查或函数，按需对 URL 进行编码。

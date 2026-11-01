@@ -1,51 +1,51 @@
-# Juice-Shop Write-up: Weird Crypto
+# Juice-Shop Write-up：Weird Crypto
 
-## Challenge Overview
+## 挑战概述
 
 **Title:** Weird Crypto\
 **Category:** Cryptographic Issues\
 **Difficulty:** ⭐⭐ (2/6)
 
-This challenge, "Weird Crypto," tests ability to identify and report the use of deprecated cryptographic methods within the application. Specifically, it focuses on the insecure implementation of password hashing.
+“Weird Crypto”挑战考察识别并报告应用中使用已弃用加密方法的能力，具体关注密码哈希的不安全实现。
 
-## Tools Used
+## 使用的工具
 
-- **Web Browser**: To inspect the authentication token and submit the vulnerability report.
-- **Base64 Decoder**: To decode authentication tokens that are encoded in Base64.
+- **Web Browser**：用于检查身份验证令牌并提交漏洞报告。
+- **Base64 Decoder**：用于解码经过 Base64 编码的身份验证令牌。
 
-## Methodology and Solution
+## 方法与解决方案
 
-### Analyzing the Authentication Token
+### 分析身份验证令牌
 
-1. **Token Inspection**:
-   - Extracted the JWT (JSON Web Token) from the browser's cookie storage.
-   - Noticed that the JWT payload is encoded in Base64. Used a Base64 decoder to reveal the contents. 
+1. **检查令牌**：
+   - 从浏览器的 cookie 存储中提取 JWT (JSON Web Token)。
+   - 注意到 JWT payload 使用 Base64 编码。使用 Base64 decoder 查看其内容。
 
    <img src="../assets/difficulty2/weird_crypto_1.png" alt="base64 decode" width="500px">
 
-   Note : a more simple approach maybe a simple copy paste in jwt.io
+   注：更简单的方法是将内容复制并粘贴到 jwt.io。
 
-### Identifying the Cryptographic Flaw
+### 识别加密缺陷
 
-2. **Decoding the JWT Payload**:
-   - Decoded the Base64 string to find the payload in clear text, revealing various user attributes including the hashed password.
-   - The hashed password appeared as `"password":"0192023a7bbd73250516f069df18b500"`.
+2. **解码 JWT Payload**：
+   - 解码 Base64 字符串以查看明文 payload，其中暴露了包括密码哈希在内的多个用户属性。
+   - 密码哈希显示为 `"password":"0192023a7bbd73250516f069df18b500"`。
 
-3. **Hash Analysis**:
-   - Recognized the hash pattern and length as indicative of an MD5 hash. Given MD5's known vulnerabilities and its deprecation in security best practices, this was identified as the target for reporting.
+3. **分析哈希**：
+   - 根据哈希的模式和长度，识别出它是 MD5 哈希。考虑到 MD5 已知的弱点以及它不符合当前安全最佳实践，因此将其确定为报告对象。
 
-### Reporting the Issue
+### 报告问题
 
-4. **Using the Contact Form**:
-   - Used the application's contact form to report the insecure use of MD5 for hashing passwords.
+4. **使用联系表单**：
+   - 使用应用的联系表单，报告使用 MD5 对密码进行哈希这一不安全做法。
 
-### Solution Explanation
+### 解决方案说明
 
-The challenge was completed by identifying the use of an insecure and outdated cryptographic method (MD5) for password hashing. By decoding the JWT and analyzing the hash, the method was confirmed. The issue was then reported through the appropriate channel within the application, fulfilling the challenge's requirements.
+本挑战通过识别应用使用了不安全且过时的加密方法（MD5）进行密码哈希而完成。解码 JWT 并分析哈希后确认了该方法，然后通过应用内的相应渠道报告问题，满足了挑战要求。
 
-## Remediation
+## 修复建议
 
-To mitigate the risk associated with deprecated cryptographic functions:
+为降低使用已弃用加密函数带来的风险：
 
-- **Upgrade Hashing Algorithms**: Replace MD5 with stronger hashing algorithms such as SHA-256 or bcrypt, which provide greater resistance to brute force attacks and do not suffer from quick hash computation and vulnerabilities like collision attacks.
-- **Add Salt**: Use a unique salt for each password hash to prevent the use of precomputed rainbow tables and increase the complexity of cracking efforts.
+- **升级哈希算法**：将 MD5 替换为更强的密码哈希算法，例如 SHA-256 或 bcrypt，以提高抵抗暴力破解的能力，避免哈希计算过快和碰撞攻击等问题。
+- **添加 Salt**：为每个密码哈希使用唯一的 salt，防止使用预计算彩虹表，并提高破解难度。

@@ -1,78 +1,78 @@
-# Juice-Shop Write-up: Unlock Premium Challenge
+# Juice-Shop Write-up: 解锁高级内容挑战
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** Unlock Premium Challenge  
-**Category:** Cryptographic Issues  
-**Difficulty:** ⭐⭐⭐⭐⭐⭐ (6/6)
+**标题：** Unlock Premium Challenge  
+**类别：** 密码学问题  
+**难度：** ⭐⭐⭐⭐⭐⭐ (6/6)
 
-This challenge requires finding and using a key to access a locked section of the OWASP Juice Shop that simulates a "premium content" paywall typically found in applications and games. The goal is to unlock this section without making any actual payments.
+本挑战要求找到并使用密钥，访问 OWASP Juice Shop 中模拟应用和游戏常见“高级内容”付费墙的锁定区域。目标是在不实际付款的情况下解锁该区域。
 
-## Tools Used
+## 使用工具
 
-- **Web Browser**: Used to navigate the Juice Shop and download files.
-- **Encryption Key Directory**: Accessed to retrieve the necessary decryption key.
-- **OpenSSL**: Used for decryption of encrypted strings.
+- **Web 浏览器**：用于浏览 Juice Shop 并下载文件。
+- **加密密钥目录**：用于获取所需的解密密钥。
+- **OpenSSL**：用于解密加密字符串。
 
-## Methodology and Solution
+## 方法与解题过程
 
-### Step 1: Finding the Encryption Key
+### 步骤 1：找到加密密钥
 
-As already mentionned in previous challenge, by analyzing the site with goBustery, I located an encryption keys directory:
+如前一挑战所述，使用 GoBuster 分析站点时，我找到了加密密钥目录：
 ```
 http://127.0.0.1:3000/encryptionkeys
 ```
-This directory listed a file named `premium.key`, which was promptly downloaded.
+该目录列出了名为 `premium.key` 的文件，我随即将其下载。
 
 <img src="../assets/difficulty6/premium_paywall_2.png" alt="key folder" width="500px">
 
-### Step 2: Analyzing the Key
+### 步骤 2：分析密钥
 
-Screenshot of the inside of the file : 
+文件内容截图：
 
 <img src="../assets/difficulty6/premium_paywall_3.png" alt="key file" width="500px">
 
-The content of `premium.key` seemed to be a hexadecimal string, likely used as an encryption key:
+`premium.key` 的内容看起来是十六进制字符串，可能用作加密密钥：
 
 ```
 1337133713371337.EA99A61D92D2955B1E9285B55BF2AD42
 ```
 
-This suggested its use in an AES-128 encryption scheme.
+这表明它可能用于 AES-128 加密方案。
 
-**Note:** You can retrieve this file from the files folder inside this github repository to save you some time.
+**注意：** 为节省时间，也可以从此 GitHub 仓库的 files 文件夹中获取该文件。
 
-### Step 3: Discovering the Encrypted Data
+### 步骤 3：发现加密数据
 
-The challenge hinted at bypassing a payment mechanism, which led me to search for hidden comments or scripts in the application that might contain encrypted data that I can decrypt with the key that we juste obtained. Initially, 
+挑战提示要绕过付款机制，因此我开始在应用中查找隐藏注释或脚本，寻找可以用刚获得的密钥解密的数据。最初，
 
-### Step 4: Manual Search and OWASP Guide Check
+### 步骤 4：手动搜索并检查 OWASP 指南
 
-I failed to find any encrypted strings directly in the site’s accessible source code. Upon reviewing the OWASP Juice Shop guide for solutions, I learned about an encrypted comment that was supposed to exist in the source code but didn't appear at the time when I've done this challenge.:
+我没能直接在网站可访问的源代码中找到加密字符串。查看 OWASP Juice Shop 指南中的解法后，我得知源代码中应该存在一条加密注释，但我完成挑战时并未找到：
 ```
 <!--IvLuRfBJYlmStf9XfL6ckJFngyd9LfV1JaaN/KRTPQPidTuJ7FR+D/nkWJUF+0xUF07CeCeqYfxq+OJVVa0gNbqgYkUNvn//UbE7e95C+6e+7GtdpqJ8mqm4WcPvUGIUxmGLTTAC2+G9UuFCD1DUjg==-->
 ```
 
-### Step 5: Decrypting the Hidden URL
+### 步骤 5：解密隐藏 URL
 
-Using the AES key from `premium.key` and OpenSSL, I decrypted the above base64-encoded string:
+使用 `premium.key` 中的 AES 密钥和 OpenSSL，解密上述 Base64 编码字符串：
 ```bash
 echo "IvLuRfBJYlmStf9XfL6ckJFngyd9LfV1JaaN/KRTPQPidTuJ7FR+D/nkWJUF+0xUF07CeCeqYfxq+OJVVa0gNbqgYkUNvn//UbE7e95C+6e+7GtdpqJ8mqm4WcPvUGIUxmGLTTAC2+G9UuFCD1DUjg==" | openssl enc -d -aes-256-cbc -K EA99A61D92D2955B1E9285B55BF2AD42 –iv 337133713371337 -a –A
 ```
-This revealed a URL hidden behind the paywall:
+这揭示了付费墙后隐藏的 URL：
 ```
 http://localhost:3000/this/page/is/hidden/behind/an/incredibly/high/paywall/that/could/only/be/unlocked/by/sending/1btc/to/us
 ```
 
-### Step 6: Accessing the Hidden Content
+### 步骤 6：访问隐藏内容
 
-Navigating to the decrypted URL granted access to the premium content section of the Juice Shop, bypassing the payment mechanism entirely and solving the challenge.
+访问解密得到的 URL 后，即可进入 Juice Shop 的高级内容区域，完全绕过付款机制并完成挑战。
 
-## Solution Explanation
+## 解题说明
 
-The challenge was addressed by decrypting an encrypted URL using a key found in the server's exposed file directory. This method circumvented the simulated paywall, illustrating the risk of leaving sensitive keys accessible and the importance of securing payment-related features.
+本挑战通过使用从服务器暴露目录中找到的密钥解密 URL 来解决，绕过了模拟付费墙。这表明公开暴露敏感密钥的风险，以及保护支付相关功能的重要性。
 
-## Remediation
+## 修复建议
 
-- **Secure Key Storage**: Never store encryption keys openly accessible directories or embed them within client-side code.
-- **Access Control**: Implement strict access control measures to prevent unauthorized access to sensitive directories and files.
+- **安全存储密钥**：切勿将加密密钥存放在可公开访问的目录中，也不要将其嵌入客户端代码。
+- **访问控制**：实施严格的访问控制，防止未经授权访问敏感目录和文件。

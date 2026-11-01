@@ -1,29 +1,29 @@
-# Juice-Shop Write-up: Login Uvogins
+# Juice-Shop 攻略：登录 Uvogin
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** Login Uvogins  
-**Category:** Broken Authentication  
-**Difficulty:** ⭐⭐⭐⭐ (4/6)
+**标题：** Login Uvogins  
+**类别：** 身份验证失效  
+**难度：** ⭐⭐⭐⭐ (4/6)
 
-This challenge involves logging into the account of Uvogin at Juice Shop using information derived from public sources and his security question.
+本挑战要求利用公开来源收集的信息和安全问题，登录 Juice Shop 中 Uvogin 的账户。
 
-## Tools Used
+## 使用的工具
 
-- **Web Browser**: For accessing the Juice Shop and social media platforms.
-- **Social Media Platforms**: Particularly Twitter, to gather clues about Uvogin's personal preferences and potential security question answers.
+- **Web 浏览器**：用于访问 Juice Shop 和社交媒体平台。
+- **社交媒体平台**：尤其是 Twitter，用于收集 Uvogin 的个人喜好线索和安全问题答案。
 
-## Methodology and Solution
+## 方法与解法
 
-### Step 1: Identify Uvogin's Email and Security Question
+### 步骤 1：确定 Uvogin 的邮箱和安全问题
 
-- **Email:** uvogin@juice-sh.op
-- **Security Question:** "What is your favorite movie?"
+- **邮箱：** uvogin@juice-sh.op
+- **安全问题：** "你最喜欢的电影是什么？"
 
-### Step 2: Analyzing Uvogin's Writing Style
+### 步骤 2：分析 Uvogin 的写作风格
 
-1. **Leet Speak Analysis**:
-   - Uvogin's comments are consistently written in Leet Speak, substituting letters with numbers and special characters.
+1. **分析 Leet Speak**：
+   - Uvogin 的评论一贯使用 Leet Speak，以数字和特殊字符替换字母。
 
    <img src="../assets/difficulty4/login_uvogin_1.png" alt="leet 1" width="500px">
 
@@ -31,38 +31,37 @@ This challenge involves logging into the account of Uvogin at Juice Shop using i
 
    <img src="../assets/difficulty4/login_uvogin_3.png" alt="leet 3" width="500px">
 
-   - Comments like "0 stars for this horrible security" showcase his frustration and hint at his distinct style of communication.
+   - 诸如“0 stars for this horrible security”的评论体现了他的不满，也暗示了其独特的表达风格。
 
-### Step 3: Utilizing OSINT
+### 步骤 3：利用 OSINT
 
-2. **Online Search**:
-   - Following the hint about alias reuse and unique writing habits, an online search for `Uv0g1n` was conducted, focusing on platforms like Twitter.
+2. **在线搜索**：
+   - 根据有关重复使用别名和独特写作习惯的提示，我在线搜索了 `Uv0g1n`，重点查看 Twitter 等平台。
 
    <img src="../assets/difficulty4/login_uvogin_4.png" alt="twitter of uv0g1n" width="500px">
 
-3. **Finding Relevant Accounts**:
-   - A Twitter profile matching the username `Uv0gin` was found, which appeared to be a fan account referencing the anime "Hunter x Hunter", but this was not the correct answer.
-   - This response to a tweet of Uv0gin provided a key clue in a tweet praising the movie "Silence of the Lambs" :
+3. **找到相关账户**：
+   - 找到了一个用户名为 `Uv0gin` 的 Twitter 个人资料，看起来是提及动漫《Hunter x Hunter》的粉丝账户，但答案并不在这里。
+   - Uv0gin 对一条推文的回复提供了关键线索，其中称赞了电影 "Silence of the Lambs"：
 
    <img src="../assets/difficulty4/login_uvogin_5.png" alt="reponse tweet" width="500px">
 
-### Step 4: Testing the Security Question Answer
+### 步骤 4：测试安全问题答案
 
-4. **Resetting the Password**:
-   - Using the answer "Silence of the Lambs" derived from the tweet, the password reset function on Juice Shop was successfully used to reset Uvogin's password.
+4. **重置密码**：
+   - 使用从推文中得到的答案 "Silence of the Lambs"，通过 Juice Shop 的密码重置功能成功重置了 Uvogin 的密码。
 
    <img src="../assets/difficulty4/login_uvogin_6.png" alt="answer to security question" width="500px">
 
-5. **Logging into the Account**:
-   - After resetting the password, access to Uvogin's account was gained using the new credentials.
+5. **登录账户**：
+   - 重置密码后，使用新凭据成功访问 Uvogin 的账户。
 
-## Solution Explanation
+## 解法说明
 
-This challenge was resolved by connecting Uvogin's unique Leet Speak style to his social media activity, identifying his favorite movie through a Twitter post, and using that information to answer his security question on Juice Shop. This method highlights the importance of careful personal information management on public platforms, as seemingly innocuous details can compromise security.
+本挑战通过将 Uvogin 独特的 Leet Speak 风格与其社交媒体活动联系起来，从 Twitter 帖子中找到他最喜欢的电影，并用其回答 Juice Shop 的安全问题。这说明公开平台上看似无关紧要的个人信息也可能危及账户安全。
 
-### Security Recommendations
+### 安全建议
 
-- **Stronger Security Questions**: Use more complex and less predictable security questions.
-- **Awareness of Online Presence**: Educate users about the risks associated with sharing too much personal information online.
-- **Don't use Security Questions**: Best security practice is to not use security questions for ressettings password, but rather send an email to user to confirm that he want to change his password.
-
+- **使用更强的安全问题**：选择更复杂且不易预测的安全问题。
+- **注意网络公开信息**：让用户了解在网上分享过多个人信息的风险。
+- **不要使用安全问题**：最佳安全实践是不使用安全问题重置密码，而是向用户发送电子邮件，确认其确实希望更改密码。

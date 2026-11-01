@@ -1,41 +1,41 @@
-# Juice Shop Write-up: Error Handling Challenge
+# Juice Shop Write-up：Error Handling Challenge
 
-## Challenge Overview
+## 挑战概述
 
 **Title:** Error Handling\
 **Category:** Security Misconfiguration\
 **Difficulty:** ⭐ (1/6)
 
-This challenge involves provoking an error that reveals backend details due to improper or non-systematic error handling. The task tests understanding of how server misconfigurations can expose sensitive information and system details that could be exploited.
+本挑战通过触发错误，揭示因错误处理不当或缺乏系统性而泄露的后端细节。任务考察对服务器配置错误如何暴露敏感信息和系统详情，以及这些信息可能如何被利用的理解。
 
-## Tools Used
+## 使用的工具
 
 - Web browser
-- Knowledge of common web server configurations and error handling
+- 常见 Web 服务器配置和错误处理知识
 
-## Methodology and Solution
+## 方法与解决方案
 
-To successfully complete the challenge, I followed these steps:
+为成功完成挑战，我采取了以下步骤：
 
-1. **Experiment with URL Paths**: Accessed various non-existent or restricted URL paths on the application's server to trigger error responses.
-2. **Analyze Error Messages**: Carefully examined the error messages for any signs of verbose or detailed information leakage.
-3. **Provoke Specific Errors**: Tried accessing file types that might not be supported or allowed by the server configuration, based on the hint provided.
+1. **尝试不同 URL 路径**：访问应用服务器上各种不存在或受限的 URL 路径，以触发错误响应。
+2. **分析错误消息**：仔细检查错误消息，寻找冗长或详细的信息泄露迹象。
+3. **触发特定错误**：根据提示，尝试访问服务器配置可能不支持或禁止的文件类型。
 
-## Solution Explanation
+## 解决方案说明
 
-The error was provoked by attempting to access an invalid URL on the server, which was intended to load unsupported file types or directories. The server responded with a detailed error message indicating:
+通过尝试访问服务器上的无效 URL，触发了错误；该 URL 原本用于加载不支持的文件类型或目录。服务器返回了详细错误消息，其中显示：
 
 <img src="../assets/difficulty1/error_handling_1.png" alt="error" width="500px">
 
-- **403 Error**: The server explicitly rejected the request due to the attempted access of a restricted or unsupported file type.
-- **Verbose Error Message**: The error message displayed detailed information about the server's configuration, specifically revealing that the server is running "Express JS version 4.17.1."
+- **403 Error**：服务器明确拒绝了请求，因为访问了受限或不支持的文件类型。
+- **冗长的错误消息**：错误消息详细展示了服务器配置信息，具体暴露了服务器运行的是 “Express JS version 4.17.1”。
 
-This information is valuable as it exposes the backend technology and its version, which could help an attacker identify specific vulnerabilities associated with this version of Express JS.
+这些信息暴露了后端技术及其版本，可能帮助攻击者识别与该 Express JS 版本相关的特定漏洞。
 
-## Remediation
+## 修复建议
 
-To prevent such information leakage, consider the following steps:
+为防止此类信息泄露，可考虑以下步骤：
 
-- **Implement Generic Error Messages**: Customize error pages to provide less information about the server's backend or software versions.
-- **Error Handling Best Practices**: Review and apply best practices for error handling that avoid revealing details about the server's architecture, software stack, or directory structure.
-- **Regular Updates and Patching**: Keep server software updated to mitigate known vulnerabilities, especially when version details might be disclosed inadvertently.
+- **使用通用错误消息**：自定义错误页面，减少其中有关服务器后端或软件版本的信息。
+- **遵循错误处理最佳实践**：审查并应用错误处理最佳实践，避免泄露服务器架构、软件栈或目录结构等细节。
+- **定期更新和打补丁**：保持服务器软件为最新版本，以缓解已知漏洞，尤其是在版本信息可能意外泄露时。

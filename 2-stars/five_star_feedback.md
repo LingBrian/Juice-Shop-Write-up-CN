@@ -1,44 +1,42 @@
-# Juice-Shop Write-up: Five-Star Feedback
+# Juice-Shop Write-up：Five-Star Feedback
 
-## Challenge Overview
+## 挑战概述
 
 **Title:** Five-Star Feedback\
 **Category:** Broken Access Control\
 **Difficulty:** ⭐⭐ (2/6)
 
-The "Five-Star Feedback" challenge requires to manipulate the review system of a web application by deleting all five-star reviews. 
+“Five-Star Feedback”挑战要求操纵 Web 应用的评价系统，删除所有五星评价。
 
-## Tools Used
+## 使用的工具
 
-- **Web Browser**: To interact with the administration dashboard of the application.
-- **Access to Admin Panel**: Utilizing previously obtained administrative access to navigate and modify application data.
+- **Web Browser**：用于与应用的管理仪表板交互。
+- **Admin Panel 访问权限**：使用先前获得的管理员权限浏览和修改应用数据。
 
-## Methodology and Solution
+## 方法与解决方案
 
-### Accessing the Admin Panel
+### 访问 Admin Panel
 
-1. **Utilize Administrative Privileges**:
-   - From a previous challenge, administrative access was gained, allowing the exploration of functionalities not available to regular users, including the management of user feedback.
-   
-2. **Locating the Feedback Management Section**:
-   - Inside the admin panel, navigated to the section where user reviews and feedback are managed.
+1. **使用管理员权限**：
+   - 在先前的挑战中获得了管理员访问权限，因此可以探索普通用户无法使用的功能，包括管理用户反馈。
+2. **找到反馈管理区域**：
+   - 在管理面板中找到管理用户评价和反馈的区域。
 
-### Deleting Five-Star Reviews
+### 删除五星评价
 
-3. **Identify Five-Star Reviews**:
-   - Reviews are typically displayed with associated star ratings. Identified all entries with a five-star rating ready for deletion.
-   
+3. **识别五星评价**：
+   - 评价通常会显示对应的星级评分。找到所有五星评价并准备删除。
+
    <img src="../assets/difficulty2/five_star_feedback_1.png" alt="admin panel view" width="500px">
 
+### 解决方案说明
 
-### Solution Explanation
+本挑战通过利用访问控制不足而完成：访问控制本应限制只有授权人员才能删除反馈；即使是授权人员，也不应在没有适当监督或理由的情况下批量删除内容。
 
-The challenge was completed by exploiting insufficient access control measures that should restrict the deletion of feedback to authorized personnel only, and even then, should not allow mass deletions without proper oversight or rationale. 
+## 修复建议
 
-## Remediation
+为保护真实应用免受此类漏洞影响，可考虑以下措施：
 
-To secure against such vulnerabilities in real-world applications, consider the following measures:
-
-- **Role-Based Access Control (RBAC)**: Ensure that only authorized personnel have the ability to modify or delete user-generated content. Implement strict RBAC policies that define who can perform what actions within the admin panel.
-- **Audit Trails**: Maintain an audit trail that logs all administrative actions, especially those that affect user data or feedback. This helps in accountability and in tracing how certain actions were allowed or executed.
-- **Review Deletion Justifications**: Implement mechanisms that require administrators to provide justifications for deleting high volumes of content, especially positive content, which could be abused.
+- **基于角色的访问控制 (RBAC)**：确保只有授权人员能够修改或删除用户生成的内容。在管理面板中实施严格的 RBAC 策略，明确谁可以执行哪些操作。
+- **审计跟踪**：记录所有管理操作，尤其是影响用户数据或反馈的操作，以便落实问责并追踪特定操作如何获准或执行。
+- **要求说明删除理由**：建立相应机制，要求管理员在删除大量内容（尤其是正面内容）时提供理由，以防功能遭到滥用。

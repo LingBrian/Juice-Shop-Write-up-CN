@@ -1,65 +1,65 @@
-# Juice-Shop Write-up: Product Tempering
+# Juice-Shop 攻略：篡改商品信息
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** Product Tempering\
-**Category:** Broken Access Control\
-**Difficulty:** ⭐⭐⭐ (3/6)
+**标题：** 篡改商品信息\
+**类别：** 访问控制失效\
+**难度：** ⭐⭐⭐ (3/6)
 
-The challenge, "Product Tempering," involves changing the href attribute of a hyperlink within the product description of the "OWASP SSL Advanced Forensic Tool (O-Saft)" to point to a new URL: `https://owasp.slack.com`.
+本挑战要求更改“OWASP SSL Advanced Forensic Tool (O-Saft)”商品描述中超链接的 href 属性，使其指向新 URL：`https://owasp.slack.com`。
 
-## Tools Used
+## 使用的工具
 
-- **Web Browser**: To navigate the application and interact with product management features.
-- **Burp Suite** : To modify and resend HTTP requests to the server.
+- **Web 浏览器**：浏览应用并使用商品管理功能。
+- **Burp Suite**：修改请求并重新发送到服务器。
 
-## Methodology and Solution
+## 方法与解决方案
 
-### Identifying the Injection Point
+### 找到注入点
 
-1. **Access Control Check**:
-   - Navigate to the accounting section where products can be updated, indicating a possible lack of strict access controls on who can modify product details.
+1. **检查访问控制**：
+   - 前往可更新商品的会计页面；这表明可能没有严格限制哪些用户可以修改商品详情。
 
-   <img src="../assets/difficulty3/product_tampering_1.png" alt="admin panel" width="500px">
+    <img src="../assets/difficulty3/product_tampering_1.png" alt="admin panel" width="500px">
 
-### Attempting the Update
+### 尝试更新
 
-2. **Capture and Analyze HTTP Requests**:
-   - Capture the request sent when updating a product description using developer tools or Burp Suite.
-   - Initial attempts to modify the description by overiding it did not reflect changes, suggesting backend validation or filtering of input.
+2. **捕获并分析 HTTP 请求**：
+   - 使用开发者工具或 Burp Suite 捕获更新商品描述时发送的请求。
+   - 最初尝试覆盖描述内容，但未能生效，这表明后端可能对输入进行了验证或过滤。
 
-   <img src="../assets/difficulty3/product_tampering_2.png" alt="override" width="500px">
-    
-### Exploring API Endpoints
+    <img src="../assets/difficulty3/product_tampering_2.png" alt="override" width="500px">
+     
+### 探索 API 端点
 
-3. **API Endpoint Discovery**:
-   - Use the browser or a tool to list all product details by accessing the `/api/Products` endpoint.
-   - Identify the specific product ID for the "OWASP SSL Advanced Forensic Tool (O-Saft)" from the JSON response.
-   - Identify that this endpoint is vulnerable to description override :
+3. **发现 API 端点**：
+   - 使用浏览器或工具访问 `/api/Products`，列出所有商品详情。
+   - 从 JSON 响应中找到“OWASP SSL Advanced Forensic Tool (O-Saft)”的特定商品 ID。
+   - 发现此端点存在描述覆盖漏洞：
 
-   <img src="../assets/difficulty3/product_tampering_3.png" alt="descritpion override" width="500px">
+    <img src="../assets/difficulty3/product_tampering_3.png" alt="descritpion override" width="500px">
 
-### Successful Payload Delivery
+### 成功提交载荷
 
-4. **Constructing the Successful Payload**:
-   - Construct a JSON payload with the `description` field altered to include the new hyperlink: `<a href="https://owasp.slack.com" target="_blank">More...</a>`.
-   - Submit the modified payload to the API endpoint responsible for updating product details, e.g., `/api/Products/[ID]`, using the correct product ID.
+4. **构造有效载荷**：
+   - 构造 JSON 载荷，将 `description` 字段修改为包含新超链接：`<a href="https://owasp.slack.com" target="_blank">More...</a>`。
+   - 使用正确的商品 ID，通过负责更新商品详情的 API 端点提交修改后的载荷，例如 `/api/Products/[ID]`。
 
-   <img src="../assets/difficulty3/product_tampering_4.png" alt="modified request" width="500px">
+    <img src="../assets/difficulty3/product_tampering_4.png" alt="modified request" width="500px">
 
-### Verifying the Result
+### 验证结果
 
-5. **Verification**:
-   - Check the product description in the application to ensure that the hyperlink has been changed as intended.
-   - Confirm that the link points to the new target URL, `https://owasp.slack.com`.
+5. **验证**：
+   - 在应用中检查商品描述，确认超链接已按预期更改。
+   - 确认链接指向新的目标 URL：`https://owasp.slack.com`。
 
-## Conclusion
+## 结论
 
-Successfully changing the product link indicates a critical flaw in how user input is handled and validated on the server side, allowing unauthorized modifications to product details. This type of vulnerability can lead to misinformation, phishing attacks, or other malicious outcomes if exploited by an attacker.
+成功更改商品链接，说明服务器端处理和验证用户输入的方式存在严重缺陷，导致未经授权的商品详情修改。攻击者利用此类漏洞可能造成错误信息、网络钓鱼或其他恶意后果。
 
-## Remediation
+## 修复建议
 
-To prevent such vulnerabilities:
+为防止此类漏洞：
 
-- **Implement Strict Role-Based Access Controls (RBAC)**: Ensure that only authorized personnel can modify product details.
-- **Sanitize and Validate All Inputs**: Properly sanitize and validate all user inputs, especially in product descriptions that allow HTML content.
+- **实施严格的基于角色的访问控制（RBAC）**：确保只有获授权的人员可以修改商品详情。
+- **清理并验证所有输入**：妥善清理和验证所有用户输入，尤其是允许包含 HTML 内容的商品描述。

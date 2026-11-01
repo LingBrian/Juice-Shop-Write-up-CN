@@ -1,53 +1,52 @@
-# Juice-Shop Write-up: Zero Stars Challenge
+# Juice-Shop Write-up：Zero Stars Challenge
 
-## Challenge Overview
+## 挑战概述
 
 **Title:** Zero Stars\
 **Category:** Improper Input Validation\
 **Difficulty:** ⭐ (1/6)
 
-This challenge involves giving a zero-star feedback rating to a store, exploiting improper input validation mechanisms. The challenge tests abilities to manipulate web forms and intercept network requests to alter data before submission.
+本挑战通过利用输入验证不当，将商店反馈评分设为零星。本挑战考察操纵 Web 表单以及拦截网络请求并在提交前修改数据的能力。
 
-## Tools Used
+## 使用的工具
 
-- Web browser with developer tools
-- Burp Suite (or any other suitable network interception tool)
+- 带开发者工具的 Web browser
+- Burp Suite（或其他合适的网络拦截工具）
 
-## Methodology and Solution
+## 方法与解决方案
 
-To complete the "Zero Stars" challenge, two different methods were successfully employed:
+完成“Zero Stars”挑战时，成功采用了两种不同方法：
 
-### Method 1: Intercepting and Modifying Network Requests
+### 方法 1：拦截并修改网络请求
 
-1. **Setup Interception**: Configured Burp Suite to intercept the HTTP requests sent from the browser using Proxy functionnality.
-2. **Submit Review**: Attempted to submit a review normally through the website's interface, capturing the outgoing request in Burp Suite.
-3. **Modify the Request**: Altered the `ratings` parameter in the intercepted request to `0`, despite the website originally not allowing a zero-star rating to be submitted through its user interface.
+1. **设置拦截**：配置 Burp Suite，使用 Proxy 功能拦截浏览器发出的 HTTP 请求。
+2. **提交评价**：通过网站界面正常提交评价，并在 Burp Suite 中捕获发出的请求。
+3. **修改请求**：将拦截请求中的 `ratings` 参数改为 `0`，尽管网站原本不允许通过用户界面提交零星评分。
 
 <img src="../assets/difficulty1/zero_star_1.png" alt="request" width="500px">
 
-4. **Forward the Request**: Sent the modified request to the server, successfully submitting a zero-star review.
+4. **转发请求**：将修改后的请求发送到服务器，成功提交零星评价。
 
-### Method 2: Manipulating the Client-Side Form
+### 方法 2：操纵客户端表单
 
-1. **Inspect Element**: Used the browser's developer tools to inspect the review submission button and found it disabled when attempting to give a zero-star rating.
-2. **Enable Submission Button**: Manually removed the `disabled="true"` attribute from the HTML of the submit button using the developer tools, enabling the button.
+1. **检查元素**：使用浏览器开发者工具检查评价提交按钮，发现尝试提交零星评分时按钮被禁用。
+2. **启用提交按钮**：使用开发者工具，手动从提交按钮的 HTML 中移除 `disabled="true"` 属性，从而启用按钮。
 
 <img src="../assets/difficulty1/zero_star_2.png" alt="code html" width="500px">
 
-3. **Submit the Form**: With the modified button state, submitted the form. Since the rating defaults to `null` when no stars are selected, the system processed this as a zero-star review due to lack of proper server-side validation.
+3. **提交表单**：修改按钮状态后提交表单。由于未选择星级时评分默认为 `null`，系统因缺少适当的服务器端验证而将其作为零星评价处理。
 
-## Solution Explanation
+## 解决方案说明
 
-Both solutions exploit weaknesses in the application's handling of input validation:
+两种方案都利用了应用输入验证处理方面的弱点：
 
-- **Method 1** bypasses the client-side restrictions by directly manipulating the HTTP request, demonstrating the need for robust server-side validation.
-- **Method 2** highlights a common oversight where client-side controls (like a disabled button) are relied upon for validation, without corresponding server-side checks.
+- **方法 1** 通过直接操纵 HTTP 请求绕过客户端限制，说明必须实施可靠的服务器端验证。
+- **方法 2** 揭示了常见疏忽：依赖禁用按钮等客户端控件验证，却没有在服务器端进行相应检查。
 
-## Remediation
+## 修复建议
 
-To prevent such issues and secure the application against improper input validation:
+为防止此类问题并保护应用免受输入验证不当的影响：
 
-- **Implement Server-Side Validation**: Ensure that all inputs, including ratings, are validated on the server side to prevent unauthorized values from being processed.
-- **Secure Client-Side Logic**: Enhance client-side scripts to prevent easy tampering from the developer console. However, always assume that client-side controls can be bypassed.
-- **Use Proper Data Types**: Ensure that the data type for ratings strictly accepts only valid ratings and does not default to accepting `null` or other unintended values as valid input.
-
+- **实施服务器端验证**：确保所有输入（包括评分）都在服务器端进行验证，避免处理未经授权的值。
+- **保护客户端逻辑**：增强客户端脚本，避免用户轻易通过开发者控制台篡改。但始终应假定客户端控件可以被绕过。
+- **使用正确的数据类型**：确保评分数据类型只接受有效评分，不会将 `null` 或其他非预期值默认视为有效输入。

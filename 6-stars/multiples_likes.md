@@ -1,63 +1,62 @@
-# Juice-Shop Write-up: Multiple Likes
+# Juice-Shop Write-up: 多次点赞
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** Multiple Likes  
-**Category:** Broken Anti-Automation  
-**Difficulty:** ⭐⭐⭐⭐⭐⭐ (6/6)
+**标题：** Multiple Likes  
+**类别：** 反自动化失效  
+**难度：** ⭐⭐⭐⭐⭐⭐ (6/6)
 
-This challenge requires exploiting a concurrency issue in the application's handling of like button clicks for product reviews, allowing a single user to like a review multiple times simultaneously.
+本挑战要求利用应用处理商品评论点赞点击时的并发问题，使单个用户能够同时对同一条评论多次点赞。
 
-## Tools Used
+## 使用工具
 
-- **Burp Suite:** Utilized to intercept and manipulate HTTP requests.
-- **Python (with the `requests` and `threading` modules):** Used to script the concurrent sending of like requests to bypass rate limiting or other anti-automation measures.
+- **Burp Suite：** 用于拦截和操纵 HTTP 请求。
+- **Python（`requests` 和 `threading` 模块）：** 用于编写脚本并发发送点赞请求，以绕过速率限制或其他反自动化措施。
 
-## Methodology and Solution
+## 方法与解题过程
 
-### Step 1: Capturing the Like Request
+### 步骤 1：捕获点赞请求
 
-Using Burp Suite, I captured the HTTP POST request sent when a user likes a product review on the Juice Shop. The key parameters identified were:
-- **URL:** `http://127.0.0.1:3000/rest/products/reviews/like`
-- **Method:** POST
-- **Data:** `{ "id": "review_id" }` (where `review_id` is the identifier of the review being liked)
+使用 Burp Suite 捕获用户在 Juice Shop 中为商品评论点赞时发送的 HTTP POST 请求。识别到的关键参数如下：
+- **URL：** `http://127.0.0.1:3000/rest/products/reviews/like`
+- **方法：** POST
+- **数据：** `{ "id": "review_id" }`（其中 `review_id` 是被点赞评论的标识符）
 
 <img src="../assets/difficulty6/multiple_likes_2.png" alt="like request" width="500px">
 
-### Step 2: Initial Testing
+### 步骤 2：初步测试
 
-Initially attempted to manually resend the captured request multiple times using Burp's Repeater tool. This method only succeeded in registering two likes instead of the required three to complete the challenge, indicating potential server-side throttling or deduplication logic. 
+最初，我尝试使用 Burp 的 Repeater 工具手动多次重发捕获到的请求，但只成功登记了两次点赞，未达到完成挑战所需的三次。这可能表明服务器端存在节流或去重逻辑。
 
 <img src="../assets/difficulty6/multiple_likes_3.png" alt="only two like" width="500px">
 
-Even if Burp's Repeater is fast, he is visibly not fast enough, so I need to find a way to make it faster.
+虽然 Burp 的 Repeater 很快，但显然还不够快，因此我需要想办法提高速度。
 
+### 步骤 3：编写并发请求脚本
 
-### Step 3: Scripting Concurrent Requests
-
-To overcome the limitations observed with manual resending, I scripted a solution using Python. My idea to speed-up the process it to employ multi-threading to send simultaneous requests to the like endpoint.
+为了克服手动重发时遇到的限制，我使用 Python 编写了脚本。我的思路是采用多线程，向点赞端点同时发送请求，从而提高处理速度。
 
 <img src="../assets/difficulty6/multiple_likes_4.png" alt="python scripts" width="500px">
 
-**Access the script:** You can find the used script in the tools folder of this repository :
-- [Folder link](https://github.com/whyiest/juice-shop-write-up/tree/main/tools)
-- [Script link](https://github.com/whyiest/juice-shop-write-up/tree/main/tools/multiple_likes.py)
+**获取脚本：** 使用的脚本位于此仓库的 tools 文件夹中：
+- [文件夹链接](https://github.com/whyiest/juice-shop-write-up/tree/main/tools)
+- [脚本链接](https://github.com/whyiest/juice-shop-write-up/tree/main/tools/multiple_likes.py)
 
-Don't forget to add the three needed section in the script : Cookies, EMail and the most important, your bearer token. You can obtain all of them by peforming an action on Juice-Shop and capturing the request via Burp Suite or any other tool.
+记得在脚本中填写三个必需部分：Cookies、Email，以及最重要的 bearer token。可以在 Juice Shop 中执行操作并通过 Burp Suite 或其他工具捕获请求来获取这些信息。
 
 <img src="../assets/difficulty6/multiple_likes_5.png" alt="python result" width="500px">
 
-### Step 4: Verifying Success
+### 步骤 4：验证成功
 
-After running the script, I verified in the application that the review had received multiple likes (5 in this case) from the same user at the same time.
+运行脚本后，我在应用中确认同一条评论在同一时间收到了来自同一用户的多次点赞（本例中为 5 次）。
 
 <img src="../assets/difficulty6/multiple_likes_6.png" alt="comment result" width="500px">
 
-## Solution Explanation
+## 解题说明
 
-The successful application of multiple likes from a single user session to a single review demonstrated a flaw in the Juice Shop's handling of concurrency and rate limiting. This exploit was achieved by simultaneously sending multiple like requests before the server could process and apply the restrictions properly.
+同一用户会话对同一条评论成功提交多次点赞，说明 Juice Shop 的并发处理和速率限制存在缺陷。通过在服务器处理并应用限制前同时发送多个点赞请求，成功利用了该问题。
 
-## Remediation
+## 修复建议
 
-- **Implement Proper Rate Limiting:** Use server-side rate limiting that properly tracks and limits the rate of actions that can be taken, especially those that modify data states, on a per-user basis.
-- **Concurrency Handling:** Improve the server's handling of concurrent requests to ensure actions like likes are processed in a way that prevents abuse. You can for example use locks or semaphores.
+- **实施适当的速率限制：** 在服务端按用户跟踪并限制操作频率，尤其是会改变数据状态的操作。
+- **处理并发：** 改进服务器对并发请求的处理，确保点赞等操作不会被滥用。例如，可使用锁或信号量。

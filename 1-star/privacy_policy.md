@@ -1,30 +1,30 @@
-# Juice Shop Write-up: Privacy Policy Challenge
+# Juice Shop Write-up：Privacy Policy Challenge
 
-## Challenge Overview
+## 挑战概述
 
 **Title:** Privacy Policy\
 **Category:** Miscellaneous\
 **Difficulty:** ⭐ (1/6)
 
-The objective of this challenge is to consult the Privacy Policy of the site, which indirectly provides clues about the path to an FTP server. The challenge tests attention to detail and ability to derive insights from seemingly non-technical information.
+本挑战的目标是查阅网站的 Privacy Policy，其中间接提供了 FTP 服务器路径的线索。本挑战考察对细节的关注，以及从看似非技术性的信息中推断线索的能力。
 
-## Tools Used
+## 使用的工具
 
 - Web browser
 
-## Methodology and Solution
+## 方法与解决方案
 
-The steps taken to solve the Privacy Policy challenge were straightforward:
+解决 Privacy Policy 挑战的步骤很简单：
 
-1. **Locate the Privacy Policy**: Navigated to the section of the website where legal or privacy-related documents are likely to be found. This page is likely the page about : 127.0.0.1:3000/#/about 
-2. **Examine the Content**: Opened and thoroughly read the Privacy Policy, which in this case was presented as a Markdown file (`legal.md`).
+1. **找到 Privacy Policy**：前往网站上通常放置法律或隐私相关文档的区域。该页面可能是：127.0.0.1:3000/#/about
+2. **检查内容**：打开并仔细阅读 Privacy Policy；本例中，它以 Markdown 文件（`legal.md`）的形式呈现。
 
 <img src="../assets/difficulty1/policy_1.png" alt="policy" width="500px">
 
-## Solution Explanation
+## 解决方案说明
 
-It's only necessary to open the file.
+只需打开该文件即可。
 
-## Remediation
+## 修复建议
 
-In a real-world scenario, ensuring that no sensitive information (intentional or accidental) leaks through legal or policy documents is crucial. Regular audits and reviews of all published content should be conducted to safeguard against such disclosures.
+在真实场景中，务必确保法律或政策文档不会（有意或无意地）泄露敏感信息。应定期审计和审查所有已发布内容，以防止此类信息泄露。

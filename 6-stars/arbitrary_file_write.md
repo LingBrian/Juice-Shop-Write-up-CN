@@ -1,81 +1,80 @@
-# Juice-Shop Write-up: Arbitrary File Write
+# Juice-Shop Write-up: 任意文件写入
 
-## Challenge Overview
-**Title:** Arbitrary File Write  
-**Category:** Vulnerable Components  
-**Difficulty:** ⭐⭐⭐⭐⭐ (6/6)  
+## 挑战概述
+**标题：** Arbitrary File Write  
+**类别：** 易受攻击的组件  
+**难度：** ⭐⭐⭐⭐⭐ (6/6)  
 
-The objective of this challenge is to exploit an arbitrary file write vulnerability by overwriting the `legal.md` file on the Juice Shop server.
+本挑战的目标是利用任意文件写入漏洞，覆盖 Juice Shop 服务器上的 `legal.md` 文件。
 
-## Tools Used
-- **Web Browser:** For navigating the Juice Shop application and accessing developer tools.
-- **GoBuster:** For directory and file brute-forcing to discover hidden paths.
-- **Command Line Tools:** For creating a zip file with a specific directory structure to exploit the vulnerability.
+## 使用工具
+- **Web 浏览器：** 用于浏览 Juice Shop 应用并访问开发者工具。
+- **GoBuster：** 用于爆破目录和文件，以发现隐藏路径。
+- **命令行工具：** 用于创建具有特定目录结构的 ZIP 文件，以利用该漏洞。
 
-## Methodology and Solution
+## 方法与解题过程
 
-### Step 1: Finding the File Upload Entry Points
-The challenge hints point towards file upload functionalities in the application. We identified two potential pages:
-1. **Complain Page:** For uploading complaint files.
-2. **Profile Page:** For uploading profile pictures.
+### 步骤 1：查找文件上传入口
+挑战提示指向应用中的文件上传功能。我们找到了两个可能的页面：
+1. **投诉页面：** 用于上传投诉文件。
+2. **个人资料页面：** 用于上传个人头像。
 
-### Step 2: Identifying the Vulnerability
-Using Twitter Advanced Search, we identified tweet from the Juice Shop Twitter account highlighted that the complain page now supports ZIP file uploads:
-- **Tweet:** Mentioned a convenient ZIP file upload feature on the complain page.
+### 步骤 2：识别漏洞
+通过 Twitter 高级搜索，我们发现 Juice Shop 的 Twitter 账号发布了一条推文，指出投诉页面现已支持上传 ZIP 文件：
+- **推文：** 提到了投诉页面便捷的 ZIP 文件上传功能。
 
 <img src="../assets/difficulty6/arbitrary_file_write_1.png" alt="tweet" width="600px">
-  
-We researched "arbitrary file writing using zip" on Google and found the Zip Slip vulnerability, which allows arbitrary file write by exploiting path traversal in ZIP file extraction.
 
-### Step 3: Determining the Target File Path
-The target file to overwrite is `legal.md`, located at `http://127.0.0.1:3000/ftp/legal.md`.
+我们在 Google 上搜索“arbitrary file writing using zip”，发现了 Zip Slip 漏洞。该漏洞可利用 ZIP 解压过程中的路径遍历来任意写入文件。
 
-### Step 4: Creating the Malicious ZIP File
-To exploit the Zip Slip vulnerability, we need to create a ZIP file that extracts `legal.md` to the target path:
-1. **Determine the Target Path:** We need to place our `legal.md` file in the path `../../ftp/legal.md` relative to the extraction point.
+### 步骤 3：确定目标文件路径
+要覆盖的目标文件是 `legal.md`，位于 `http://127.0.0.1:3000/ftp/legal.md`。
 
-2. **Create Directory Structure:**
+### 步骤 4：创建恶意 ZIP 文件
+利用 Zip Slip 漏洞需要创建一个 ZIP 文件，使其中的 `legal.md` 被解压到目标路径：
+1. **确定目标路径：** 需要将 `legal.md` 放到相对于解压位置的 `../../ftp/legal.md` 路径。
+
+2. **创建目录结构：**
    ```bash
-   # Create a temporary working directory
+   # 创建临时工作目录
    mkdir -p ~/Desktop/temp/child/child
    
-   # Navigate to the temporary directory
+   # 切换到临时目录
    cd ~/Desktop/temp
    
-   # Create the folder structure to simulate the target path
+   # 创建用于模拟目标路径的文件夹结构
    mkdir -p folder/file
    cd ./folder/file
    touch legal.md
-   echo "Contenu malveillant" > legal.md
+   echo "恶意内容" > legal.md
 
-   # Navigate back to root folder 
+   # 返回根目录
    cd ../../
    ```
 
-3. **Add the Malicious File:**
+3. **添加恶意文件：**
    ```bash
    cd ./child/child
    ```
 
-4. **Create the ZIP Archive:**
+4. **创建 ZIP 压缩包：**
    ```bash
    zip exploit.zip ../../ftp/legal.md
    ```
 
-This command creates a ZIP file that, when extracted, places `legal.md` at `../../ftp/legal.md` from the extraction point, effectively overwriting the target file.
+该命令创建的 ZIP 文件解压后，会将 `legal.md` 放到相对于解压位置的 `../../ftp/legal.md`，从而覆盖目标文件。
 
-### Step 5: Uploading the ZIP File
-1. **Access Complain Page:** Navigate to the complain page on the Juice Shop application.
-2. **Upload ZIP File:** Upload the `exploit.zip` file created in the previous step.
+### 步骤 5：上传 ZIP 文件
+1. **访问投诉页面：** 打开 Juice Shop 应用的投诉页面。
+2. **上传 ZIP 文件：** 上传前一步创建的 `exploit.zip` 文件。
 
-### Step 6: Verifying the Exploit
-1. **Verify File Overwrite:** Check the content of `http://127.0.0.1:3000/ftp/legal.md` to confirm that it has been overwritten with the malicious content.
+### 步骤 6：验证利用结果
+1. **验证文件覆盖：** 检查 `http://127.0.0.1:3000/ftp/legal.md` 的内容，确认它已被恶意内容覆盖。
 
-## Solution Explanation
-The challenge was solved by exploiting the Zip Slip vulnerability during file upload. By crafting a ZIP file that navigates to the correct directory and overwrites the target file, we successfully demonstrated the arbitrary file write vulnerability.
+## 解题说明
+本挑战利用了文件上传过程中的 Zip Slip 漏洞。通过构造一个能够遍历到正确目录并覆盖目标文件的 ZIP 文件，成功展示了任意文件写入漏洞。
 
-## Remediation
-- **Input Validation:** Ensure all file paths are properly validated and sanitized to prevent path traversal and arbitrary file write attacks.
-- **Secure File Handling:** Use secure libraries for handling file uploads and extractions, and avoid extracting files to directories without proper validation.
-- **User Permissions:** Restrict file write permissions to limit the potential impact of such vulnerabilities.
-
+## 修复建议
+- **输入验证：** 验证并清理所有文件路径，防止路径遍历和任意文件写入攻击。
+- **安全处理文件：** 使用安全的文件上传和解压库，避免在缺少适当验证的目录中解压文件。
+- **用户权限：** 限制文件写入权限，降低漏洞的潜在影响。

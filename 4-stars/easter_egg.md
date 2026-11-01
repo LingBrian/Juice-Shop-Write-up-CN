@@ -1,57 +1,57 @@
-# Juice-Shop Write-up: Find the Easter Egg
+# Juice-Shop 攻略：寻找复活节彩蛋
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** Easter Egg\
-**Category:** Broken Access Control\
-**Difficulty:** ⭐⭐⭐⭐ (4/6)
+**标题：** Easter Egg\
+**类别：** 访问控制失效\
+**难度：** ⭐⭐⭐⭐ (4/6)
 
-The challenge involved discovering a hidden Easter egg within the application, requiring exploration of the application's directory structure and clever manipulation to access restricted file types.
+本挑战要求探索应用目录结构，并巧妙绕过限制以访问受限文件类型，从而发现应用中隐藏的复活节彩蛋。
 
-## Tools Used
+## 使用的工具
 
-- **Web Browser**: Used to navigate and explore the application’s FTP directory.
-- **Command-Line Interface (CLI)**: Utilized to execute commands and handle file operations.
-- **Base64 Decoder**: To decode encoded text.
+- **Web 浏览器**：用于浏览和探索应用的 FTP 目录。
+- **命令行界面（CLI）**：用于执行命令和处理文件。
+- **Base64 解码器**：用于解码编码文本。
 
-## Methodology and Solution
+## 方法与解法
 
-### Step 1: Exploring the FTP Server
+### 步骤 1：探索 FTP 服务器
 
-1. **FTP Directory Access**:
-   - Navigate to `127.0.0.1:3000/ftp` using a web browser to access the server’s FTP directory, which revealed various files including `eastere.gg`.
+1. **访问 FTP 目录**：
+   - 在浏览器中访问 `127.0.0.1:3000/ftp`，查看服务器的 FTP 目录，其中发现了 `eastere.gg` 等文件。
 
    <img src="../assets/difficulty4/easter_egg_1.png" alt="ftp files" width="500px">
 
-### Step 2: Circumventing File Access Restrictions
+### 步骤 2：绕过文件访问限制
 
-2. **Null Byte Poisoning**:
-   - Identify that only `.pdf` or `.md` files are downloadable directly through the interface.
-   - Attempt to access the `eastere.gg` file by manipulating the URL to include a null byte followed by an allowed file extension. Example: Accessing `eastere.gg%2500.pdf` tricks the system into bypassing the extension check, allowing the download of a non-.pdf/.md file.
+2. **空字节注入**：
+   - 发现界面只允许直接下载 `.pdf` 或 `.md` 文件。
+   - 尝试在 URL 中加入空字节和允许的文件扩展名，以访问 `eastere.gg`。例如，访问 `eastere.gg%2500.pdf` 可欺骗系统绕过扩展名检查，从而下载非 `.pdf`/`.md` 文件。
 
    <img src="../assets/difficulty4/easter_egg_2.png" alt="extension trick" width="500px">
 
-### Step 3: Accessing and Decoding the Easter Egg
+### 步骤 3：访问并解码复活节彩蛋
 
-3. **File Download and Examination**:
-   - Successfully download the `eastere.gg` file using the manipulated URL.
-   - Open the file to discover it contains text suggesting another layer to the Easter egg challenge, providing a Base64 encoded string.
+3. **下载并检查文件**：
+   - 使用篡改后的 URL 成功下载 `eastere.gg` 文件。
+   - 打开文件后发现，其中的文本提示复活节彩蛋还有另一层，并提供了一段 Base64 编码字符串。
 
    <img src="../assets/difficulty4/easter_egg_3.png" alt="opened file" width="500px">
 
-### Step 4: Decoding the Hidden Message
+### 步骤 4：解码隐藏信息
 
-4. **Decode the Encoded String**:
-   - Decode the Base64 string to reveal further information or a hidden message pertaining to the next challenge or Easter egg.
+4. **解码字符串**：
+   - 解码 Base64 字符串，获取更多信息，或发现指向下一个挑战或复活节彩蛋的隐藏消息。
 
-## Solution Explanation
+## 解法说明
 
-The core challenge was to bypass the file access restrictions set by the application, which limited downloads to .pdf and .md files. By exploiting the server’s poor handling of file extensions through null byte poisoning, the restricted file eastere.gg was accessed. 
+本挑战的核心是绕过应用的文件访问限制，该限制只允许下载 .pdf 和 .md 文件。利用服务器对文件扩展名处理不当的缺陷，通过空字节注入访问了受限文件 eastere.gg。
 
-The decoded message inside eastere.gg served as a gateway to understanding another hidden layer, likely leading to additional challenges or rewards in the context of the Juice-Shop application. 
+解码 eastere.gg 中的消息后，可以进一步理解隐藏内容，可能会找到 Juice-Shop 应用中的其他挑战或奖励。
 
-## Remediation
+## 修复建议
 
-To prevent such issues in real-world applications:
-- **Validate File Extensions Server-Side**: Ensure that file extension checks are implemented securely on the server side without relying on URL parsing alone.
-- **Strict MIME Type Checking**: Use MIME type verification alongside file extension checks to strengthen validation processes.
+为避免现实应用中出现此类问题：
+- **在服务器端验证文件扩展名**：确保服务器端安全地实施扩展名检查，而不是仅依赖 URL 解析。
+- **严格检查 MIME 类型**：结合 MIME 类型验证和扩展名检查，以加强验证流程。

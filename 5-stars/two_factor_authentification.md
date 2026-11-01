@@ -1,67 +1,66 @@
-# Juice-Shop Write-up: Two-Factor Authentication Bypass
+# Juice-Shop Write-up: 双因素身份验证绕过
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** Two-Factor Authentication Bypass  
-**Category:** Broken Authentication  
-**Difficulty:** ⭐⭐⭐⭐⭐ (5/6)
+**标题：** Two-Factor Authentication Bypass  
+**类别：** 身份验证失效  
+**难度：** ⭐⭐⭐⭐⭐ (5/6)
 
-The challenge requires bypassing the two-factor authentication (2FA) mechanism of the Juice Shop application by obtaining and exploiting the Time-based One-Time Password (TOTP) associated with a user account.
+本挑战要求获取并利用与用户账户关联的基于时间的一次性密码（TOTP），以绕过 Juice Shop 应用的双因素身份验证（2FA）机制。
 
-## Tools Used
+## 使用工具
 
-- **SQL Injection:** To extract sensitive data from the database.
-- **TOTP Generator:** Used to generate valid TOTP codes based on the extracted secret.
+- **SQL 注入：** 用于从数据库中提取敏感数据。
+- **TOTP 生成器：** 用于根据提取的密钥生成有效 TOTP 代码。
 
-## Methodology and Solution
+## 方法与解题过程
 
-### Step 1: Understanding TOTP
+### 步骤 1：了解 TOTP
 
-Reviewed the fundamentals of TOTP, which is a common 2FA method that uses a secret key and the current time to generate a temporary passcode, usually changing every 30 seconds. The process involves hashing the time and secret key to produce a short-lived authentication code. I found this schema which explain greatly this concept : 
+回顾 TOTP 的基本原理：这是一种常见的 2FA 方法，使用密钥和当前时间生成临时密码，通常每 30 秒变化一次。该过程通过对时间和密钥进行哈希，生成短时有效的身份验证代码。下面的示意图很好地解释了这一概念：
 
 <img src="../assets/difficulty5/two_factor_authentification_2.png" alt="explanation schema" width="500px">
 
-In summary we have the following algorigram : 
+概括来说，算法如下：
 
 <img src="../assets/difficulty5/two_factor_authentification_4.png" alt="algorithm" width="500px">
 
-If you have not understand this concept, I suggest you to read this article : https://rublon.com/blog/what-is-totp/
+如果你还不理解这一概念，建议阅读这篇文章：https://rublon.com/blog/what-is-totp/
 
-### Step 2: Extracting TOTP Secret via SQL Injection
+### 步骤 2：通过 SQL 注入提取 TOTP 密钥
 
-Then, I utilized a previously identified SQL injection vulnerability within the application's search feature:
+接着，我利用了之前在应用搜索功能中发现的 SQL 注入漏洞：
 
-**Injection Payload:**
+**注入载荷：**
 ```sql
 test')) UNION SELECT username, password, role, deletedAt, isActive, totpSecret AS TOTP, id, email, profileImage FROM USERS--
 ```
 
-This payload was designed to extract information about users, including their TOTP secrets, from the database.
+该载荷旨在从数据库中提取用户信息，包括 TOTP 密钥。
 
-### Step 3: Obtaining the TOTP Secret
+### 步骤 3：获取 TOTP 密钥
 
-Executed the SQL injection by embedding it in the search feature's query:
+将载荷嵌入搜索功能的查询中，执行 SQL 注入：
 `http://127.0.0.1:3000/#/search?q=test`
 
-The attack returned several user details, importantly including the TOTP secret for the user `wurstbot`:
-- **TOTP Secret:** `IFTXE3SPOEYVURT2MRYGI52TKJ4HC3KH`
+攻击返回了多项用户详情，其中包括用户 `wurstbot` 的 TOTP 密钥：
+- **TOTP 密钥：** `IFTXE3SPOEYVURT2MRYGI52TKJ4HC3KH`
 
-### Step 4: Generating the TOTP Code
+### 步骤 4：生成 TOTP 代码
 
-Used a TOTP generator tool, inputting the extracted secret key and syncing it with the current UNIX time to generate a valid 2FA code.
+使用 TOTP 生成器输入提取到的密钥，并与当前 UNIX 时间同步，生成有效的 2FA 代码。
 
 <img src="../assets/difficulty5/two_factor_authentification_5.png" alt="TOPT Generator" width="500px">
 
-### Step 5: Bypassing 2FA
+### 步骤 5：绕过 2FA
 
-Applied the generated TOTP code in the 2FA prompt on the login page of the Juice Shop application, successfully bypassing the two-factor authentication mechanism.
+在 Juice Shop 登录页面的 2FA 提示中输入生成的 TOTP 代码，成功绕过双因素身份验证机制。
 
-## Solution Explanation
+## 解题说明
 
-By exploiting the SQL injection vulnerability, the TOTP secret for a user account was extracted. This secret was then used to generate a valid TOTP code, effectively bypassing the 2FA protection mechanism without any direct access to the user's authenticator device or app. This demonstrates a significant security flaw where sensitive data leakage (such as TOTP secrets) can compromise the integrity of two-factor authentication systems.
+利用 SQL 注入漏洞提取了用户账户的 TOTP 密钥，再用该密钥生成有效 TOTP 代码，从而在无法直接访问用户身份验证器设备或应用的情况下绕过 2FA。这表明敏感数据（例如 TOTP 密钥）泄露会破坏双因素身份验证系统的安全性。
 
-## Remediation
+## 修复建议
 
-- **Secure Storage of Secrets:** TOTP secrets should be stored securely using encryption and should not be retrievable via injection attacks.
-- **Input Validation and Sanitization:** Ensure all user inputs are validated and sanitized to prevent SQL injection.
-
+- **安全存储密钥：** 应加密存储 TOTP 密钥，并防止其通过注入攻击被读取。
+- **输入验证与清理：** 验证和清理所有用户输入，以防止 SQL 注入。

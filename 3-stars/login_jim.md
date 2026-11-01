@@ -1,46 +1,46 @@
-# Juice-Shop Write-up: Login Jim
+# Juice-Shop 攻略：登录 Jim 账户
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** Login Jim\
-**Category:** SQL Injection (SQLi)\
-**Difficulty:** ⭐⭐⭐ (3/6)
+**标题：** 登录 Jim 账户\
+**类别：** SQL 注入（SQLi）\
+**难度：** ⭐⭐⭐ (3/6)
 
-The "Login Jim" challenge needs exploiting an SQL Injection vulnerability to bypass login mechanisms and gain unauthorized access to a user account, specifically Jim's. 
+“登录 Jim 账户”挑战要求利用 SQL 注入漏洞绕过登录机制，未经授权访问用户账户，具体目标是 Jim 的账户。
 
-## Tools Used
+## 使用的工具
 
-- **Web Browser**: For interacting with the login interface of the application.
+- **Web 浏览器**：与应用登录界面交互。
 
-## Methodology and Solution
+## 方法与解决方案
 
-### Identifying the Vulnerability
+### 识别漏洞
 
-1. **Initial Login Attempt**:
-   - Like the previous admin account challenge, the first step involves checking the login form for SQL Injection vulnerabilities. Input fields where user credentials are entered are common points of exploitation.
+1. **首次尝试登录**：
+   - 与先前的管理员账户挑战类似，首先检查登录表单是否存在 SQL 注入漏洞。用户输入凭据的字段通常是常见的攻击入口。
 
-### Executing the SQL Injection
+### 执行 SQL 注入
 
-2. **Crafting the Injection Query**:
-   - Input a crafted SQL command into the username or password field that alters the backend SQL query to always return true. Common SQLi payloads involve using `' OR '1'='1' --` to manipulate the SQL query.
-   - For Jim, the payload would be entered in the username or password field: `' OR '1'='1' --`. This payload effectively makes the SQL query behind the authentication form return true, bypassing the need for a correct username and password.
+2. **构造注入查询**：
+   - 在用户名或密码字段中输入经过构造的 SQL 命令，改变后端 SQL 查询，使其始终返回真。常见的 SQLi 载荷包括 `' OR '1'='1' --`，可用于操纵 SQL 查询。
+   - 针对 Jim，可在用户名或密码字段中输入载荷：`' OR '1'='1' --`。该载荷会使身份验证表单背后的 SQL 查询返回真，从而无需正确的用户名和密码即可绕过登录。
 
-   <img src="image.png" alt="sql injection" width="500px">
+    <img src="image.png" alt="sql injection" width="500px">
 
-### Gaining Access
+### 获取访问权限
 
-3. **Accessing Jim’s Account**:
-   - After submitting the SQLi payload through the login form, the application processes the altered SQL query, which incorrectly authenticates the session as Jim due to the query returning a true value.
-   - Successfully bypass the authentication, granting access to Jim’s account without knowing the actual credentials.
+3. **访问 Jim 的账户**：
+   - 通过登录表单提交 SQLi 载荷后，应用会执行被篡改的 SQL 查询。由于查询结果为真，系统会错误地将会话认证为 Jim。
+   - 成功绕过身份验证，无需知道真实凭据即可访问 Jim 的账户。
 
-### Solution Explanation
+### 解决方案说明
 
-The challenge was completed by exploiting a SQL Injection vulnerability within the login process. This type of vulnerability arises when inputs are not properly sanitized, allowing an attacker to inject malicious SQL code. 
+通过利用登录流程中的 SQL 注入漏洞完成挑战。当输入未得到妥善清理时，就可能注入恶意 SQL 代码，从而产生此类漏洞。
 
-## Remediation
+## 修复建议
 
-To prevent such vulnerabilities in real-world applications:
+在真实应用中，可采取以下措施防止此类漏洞：
 
-- **Use Prepared Statements and Parameterized Queries**: These are much safer than constructing queries directly from user input, as they automatically handle the necessary escaping of inputs, thus preventing SQL injection.
-- **Regular Security Audits and Testing**: Conduct vulnerability assessments and security audits regularly. Use tools and techniques to detect SQL injection vulnerabilities before attackers do.
-- **Error Handling**: Do not display database error messages to users. Use generic error messages to avoid giving attackers hints about the database structure.
+- **使用预处理语句和参数化查询**：与直接根据用户输入构造查询相比，这种方法更安全；它们会自动处理必要的输入转义，从而防止 SQL 注入。
+- **定期开展安全审计和测试**：定期进行漏洞评估与安全审计，并在攻击者发现 SQL 注入漏洞前使用工具和技术加以检测。
+- **错误处理**：不要向用户显示数据库错误信息。应使用通用错误提示，避免向攻击者泄露数据库结构线索。

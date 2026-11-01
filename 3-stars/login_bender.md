@@ -1,51 +1,51 @@
-# Juice-Shop Write-up: Login Bender Challenge
+# Juice-Shop 攻略：登录 Bender 账户
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** Login Bender\
-**Category:** Injection Flaws\
-**Difficulty:** ⭐⭐⭐ (3/6)
+**标题：** 登录 Bender 账户\
+**类别：** 注入漏洞\
+**难度：** ⭐⭐⭐ (3/6)
 
-This challenge focuses on exploiting an SQL injection vulnerability to bypass authentication mechanisms and gain unauthorized access to a user's account, specifically targeting the account associated with "Bender" in the application.
+本挑战重点是利用 SQL 注入漏洞绕过身份验证机制，未经授权访问用户账户，目标是应用中与“Bender”关联的账户。
 
-## Tools Used
+## 使用的工具
 
-- Web browser
+- Web 浏览器
 
-## Methodology and Solution
+## 方法与解决方案
 
-### Locating Target Information
+### 查找目标信息
 
-1. **Identify Bender's Email**:
-   - Logged into the application as an admin to access administrative functionalities.
-   - Located Bender's email (`bender@juice-sh.op`) within the admin panel :
+1. **查找 Bender 的电子邮箱**：
+   - 以管理员身份登录应用，使用管理功能。
+   - 在管理面板中找到 Bender 的电子邮箱（`bender@juice-sh.op`）：
 
-   <img src="../assets/difficulty3/login_bender_1.png" alt="bender username from administration panel" width="500px">
+    <img src="../assets/difficulty3/login_bender_1.png" alt="bender username from administration panel" width="500px">
 
-### Performing SQL Injection
+### 执行 SQL 注入
 
-2. **Attempt to Login as Bender**:
-   - Navigated to the login page of the application.
-   - Entered Bender's email in the email field.
+2. **尝试以 Bender 身份登录**：
+   - 前往应用登录页面。
+   - 在电子邮箱字段中输入 Bender 的电子邮箱。
    
-3. **Constructing the SQL Injection**:
-   - Modified the entry in the email input field to include an SQL injection payload: `bender@juice-sh.op' AND '1'='1' --`.
-   - This payload attempts to manipulate the SQL query behind the login form by closing off the email string (with a single quote), adding a condition that always evaluates to true (`AND '1'='1'`), and then commenting out the remainder of the SQL command with `--`.
+3. **构造 SQL 注入**：
+   - 修改电子邮箱输入内容，加入 SQL 注入载荷：`bender@juice-sh.op' AND '1'='1' --`。
+   - 此载荷通过单引号闭合电子邮箱字符串，加入始终为真的条件（`AND '1'='1'`），再用 `--` 注释掉 SQL 命令的剩余部分，以操纵登录表单背后的 SQL 查询。
 
-### Observing the Outcome
+### 观察结果
 
-4. **Observe Authentication Bypass**:
-   - With the payload submitted, the SQL query altered by the injection would incorrectly authenticate the session as Bender without requiring a password.
-   - Successfully logged in as Bender, demonstrating the exploitation of the SQL injection vulnerability.
+4. **观察身份验证绕过**：
+   - 提交载荷后，注入会改变 SQL 查询，导致系统错误地将会话认证为 Bender，无需密码。
+   - 成功以 Bender 身份登录，证明 SQL 注入漏洞可被利用。
 
-   <img src="../assets/difficulty3/login_bender_2.png" alt="login proof" width="500px">
+    <img src="../assets/difficulty3/login_bender_2.png" alt="login proof" width="500px">
 
-## Solution Explanation
+## 解决方案说明
 
-This challenge was resolved by exploiting a classic SQL injection vulnerability in the login form's email field. The specific vulnerability allowed for manipulation of the underlying SQL query, enabling unauthorized access to Bender's account by always making the conditional part of the query true and bypassing password verification.
+通过利用登录表单电子邮箱字段中的典型 SQL 注入漏洞，成功完成挑战。该漏洞允许操纵底层 SQL 查询，使条件始终为真并绕过密码验证，从而未经授权访问 Bender 的账户。
 
-## Remediation
+## 修复建议
 
-To prevent such vulnerabilities in real applications:
-- **Use Prepared Statements**: Implement prepared statements with parameterized queries to handle SQL commands. This practice prevents SQL injection by separating SQL logic from data.
-- **Employ Proper Input Validation**: Ensure that all user inputs are properly validated and sanitized to prevent malicious data from affecting SQL commands.
+在真实应用中，可采取以下措施防止此类漏洞：
+- **使用预处理语句**：采用带参数的预处理语句处理 SQL 命令。此做法将 SQL 逻辑与数据分离，从而防止 SQL 注入。
+- **实施适当的输入验证**：确保验证并清理所有用户输入，防止恶意数据影响 SQL 命令。

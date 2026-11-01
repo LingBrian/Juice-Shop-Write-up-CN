@@ -1,58 +1,57 @@
-# Juice-Shop Write-up: NFT Takeover
+# Juice-Shop Write-up：NFT Takeover
 
-## Challenge Overview
+## 挑战概述
 
 **Title:** NFT Takeover\
 **Category:** Sensitive Data Exposure\
 **Difficulty:** ⭐⭐ (2/6)
 
-The "NFT Takeover" challenge involves gaining access to a digital wallet containing an official Soul Bound Token (NFT) by leveraging sensitive information exposed inadvertently through user feedback.
+“NFT Takeover”挑战利用用户反馈中意外暴露的敏感信息，获取含有官方 Soul Bound Token (NFT) 的数字钱包。
 
-## Tools Used
+## 使用的工具
 
-- **Web Browser**: To navigate to the specific page and interact with the web application.
-- **Mnemonic Converter**: Used to convert seed phrases into private keys necessary for blockchain wallet access.
+- **Web Browser**：用于导航至指定页面并与 Web 应用交互。
+- **Mnemonic Converter**：用于将助记词转换为访问区块链钱包所需的私钥。
 
-## Methodology and Solution
+## 方法与解决方案
 
-### Finding the NFT Access Point
+### 找到 NFT 访问入口
 
-1. **Navigating to the NFT Page**:
-   - Explored the application's JavaScript files to find any references to "NFT," leading to the discovery of the `/juicy-nft` path.
+1. **前往 NFT 页面**：
+   - 检查应用的 JavaScript 文件，查找与“NFT”有关的内容，由此发现 `/juicy-nft` 路径。
 
    <img src="../assets/difficulty2/nft_takeover_1.png" alt="path" width="500px">
 
-   - Accessed `http://127.0.0.1:3000/#/juicy-nft`, which prompted for a private key to access the NFT wallet.
+   - 访问 `http://127.0.0.1:3000/#/juicy-nft` 后，页面要求输入私钥以访问 NFT 钱包。
 
    <img src="../assets/difficulty2/nft_takeover_2.png" alt="nft page" width="500px">
 
-### Utilizing Exposed Sensitive Information
+### 利用暴露的敏感信息
 
-2. **Extracting the Seed Phrase from User Feedback**:
-   - Found a user feedback comment that inadvertently shared a seed phrase: "purpose betray marriage blame crunch monitor spin slide donate sport lift clutch."
+2. **从用户反馈中提取助记词**：
+   - 发现一条用户反馈评论意外泄露了助记词：“purpose betray marriage blame crunch monitor spin slide donate sport lift clutch.”
 
    <img src="../assets/difficulty2/nft_takeover_3.png" alt="admin panel" width="500px">
 
-   - Recognized that this seed phrase likely relates to the private key required by the `/juicy-nft` page.
+   - 判断该助记词可能与 `/juicy-nft` 页面所需的私钥有关。
 
-3. **Converting the Seed Phrase to a Private Key**:
-   - Used a Mnemonic converter tool to transform the seed phrase into a corresponding private key. 
-   - Obtained the private key: `0x5bcc3e9d38baa06e7bfaab80ae5957bbe8ef059e640311d7d6d465e6bc948e3e`.
+3. **将助记词转换为私钥**：
+   - 使用 Mnemonic converter 工具，将助记词转换为对应的私钥。
+   - 得到私钥：`0x5bcc3e9d38baa06e7bfaab80ae5957bbe8ef059e640311d7d6d465e6bc948e3e`。
 
-### Accessing the NFT Wallet
+### 访问 NFT 钱包
 
-4. **Authenticating and Taking Over the NFT**:
-   - Entered the derived private key on the NFT page, which authenticated access to the wallet containing the Soul Bound Token.
+4. **身份验证并接管 NFT**：
+   - 在 NFT 页面输入推导出的私钥，成功验证并访问含有 Soul Bound Token 的钱包。
 
-### Solution Explanation
+### 解决方案说明
 
-The challenge was successfully completed by identifying and exploiting a security lapse where a user inadvertently disclosed a seed phrase in the feedback section. This seed phrase was converted into a private key, granting unauthorized access to an NFT wallet. 
+本挑战通过发现并利用用户在反馈区域意外泄露助记词的安全疏漏而完成。将助记词转换为私钥后，即可未授权访问 NFT 钱包。
 
-## Remediation
+## 修复建议
 
-To prevent such security vulnerabilities:
+为防止此类安全漏洞：
 
-- **Secure Information Handling**: Ensure that any form of sensitive information, such as cryptographic keys or seed phrases, is neither stored nor transmitted in clear text within user-accessible areas.
-- **Input Validation and Sanitization**: Implement stringent input validation and sanitization on all user-submitted content to prevent inadvertent exposure of sensitive data.
-- **Monitoring and Filtering**: Deploy monitoring tools to detect and alert on potential exposure of sensitive information, and employ automated filtering to obscure or block the display of such data.
-
+- **安全处理信息**：确保加密密钥或助记词等敏感信息不会以明文形式存储或传输到用户可访问的区域。
+- **输入验证与净化**：对所有用户提交的内容实施严格的输入验证和净化，避免敏感数据意外暴露。
+- **监控与过滤**：部署监控工具，检测并提醒潜在的敏感信息暴露，并使用自动过滤机制对这类数据进行遮蔽或阻止其显示。

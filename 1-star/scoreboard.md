@@ -1,38 +1,34 @@
-# Juice Shop Write-up: Score Board Challenge
+# Juice Shop Write-up：Score Board Challenge
 
-## Challenge Overview
+## 挑战概述
 
 **Title:** Score Board\
 **Category:** Miscellaneous\
 **Difficulty:** ⭐ (1/6)
 
-This challenge requires to locate a carefully hidden "Score Board" page within the application. The solution to this challenge involves analyzing the JavaScript code of the application to discover the route to the Score Board page.
+本挑战要求找到应用中隐藏得很巧妙的“Score Board”页面。解决方法是分析应用程序的 JavaScript 代码，以发现该页面的路由。
 
-## Tools Used
+## 使用的工具
 
-- Web browser (e.g., Chrome, Firefox)
-- Developer Tools for viewing JavaScript source code
+- Web browser（例如 Chrome、Firefox）
+- 用于查看 JavaScript 源代码的 Developer Tools
 
-## Methodology and Solution
+## 方法与解决方案
 
-To solve the "Score Board" challenge, the approach involved inspecting the JavaScript code of the application. Here are the step-by-step details:
+解决“Score Board”挑战时，我们检查了应用程序的 JavaScript 代码。步骤如下：
 
-1. **Access Developer Tools**: I opened the developer tools in the web browser while interacting with the application.
-2. **Review JavaScript Files**: Navigated to the "Sources" tab in the developer tools and reviewed the files loaded by the application.
-3. **Analyze main.js**: Focused on the `main.js` file, as it often contains route definitions and application logic.
-4. **Search for Hidden Routes**: Searched within the `main.js` file for mentions of various application routes. It was identified that the file explicitly listed several path definitions including the hidden "Score Board."
+1. **打开 Developer Tools**：在与应用交互时打开 Web browser 的开发者工具。
+2. **查看 JavaScript 文件**：切换到开发者工具中的“Sources”选项卡，检查应用加载的文件。
+3. **分析 main.js**：重点查看 `main.js` 文件，因为其中通常包含路由定义和应用逻辑。
+4. **搜索隐藏路由**：在 `main.js` 文件中搜索各种应用路由，发现该文件明确列出多个路径定义，其中包括隐藏的“Score Board”路径。
 
 <img src="../assets/difficulty1/scoreboard_1.png" alt="scoreboard" width="500px">
-5. **Access the Score Board**: Used the route found in the `main.js` file to directly access the Score Board page by entering the path in the browser's address bar.
+5. **访问 Score Board**：使用在 `main.js` 文件中找到的路由，在浏览器地址栏输入路径，直接访问 Score Board 页面。
 
-## Solution Explanation
+## 解决方案说明
 
-The JavaScript file `main.js` was key to finding the Score Board as it contained all the route definitions used in the application. By examining this file, the route to the Score Board was easily discovered. This challenge tests basic skills in JavaScript analysis and understanding web application routing.
+`main.js` 是找到 Score Board 的关键，因为它包含应用程序使用的所有路由定义。查看该文件后，很容易发现 Score Board 的路由。本挑战考察 JavaScript 分析和 Web 应用路由的基础技能。
 
-## Remediation
+## 修复建议
 
-No remediation is necessary for this challenge as finding the hidden page was the intended goal of the exercise. However, in a real-world scenario, sensitive pages should not be discoverable through client-side code without appropriate access controls.
-
-
-
-
+本挑战以找到隐藏页面为目标，因此无需修复。不过，在真实场景中，敏感页面不应仅仅依靠隐藏客户端代码中的路由来保护，而应设置适当的访问控制。

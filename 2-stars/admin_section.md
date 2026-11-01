@@ -1,52 +1,50 @@
-# Juice-Shop Write-up: Admin Section
+# Juice-Shop Write-up：Admin Section
 
-## Challenge Overview
+## 挑战概述
 
 **Title:** Admin Section\
 **Category:** Broken Access Control\
 **Difficulty:** ⭐⭐ (2/6)
 
-The "Admin Section" challenge involves accessing a restricted administrative area of a web application. 
+“Admin Section”挑战涉及访问 Web 应用中受限的管理区域。
 
-## Tools Used
+## 使用的工具
 
-- **Web Browser**: For accessing the application and utilizing developer tools to inspect source files.
-- **Developer Tools**: Specifically the source code viewer to examine the JavaScript files for route definitions.
+- **Web Browser**：用于访问应用并使用开发者工具检查源文件。
+- **Developer Tools**：具体使用源代码查看器检查 JavaScript 文件中的路由定义。
 
-## Methodology and Solution
+## 方法与解决方案
 
-### Exploring Application Routes
+### 探索应用路由
 
-1. **Source Code Analysis**:
-   - Using the browser's developer tools, the `main.js` file was examined. This file contained definitions for various application routes (paths and components), including a path for an "administration" section.
-   - The route setup indicated that the administration area could be accessed directly if the correct path was known.
+1. **源代码分析**：
+   - 使用浏览器开发者工具检查 `main.js` 文件。该文件包含各种应用路由（路径和组件）的定义，其中包括“administration”区域的路径。
+   - 路由设置表明，只要知道正确路径，就可以直接访问管理区域。
 
    <img src="../assets/difficulty2/admin_section_1.png" alt="routes" width="500px">
 
-2. **Direct Path Access**:
-   - Accessed the path `127.0.0.1:3000/#/administration` directly by entering it in the browser's address bar.
-   - Initially, this approach led to an access-denied page due to insufficient permissions.
+2. **直接访问路径**：
+   - 在浏览器地址栏直接输入路径 `127.0.0.1:3000/#/administration`。
+   - 最初由于权限不足，页面拒绝了访问。
 
    <img src="../assets/difficulty2/admin_section_2.png" alt="permissions" width="500px">
 
-### Gaining Administrative Access
+### 获取管理员访问权限
 
-3. **Role Elevation**:
-   - Logged in with an administrator account credentials.
-   - Revisited the `/administration` path which now successfully displayed the administrative dashboard, demonstrating improper access control that relies solely on the obscurity of the path.
+3. **提升角色权限**：
+   - 使用管理员账户凭据登录。
+   - 再次访问 `/administration` 路径后，成功显示管理仪表板。这表明访问控制不当，系统仅依赖路径隐蔽性来保护该区域。
 
    <img src="../assets/difficulty2/admin_section_3.png" alt="page access" width="500px">
 
+### 解决方案说明
 
-### Solution Explanation
+本挑战通过从 JavaScript 源文件中找出隐藏的管理路径，再使用管理员凭据访问该路径而解决。这表明应用未能充分保护敏感区域，而只是将其隐藏，并假定未授权用户不会发现该路径。
 
-The challenge was resolved by uncovering the hidden administrative path from the JavaScript source files and then accessing it with an administrator's credentials. This shows a vulnerability in the application where sensitive areas are not adequately secured but merely hidden, assuming unauthorized users will not discover the path.
+## 修复建议
 
-## Remediation
+为有效保护管理区域，可考虑实施以下措施：
 
-To secure the admin section effectively, consider implementing the following:
-
-- **Proper Access Control**: Ensure robust access control measures are in place that authenticate and authorize users before granting access to sensitive parts of the application. Use server-side checks to confirm permissions.
-- **Separation of Concerns**: As suggested, separate the administrative functions from the main application. Ideally, host the admin panel on a different server or as a separate service that is not accessible from the public internet.
-- **Use of Web Application Firewalls (WAF)**: Deploy a WAF to monitor and block unauthorized attempts to access restricted areas.
-
+- **适当的访问控制**：在授予用户访问应用敏感部分的权限前，实施可靠的身份验证和授权措施。通过服务器端检查确认用户权限。
+- **关注点分离**：如建议所述，将管理功能与主应用分离。理想情况下，可将管理面板托管在不同的服务器上，或作为无法从公共互联网访问的独立服务。
+- **使用 Web Application Firewalls (WAF)**：部署 WAF，以监控并阻止未经授权的访问受限区域的尝试。

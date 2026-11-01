@@ -1,63 +1,62 @@
-# Juice-Shop Write-up: Change Bender's Password
+# Juice-Shop Write-up: 修改 Bender 的密码
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** Change Bender's Password\
-**Category:** Broken Authentication\
-**Difficulty:** ⭐⭐⭐⭐⭐ (5/6)
+**标题：** Change Bender's Password\
+**类别：** 身份验证失效\
+**难度：** ⭐⭐⭐⭐⭐ (5/6)
 
-This challenge involves changing the password of the user Bender to `slurmCl4ssic` on the `juice-sh.op` platform without using SQL Injection or the forgot password functionality.
+本挑战要求在 `juice-sh.op` 平台上将用户 Bender 的密码改为 `slurmCl4ssic`，且不能使用 SQL 注入或忘记密码功能。
 
-## Tools Used
+## 使用工具
 
-- **Web Browser**: For interacting with the web application and changing passwords.
-- **HTTP Interception Tool**: Such as Burp Suite, used to intercept, modify, and resend HTTP requests.
+- **Web 浏览器**：用于与 Web 应用交互并修改密码。
+- **HTTP 拦截工具**：例如 Burp Suite，用于拦截、修改并重新发送 HTTP 请求。
 
-## Methodology and Solution
+## 方法与解题过程
 
-### Initial Setup
+### 初始设置
 
-1. **Accessing Account**:
-   - Log into Bender’s account using provided credentials or by bypassing login mechanisms.
+1. **访问账户**：
+   - 使用提供的凭据登录 Bender 账户，或绕过登录机制。
 
-### Exploring Change Password Functionality
+### 探索修改密码功能
 
-2. **Intercepting the Change Password Request**:
-   - Use an HTTP interception tool to capture the request made when attempting to change Bender's password.
-   - Analyze the request to understand the parameters involved, especially focusing on how the current password is handled.
+2. **拦截修改密码请求**：
+   - 使用 HTTP 拦截工具捕获尝试修改 Bender 密码时发出的请求。
+   - 分析请求参数，尤其关注当前密码的处理方式。
 
    <img src="../assets/difficulty5/change_bender_password_1.png" alt="change password request" width="500px">
 
+### 修改请求
 
-### Manipulating the Request
-
-3. **Request Manipulation Trials**:
-   - Attempt to change the password by modifying the `current` password field in various ways to explore potential weaknesses:
-     - Try using an incorrect password directly — FAILED
+3. **尝试修改请求**：
+   - 以不同方式修改 `current` 密码字段，探索潜在弱点：
+     - 直接使用错误密码——失败
 
      <img src="../assets/difficulty5/change_bender_password_2.png" alt="false password" width="500px">
 
-     - Leave the `current` password field blank - FAILED
+     - 将 `current` 密码字段留空——失败
 
      <img src="../assets/difficulty5/change_bender_password_3.png" alt="blank password" width="500px">
 
-     - Remove the `current` password parameter entirely from the request - WORKED
+     - 从请求中完全删除 `current` 密码参数——成功
 
      <img src="../assets/difficulty5/change_bender_password_4.png" alt="removed password" width="500px">
 
-### Successful Exploitation
+### 成功利用
 
-4. **Bypassing Password Check**:
-   - Discover that removing the `current` password field entirely from the request bypasses the check for the current password and allows setting a new password.
-   - Submit the request with the `current` password parameter removed and the new password set to `slurmCl4ssic`.
+4. **绕过密码检查**：
+   - 发现完全删除 `current` 密码字段即可绕过当前密码检查，并设置新密码。
+   - 删除 `current` 密码参数，并将新密码设为 `slurmCl4ssic` 后提交请求。
 
-## Solution Explanation
+## 解题说明
 
-The challenge was successfully solved by identifying a vulnerability in the password change functionality where the server does not properly validate the presence of the `current` password parameter. By omitting this parameter, the server processes the request as valid, allowing the password to be changed without knowing the original password.
+本挑战通过发现密码修改功能中的漏洞成功解决：服务器没有正确验证 `current` 密码参数是否存在。省略该参数后，服务器会将请求视为有效，从而无需知道原密码即可修改密码。
 
-## Remediation
+## 修复建议
 
-To prevent such vulnerabilities in real-world applications:
+在实际应用中，可通过以下方式防止此类漏洞：
 
-- **Strict Parameter Validation**: Ensure that all necessary parameters are checked for their presence and validity before processing requests.
-- **Enhanced Server-Side Logic**: Implement server-side logic to detect and reject incomplete or malformed requests.
+- **严格验证参数：** 在处理请求前，确保检查所有必需参数是否存在且有效。
+- **强化服务端逻辑：** 实现服务端逻辑，检测并拒绝不完整或格式错误的请求。

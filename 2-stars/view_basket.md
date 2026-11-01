@@ -1,55 +1,55 @@
-# Juice-Shop Write-up: View Basket
+# Juice-Shop Write-up：View Basket
 
-## Challenge Overview
+## 挑战概述
 
 **Title:** View Basket\
 **Category:** Broken Access Control\
 **Difficulty:** ⭐⭐ (2/6)
 
-The "View Basket" challenge revolves around exploiting broken access control vulnerabilities within a web application. The specific vulnerability allows users to view the shopping basket details of other users by manipulating user-specific identifiers in web requests.
+“View Basket”挑战围绕 Web 应用中的访问控制失效漏洞展开。具体漏洞允许用户通过操纵 Web 请求中的用户标识符，查看其他用户的购物篮详情。
 
-## Tools Used
+## 使用的工具
 
-- **Burp Suite**: Used for intercepting and modifying HTTP requests sent from the user's browser to the web server.
+- **Burp Suite**：用于拦截和修改用户浏览器发送到 Web 服务器的 HTTP 请求。
 
-## Methodology and Solution
+## 方法与解决方案
 
-### Understanding the Vulnerability
+### 了解漏洞
 
-The web application allows users to view the contents of their shopping basket. However, upon examining the network traffic with Burp Suite, it was discovered that the request to fetch the basket details includes a user-specific identifier (e.g., basket ID) which is vulnerable to manipulation.
+Web 应用允许用户查看自己的购物篮内容。但使用 Burp Suite 检查网络流量后发现，获取购物篮详情的请求包含一个特定于用户的标识符（例如购物篮 ID），且该标识符可以被操纵。
 
-### Steps Taken to Solve the Challenge
+### 挑战解决步骤
 
-1. **Intercept the HTTP Request**:
-   - Using Burp Suite, the HTTP request to retrieve the user's own basket was intercepted.
-   - The request URL is: `http://127.0.0.1:3000/rest/basket/1`, where `1` is the basket ID for the current user.
+1. **拦截 HTTP 请求**：
+   - 使用 Burp Suite 拦截获取用户本人购物篮的 HTTP 请求。
+   - 请求 URL 为：`http://127.0.0.1:3000/rest/basket/1`，其中 `1` 是当前用户的购物篮 ID。
 
    <img src="../assets/difficulty2/view_basket_1.png" alt="request" width="500px">
 
-   - We obtain our basket : 
+   - 成功获取了自己的购物篮：
 
    <img src="../assets/difficulty2/view_basket_2.png" alt="basket 1" width="500px">
 
-2. **Modify the Basket ID**:
-   - Altered the basket ID in the intercepted request from `1` to `2`, attempting to access another user's basket details.
+2. **修改购物篮 ID**：
+   - 将拦截请求中的购物篮 ID 从 `1` 改为 `2`，尝试访问其他用户购物篮的详情。
 
    <img src="../assets/difficulty2/view_basket_3.png" alt="replaced request" width="500px">
 
-3. **View Results**:
-   - The modified request was forwarded, and the response contained the details of another user's basket, confirming the presence of broken access control.
+3. **查看结果**：
+   - 转发修改后的请求，响应中包含了另一位用户购物篮的详情，证实存在访问控制失效问题。
 
    <img src="../assets/difficulty2/view_basket_4.png" alt="new basket" width="500px">
 
-### Solution Explanation
+### 解决方案说明
 
-The challenge was successfully solved by changing the basket ID in the request URL, which should not have been possible if proper access control mechanisms were in place. This allowed access to another user's private basket information.
+本挑战通过修改请求 URL 中的购物篮 ID 而成功解决。如果存在适当的访问控制机制，这种修改本不应奏效。该漏洞使攻击者能够访问其他用户的私人购物篮信息。
 
-## Remediation
+## 修复建议
 
-To mitigate such vulnerabilities in real applications, the following steps should be considered:
+为缓解真实应用中的此类漏洞，应考虑以下措施：
 
-- **User Session Validation**: Ensure that each request to sensitive information like a shopping basket is validated against the user's session to confirm they are authorized to view only their data.
-- **Use of Robust Access Control Mechanisms**: Implement role-based access control (RBAC) or attribute-based access control (ABAC) to enforce strict permissions on data access.
-- **Regular Security Audits**: Conduct regular security audits and penetration testing to identify and fix access control issues before they can be exploited.
+- **验证用户会话**：确保每个访问敏感信息（例如购物篮）的请求都与用户会话进行校验，确认用户只能查看自己的数据。
+- **使用可靠的访问控制机制**：实施基于角色的访问控制 (RBAC) 或基于属性的访问控制 (ABAC)，严格管控数据访问权限。
+- **定期安全审计**：定期开展安全审计和渗透测试，以便在访问控制问题遭到利用之前发现并修复。
 
-This challenge underscores the importance of rigorous access control mechanisms to prevent unauthorized access to sensitive user information.
+本挑战强调了严格访问控制机制的重要性，它们能够防止未经授权地访问敏感用户信息。

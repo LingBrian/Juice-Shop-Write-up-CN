@@ -1,44 +1,44 @@
-# Juice-Shop Write-up: Meta Geo Stalking
+# Juice-Shop Write-up：Meta Geo Stalking
 
-## Challenge Overview
+## 挑战概述
 
 **Title:** Meta Geo Stalking\
 **Category:** Sensitive Data Exposure\
 **Difficulty:** ⭐⭐ (2/6)
 
-This challenge, "Meta Geo Stalking," tests ability to utilize metadata from images posted online to answer security questions and reset a user's password. 
+“Meta Geo Stalking”挑战考察利用网上发布图片的元数据回答安全问题，并重置用户密码的能力。
 
-## Tools Used
+## 使用的工具
 
-- **Web Browser**: For navigating to the image download link and accessing the password reset page.
-- **ExifTool**: Used to extract GPS coordinates and other metadata from the image file.
-- **GPS Mapping Tool / Google Maps**: To pinpoint the exact location from the GPS coordinates.
+- **Web Browser**：用于访问图片下载链接和密码重置页面。
+- **ExifTool**：用于提取图片的 GPS 坐标和其他元数据。
+- **GPS Mapping Tool / Google Maps**：用于根据 GPS 坐标确定具体位置。
 
-## Methodology and Solution
+## 方法与解决方案
 
-### Initial Setup and Discovery
+### 初步准备与发现
 
-1. **Identifying Security Question**:
-   - Attempted to reset the password for John's account, which revealed the security question: "What is your favorite place to walk?"
+1. **识别安全问题**：
+   - 尝试重置 John 的账户密码后，系统显示安全问题：“What is your favorite place to walk?”
 
    <img src="../assets/difficulty2/meta_geostaking_1.png" alt="reset question" width="500px">
 
-   - This corresponds directly to the image caption located in photo wall, hinting that the answer is related to the location shown in the photo.
+   - 这个问题与照片墙上的图片说明直接对应，暗示答案与照片所示地点有关。
 
    <img src="../assets/difficulty2/meta_geostaking_2.png" alt="image from photo wall" width="500px">
 
-2. **Downloading and Analyzing the Image**:
-   - Downloaded the image from `http://127.0.0.1:3000/assets/public/images/uploads/favorite-hiking-place.png`.
-   - Used ExifTool to extract metadata from the image, which included GPS coordinates.
+2. **下载并分析图片**：
+   - 从 `http://127.0.0.1:3000/assets/public/images/uploads/favorite-hiking-place.png` 下载图片。
+   - 使用 ExifTool 提取图片元数据，其中包含 GPS 坐标。
 
-### Locating the Exact Place
+### 确定具体地点
 
-3. **Using GPS Coordinates**:
-   - Input the GPS coordinates into a mapping tool to get a precise location. The coordinates extracted were `36°57'31.38"N 84°20'53.58"W`.
+3. **使用 GPS 坐标**：
+   - 将 GPS 坐标输入地图工具以获得精确位置。提取到的坐标为 `36°57'31.38"N 84°20'53.58"W`。
 
    <img src="../assets/difficulty2/meta_geostaking_3.png" alt="gps" width="500px">
 
-   - Google Maps confirmed the location as Daniel Boone National Forest.
+   - Google Maps 确认该地点为 Daniel Boone National Forest。
 
    <img src="../assets/difficulty2/meta_geostaking_4.png" alt="localisation zoom 3" width="500px">
 
@@ -46,22 +46,21 @@ This challenge, "Meta Geo Stalking," tests ability to utilize metadata from imag
 
    <img src="../assets/difficulty2/meta_geostaking_6.png" alt="localisation zoom 1" width="500px">
 
-### Password Reset
+### 重置密码
 
-4. **Answering Security Question and Resetting Password**:
-   - With the location identified as Daniel Boone National Forest, this was used as the answer to the security question.
-   - Successfully reset John’s password using the location information derived from the image’s metadata.
+4. **回答安全问题并重置密码**：
+   - 确认地点是 Daniel Boone National Forest 后，将其作为安全问题的答案。
+   - 根据从图片元数据中获得的位置信息，成功重置 John 的密码。
 
    <img src="../assets/difficulty2/meta_geostaking_7.png" alt="request to reset" width="500px">
 
-### Solution Explanation
+### 解决方案说明
 
-The challenge was solved by correlating the security question with the location data embedded within an image's metadata. This demonstrates how seemingly harmless sharing of location-tagged images can lead to security breaches if such information aligns with security question answers.
+本挑战通过将安全问题与图片元数据中嵌入的位置数据关联起来而解决。这表明，如果带有地理位置标签的图片中包含与安全问题答案相关的信息，看似无害的图片分享也可能导致安全漏洞。
 
-## Remediation
+## 修复建议
 
-To mitigate risks associated with metadata in shared images and sensitive data exposure:
+为降低共享图片元数据和敏感数据暴露带来的风险：
 
-- **Metadata Scrubbing**: Encourage users to remove metadata from photos before uploading them to public platforms, or implement server-side processes to automatically strip this data.
-- **Use Non-Descriptive Security Questions**: Employ security questions that do not directly relate to information that could be publicly deduced or found through OSINT techniques. Better option is to not use security questions and rather send an email for resetting password.
-
+- **清除元数据**：鼓励用户在将照片上传到公共平台前移除元数据，或在服务器端自动清除这些数据。
+- **避免使用容易推断的安全问题**：使用答案无法通过公开信息或 OSINT 技术直接推断的安全问题。更好的做法是不使用安全问题，而改用电子邮件进行密码重置。

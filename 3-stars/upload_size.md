@@ -1,66 +1,66 @@
-# Juice-Shop Write-up: Upload Size
+# Juice-Shop 攻略：上传文件大小
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** Upload Size\
-**Category:** Improper Input Validation\
-**Difficulty:** ⭐⭐⭐ (3/6)
+**标题：** 上传文件大小\
+**类别：** 输入验证不当\
+**难度：** ⭐⭐⭐ (3/6)
 
-The "Upload Size" challenge requires uploading a file larger than 100 KB, which is beyond the size limit enforced by the application's client-side validation.
+“上传文件大小”挑战要求上传大于 100 KB 的文件，超过应用客户端验证所实施的大小限制。
 
-## Tools Used
+## 使用的工具
 
-- **Web Browser**: For navigating the web application and manipulating file uploads.
-- **Burp Suite**: To intercept, modify, and resend HTTP requests to bypass client-side restrictions.
+- **Web 浏览器**：浏览 Web 应用并操作文件上传。
+- **Burp Suite**：拦截、修改并重新发送 HTTP 请求，以绕过客户端限制。
 
-## Methodology and Solution
+## 方法与解决方案
 
-### Initial Attempt
+### 首次尝试
 
-1. **Testing File Upload**:
-   - Attempt to upload a file larger than 100 KB directly through the profile image upload functionality.
+1. **测试文件上传**：
+   - 尝试通过个人资料图片上传功能，直接上传大于 100 KB 的文件。
 
-   <img src="../assets/difficulty3/upload_size_1.png" alt="large file" width="500px">
+    <img src="../assets/difficulty3/upload_size_1.png" alt="large file" width="500px">
 
-   - Encounter an error: `MulterError: File too large`, indicating server-side enforcement of the file size limit.
+   - 遇到错误：`MulterError: File too large`，表明服务器端实施了文件大小限制。
 
-   <img src="../assets/difficulty3/upload_size_2.png" alt="error file too large" width="500px">
+    <img src="../assets/difficulty3/upload_size_2.png" alt="error file too large" width="500px">
 
-### Analyzing the Application
+### 分析应用
 
-2. **Exploring Alternative Upload Points**:
-   - Redirect focus to the complaint page as hinted, where file uploads are also supported.
-   - Discover that this page only superficially restricts file sizes through client-side JavaScript, making it a potential vector for bypassing the restriction.
+2. **探索其他上传入口**：
+   - 根据提示转而查看投诉页面，该页面也支持文件上传。
+   - 发现该页面仅通过客户端 JavaScript 浅层限制文件大小，因此可能有办法绕过限制。
 
-### Crafting the Payload
+### 构造载荷
 
-3. **Creating an Edge Case File**:
-   - Generate a file just under the 100 KB limit using the linux command: `base64 /dev/urandom | head -c 99900 > random.pdf`.
+3. **创建边界情况文件**：
+   - 使用 Linux 命令生成一个略小于 100 KB 的文件：`base64 /dev/urandom | head -c 99900 > random.pdf`。
 
-### Exploiting the Server-Side Check
+### 利用服务器端检查
 
-4. **Modifying the Request**:
-   - Upload the `random.pdf` and intercept the HTTP request using Burp Suite.
+4. **修改请求**：
+   - 上传 `random.pdf`，并使用 Burp Suite 拦截 HTTP 请求。
 
-   <img src="../assets/difficulty3/upload_size_3.png" alt="request of upload" width="500px">
+    <img src="../assets/difficulty3/upload_size_3.png" alt="request of upload" width="500px">
 
-   - Modify the intercepted request by duplicating the content within the file payload to push the size over 100 KB.
+   - 通过重复文件载荷中的内容来修改被拦截的请求，使文件大小超过 100 KB。
 
-   <img src="../assets/difficulty3/upload_size_4.png" alt="modified request of upload" width="500px">
+    <img src="../assets/difficulty3/upload_size_4.png" alt="modified request of upload" width="500px">
 
-### Bypassing the Size Limit
+### 绕过大小限制
 
-5. **Resend the Modified Request**:
-   - Send the modified request with the now larger file size.
-   - Successfully bypass the server-side file size check, as indicated by the successful upload response from the server.
+5. **重新发送修改后的请求**：
+   - 发送修改后、文件大小已增加的请求。
+   - 服务器成功响应上传请求，表明文件大小检查已被绕过。
 
-### Solution Explanation
+### 解决方案说明
 
-The challenge was resolved by exploiting a weakness in the server's file size checking mechanism, where only initial file sizes are validated client-side, and server-side checks can be bypassed through request modification. This highlights a common security oversight where server-side validations do not robustly re-check parameters that could be tampered with after client-side checks.
+通过利用服务器文件大小检查机制的弱点完成挑战：只有初始文件大小在客户端进行验证，而服务器端检查可通过修改请求绕过。这体现了常见的安全疏漏：服务器端没有对客户端检查后可能被篡改的参数进行充分复核。
 
-## Remediation
+## 修复建议
 
-To prevent such vulnerabilities in real-world applications:
+在真实应用中，可采取以下措施防止此类漏洞：
 
-- **Implement Robust Server-Side Validation**: Ensure that all input validations, including file sizes, are re-checked on the server after being submitted.
-- **Limit Input Modification**: Use multipart/form-data parsing libraries that strictly enforce total payload sizes, rather than relying on client-side enforcement.
+- **实施健全的服务器端验证**：确保所有输入验证（包括文件大小）都在提交后由服务器重新执行。
+- **限制输入修改**：使用严格限制整个载荷大小的 multipart/form-data 解析库，而不要依赖客户端限制。

@@ -1,47 +1,46 @@
-# Juice-Shop Write-up: Login MC SafeSearch
+# Juice-Shop Write-up：Login MC SafeSearch
 
-## Challenge Overview
+## 挑战概述
 
 **Title:** Login MC SafeSearch\
 **Category:** Open Source Intelligence (OSINT)\
 **Difficulty:** ⭐⭐ (2/6)
 
-This challenge involves using OSINT techniques to uncover the password for the user account of MC SafeSearch. 
+本挑战需要使用 OSINT 技术，找出 MC SafeSearch 用户账户的密码。
 
-## Tools Used
+## 使用的工具
 
-- **Web Browser**: Essential for conducting online searches and accessing various social media and video platforms.
-- **Search Engines**: Google and other search engines for finding relevant information and tracing the digital footprint of the username.
+- **Web Browser**：用于进行在线搜索，并访问各类社交媒体和视频平台。
+- **搜索引擎**：使用 Google 等搜索引擎查找相关信息，并追踪该用户名的数字足迹。
 
-## Methodology and Solution
+## 方法与解决方案
 
-### Initial Clue Analysis
+### 初步线索分析
 
-1. **Examine the Provided Information**:
-   - The challenge provided a user comment which mentioned lyrics from the movie "Frozen." This initial clue, however, did not directly help in finding the password.
+1. **检查提供的信息**：
+   - 挑战提供了一条用户评论，其中提到了电影“Frozen”的歌词。不过，这条初始线索并不能直接帮助找到密码。
 
-### OSINT Investigation
+### OSINT 调查
 
-2. **Social Media and Content Search**:
-   - An extensive search around the theme of "Frozen" does not produced signfificant results.
-   - Search about username of the user led to discovering a video by a rapper who discusses passwords in his content. 
-   - In the video, the rapper mentioned a unique naming convention for his password involving his dog named Mr. Noodles, with modifications to replace certain letters with numbers.
+2. **搜索社交媒体和内容**：
+   - 围绕“Frozen”主题进行了大量搜索，但没有发现显著结果。
+   - 搜索该用户的用户名后，发现一段说唱歌手谈及密码的视频。
+   - 视频中，说唱歌手提到其密码采用了一种独特的命名方式：以名叫 Mr. Noodles 的狗为灵感，并将某些字母替换为数字。
 
-3. **Password Hypothesis and Testing**:
-   - Based on the video, the password "Mr. N00dles" was hypothesized, replacing 'o' with '0' as commonly found in password creation strategies to add complexity.
+3. **推测并测试密码**：
+   - 根据视频内容，推测密码为“Mr. N00dles”，将字母“o”替换为“0”；这是常见的密码复杂化方式。
 
-4. **Attempt Login**:
-   - Using the derived password "Mr. N00dles" to attempt a login successfully granted access to MC SafeSearch’s account.
+4. **尝试登录**：
+   - 使用推测出的密码“Mr. N00dles”登录，成功进入 MC SafeSearch 的账户。
 
-### Solution Explanation
+### 解决方案说明
 
-The challenge was successfully resolved by using publicly available video content to derive the password. 
+本挑战利用公开可用的视频内容推测出密码，从而成功解决。
 
-## Remediation
+## 修复建议
 
-To mitigate such vulnerabilities in real-world scenarios, consider the following strategies:
+为降低真实场景中的此类风险，可考虑以下策略：
 
-- **Stronger Password Policies**: Implement and enforce policies that discourage the use of easily guessable passwords, even if they include number substitutions for letters.
-- **Education and Awareness**: Train users on the importance of using non-predictable passwords that do not relate directly to publicly known information about them, such as pet names, favorite movies, etc.
-- **Use of Multi-Factor Authentication (MFA)**: Adding an additional layer of security with MFA can significantly reduce the risk of unauthorized access, even if a password is compromised or guessed.
-
+- **加强密码策略**：实施并执行密码策略，避免使用容易猜到的密码，即使密码中包含字母与数字的替换也不例外。
+- **安全教育与意识培养**：教育用户使用难以预测的密码，避免直接使用可通过公开信息得知的内容，例如宠物名称或喜爱的电影等。
+- **使用多因素身份验证 (MFA)**：增加额外的安全层；即使密码已泄露或被猜中，MFA 也能显著降低未授权访问风险。

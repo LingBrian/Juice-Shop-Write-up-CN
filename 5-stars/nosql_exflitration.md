@@ -1,62 +1,61 @@
-# Juice-Shop Write-up: NoSQL Infiltration
+# Juice-Shop Write-up: NoSQL 渗出
 
-## Challenge Overview
-**Title:** NoSQL Infiltration  
-**Category:** NoSQL Injection  
-**Difficulty:** ⭐⭐⭐⭐⭐ (5/6)  
+## 挑战概述
+**标题：** NoSQL Infiltration  
+**类别：** NoSQL 注入  
+**难度：** ⭐⭐⭐⭐⭐ (5/6)  
 
-The objective of this challenge is to exploit a NoSQL injection vulnerability in the Juice Shop application to gain access to all order histories.
+本挑战的目标是利用 Juice Shop 应用中的 NoSQL 注入漏洞，获取所有订单历史记录。
 
-## Tools Used
-- **Web Browser:** For navigating the Juice Shop application.
-- **Burp Suite:** For intercepting and modifying HTTP requests to test for injection points.
+## 使用工具
+- **Web 浏览器：** 用于浏览 Juice Shop 应用。
+- **Burp Suite：** 用于拦截和修改 HTTP 请求，以测试注入点。
 
-## Methodology and Solution
+## 方法与解题过程
 
-### Step 1: Identifying Potential Injection Points
-The challenge involves interacting with order-related functionalities, so by extents with orders page. The following steps were taken to identify injection points:
-1. **Access Order History:** Navigate to `http://localhost:3000/#/order-history` (because it's an obvious page for order) and click on one of the orders.
-2. **Intercept Requests:** Use Burp Suite to intercept and analyze the requests being made when viewing an order.
+### 步骤 1：识别潜在注入点
+本挑战涉及订单相关功能，因此我们从订单页面着手。以下步骤用于识别注入点：
+1. **访问订单历史：** 前往 `http://localhost:3000/#/order-history`（这是显而易见的订单页面），并点击其中一个订单。
+2. **拦截请求：** 使用 Burp Suite 拦截并分析查看订单时发出的请求。
 
-### Step 2: Analyzing the API Endpoint
-By analyzing the intercepted requests, we identified the following endpoint used to fetch order details:
-- **Endpoint:** `/rest/track-order/[id]`
+### 步骤 2：分析 API 端点
+通过分析拦截到的请求，我们发现用于获取订单详情的端点：
+- **端点：** `/rest/track-order/[id]`
 
 <img src="../assets/difficulty5/nosql_exfiltration_1.png" alt="normal request" width="600px">
 
-### Step 3: Testing for NoSQL Injection (Not working yet)
-To test for NoSQL injection, we attempted basic payloads:
-1. **Payload:** `/rest/track-order/'`
+### 步骤 3：测试 NoSQL 注入（尚未成功）
+为测试 NoSQL 注入，我们尝试了基本载荷：
+1. **载荷：** `/rest/track-order/'`
 
 <img src="../assets/difficulty5/nosql_exfiltration_2.png" alt="modified request" width="600px">
 
-   - **Result:** Received a `500 Internal Server Error`, indicating a potential injection point.
-2. **Payload:** `/rest/track-order/''`
-   - **Result:** Received an `Unexpected string` error instead of `Unexpected token`, suggesting that the server interprets our input as part of a NoSQL query.
+   - **结果：** 收到 `500 Internal Server Error`，表明这里可能存在注入点。
+2. **载荷：** `/rest/track-order/''`
+   - **结果：** 收到 `Unexpected string` 错误，而不是 `Unexpected token`，说明服务器可能将我们的输入解析为 NoSQL 查询的一部分。
 
 <img src="../assets/difficulty5/nosql_exfiltration_3.png" alt="request with payload" width="600px">
 
-### Step 4: Crafting the NoSQL Injection Payload
-Given the error messages, we inferred that the server was likely constructing a query similar to:
+### 步骤 4：构造 NoSQL 注入载荷
+根据错误消息，我们推断服务器可能构造了类似以下的查询：
 ```javascript
 { $where: "property === '" + payload + "'" }
 ```
-To exploit this, we crafted a payload that would always evaluate to true:
-- **Payload:** `' || true || '`
-- **URL Encoded Payload:** `%27%20%7C%7C%20true%20%7C%7C%20%27`
+为利用该问题，我们构造了一个始终为真的载荷：
+- **载荷：** `' || true || '` 
+- **URL 编码后的载荷：** `%27%20%7C%7C%20true%20%7C%7C%20%27`
 
-### Step 5: Injecting the Payload
-1. **Inject Payload:** Modify the URL to include the payload: `/rest/track-order/%27%20%7C%7C%20true%20%7C%7C%20%27`
-2. **Execute Request:** Send the request and observe the response.
+### 步骤 5：注入载荷
+1. **注入载荷：** 修改 URL，将载荷加入其中：`/rest/track-order/%27%20%7C%7C%20true%20%7C%7C%20%27`
+2. **执行请求：** 发送请求并查看响应。
 
-### Step 6: Observing the Results
-Upon injecting the payload, the server returned all orders instead of just the specific order, confirming the successful NoSQL injection.
+### 步骤 6：观察结果
+注入载荷后，服务器返回了所有订单，而非仅返回指定订单，证实 NoSQL 注入成功。
 
-## Solution Explanation
-The challenge was solved by identifying a NoSQL injection vulnerability in the `/rest/track-order/[id]` endpoint. By injecting a payload that always evaluates to true, we were able to manipulate the query to return all orders, demonstrating the vulnerability.
+## 解题说明
+通过发现 `/rest/track-order/[id]` 端点中的 NoSQL 注入漏洞，并注入始终为真的载荷，我们操纵查询返回了所有订单，展示了该漏洞。
 
-## Remediation
-- **Input Validation and Sanitization:** Ensure all user inputs are properly validated and sanitized to prevent injection attacks.
-- **Use Parameterized Queries:** Implement parameterized queries to prevent injection by separating code and data.
-- **Error Handling:** Improve error handling to avoid revealing detailed error messages that can help attackers craft their payloads.
-
+## 修复建议
+- **输入验证与清理：** 验证和清理所有用户输入，以防止注入攻击。
+- **使用参数化查询：** 通过参数化查询将代码与数据分离，以防止注入。
+- **错误处理：** 改进错误处理，避免泄露可帮助攻击者构造载荷的详细错误信息。

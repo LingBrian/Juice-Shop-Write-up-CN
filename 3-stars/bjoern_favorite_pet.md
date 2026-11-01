@@ -1,51 +1,49 @@
-# Juice-Shop Write-up: Bjoern’s Favorite Pet
+# Juice-Shop 攻略：Bjoern 最喜欢的宠物
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** Bjoern’s Favorite Pet\
-**Category:** OSINT (Open Source Intelligence)\
-**Difficulty:** ⭐⭐⭐ (3/6)
+**标题：** Bjoern 最喜欢的宠物\
+**类别：** OSINT（开源情报）\
+**难度：** ⭐⭐⭐ (3/6)
 
-The "Bjoern’s Favorite Pet" challenge involves using open-source intelligence to discover personal information related to Bjoern, specifically identifying the name of his favorite pet, which is used as the answer to a security question.
+“Bjoern 最喜欢的宠物”挑战要求运用开源情报，查找与 Bjoern 有关的个人信息，具体来说是找出他最喜欢的宠物的名字，并将其用作安全问题的答案。
 
-## Tools Used
+## 使用的工具
 
-- **Web Browser**: To access the administration panel and social media platforms.
-- **OSINT Techniques**: Leveraging publicly available data to gather personal information.
+- **Web 浏览器**：访问管理面板和社交媒体平台。
+- **OSINT 技术**：利用公开数据收集个人信息。
 
-## Methodology and Solution
+## 方法与解决方案
 
-### Gathering Initial Information
+### 收集初始信息
 
-1. **Identifying Bjoern’s Email**:
-   - Accessed the administrative panel of the application to obtain Bjoern’s email address, which is `bjoern@owasp.org`.
+1. **查找 Bjoern 的电子邮箱**：
+   - 访问应用的管理面板，获取 Bjoern 的电子邮箱：`bjoern@owasp.org`。
 
-   <img src="../assets/difficulty3/bjoern_favorite_pet_1.png" alt="bjoern account on admin panel" width="500px">
+    <img src="../assets/difficulty3/bjoern_favorite_pet_1.png" alt="bjoern account on admin panel" width="500px">
 
-### Using OSINT to Find the Pet's Name
+### 运用 OSINT 查找宠物名字
 
-2. **Exploring Social Media**:
-   - Used Bjoern’s email address to search for his social media profiles. Located his Twitter account.
-   - On Twitter, found a post by Bjoern featuring a picture of his cat named Zaya.
+2. **查看社交媒体**：
+   - 使用 Bjoern 的电子邮箱搜索其社交媒体资料，并找到他的 Twitter 账号。
+   - 在 Twitter 上找到 Bjoern 发布的一条动态，其中有一只名叫 Zaya 的猫。
 
-   <img src="../assets/difficulty3/bjoern_favorite_pet_2.png" alt="post twitter" width="500px">
+    <img src="../assets/difficulty3/bjoern_favorite_pet_2.png" alt="post twitter" width="500px">
 
-### Leveraging the Information
+### 利用收集到的信息
 
-3. **Answering the Security Question**:
-   - With the name of Bjoern’s cat discovered, used "Zaya" as the answer to the security question associated with resetting or accessing his account.
+3. **回答安全问题**：
+   - 找到 Bjoern 的猫的名字后，在重置或访问其账户时，将“Zaya”用作关联安全问题的答案。
 
-   <img src="../assets/difficulty3/bjoern_favorite_pet_3.png" alt="answer security" width="500px">
+    <img src="../assets/difficulty3/bjoern_favorite_pet_3.png" alt="answer security" width="500px">
 
-### Solution Explanation
+### 解决方案说明
 
-The challenge was solved by effectively utilizing OSINT skills to identify Bjoern's pet’s name, which was critical for bypassing security controls related to personal accounts. By connecting an email obtained from an admin panel to personal content shared on social media, this task highlights the importance of carefully managing personal information online.
+通过运用 OSINT 技巧找出 Bjoern 的宠物名字，成功绕过了与个人账户相关的安全控制。将从管理面板获得的电子邮箱与社交媒体上的个人内容关联起来，也体现了谨慎管理线上个人信息的重要性。
 
-## Remediation
+## 修复建议
 
-To mitigate similar vulnerabilities in real-world scenarios:
+在真实环境中，可采取以下措施缓解类似漏洞：
 
-
-- **Use of Non-Personal Security Questions**: Encourage or enforce the use of security questions that do not rely on information that could easily be obtained or guessed through public data. Note that it's better to not use security question
-but rather send email when user want to reset his password.
-- **Privacy Settings**: Advise users to utilize privacy settings on social media platforms to control who can see their posts, especially when sharing personal or potentially sensitive information.
+- **避免使用个人信息作为安全问题**：鼓励或要求用户选择不依赖公开数据、且难以猜测的安全问题。更好的做法是不使用安全问题，而是在用户需要重置密码时向其发送电子邮件。
+- **隐私设置**：建议用户使用社交媒体平台的隐私设置控制内容的可见范围，尤其是在分享个人或潜在敏感信息时。

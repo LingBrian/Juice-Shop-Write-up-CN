@@ -1,52 +1,51 @@
-# Juice-Shop Write-up: Imaginary Challenge
+# Juice-Shop Write-up: 虚构挑战
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** Imaginary Challenge  
-**Category:** Cryptographic Issues  
-**Difficulty:** ⭐⭐⭐⭐⭐⭐ (6/6)
+**标题：** Imaginary Challenge  
+**类别：** 密码学问题  
+**难度：** ⭐⭐⭐⭐⭐⭐ (6/6)
 
-The "Imaginary Challenge" is a metaphorical challenge within OWASP Juice Shop, designed to emphasize understanding the environment and using creative problem-solving skills.
+“虚构挑战”是 OWASP Juice Shop 中的一个隐喻式挑战，旨在强调理解环境并运用创造性解决问题的能力。
 
-## IMPORTANT NOTE
+## 重要说明
 
-**_This challenge is not well documented, please feel free to open a pull request if you have find a way to complete it in a proper manner._**
+**_该挑战文档不够完善。如果你找到妥善完成挑战的方法，欢迎提交 pull request。_**
 
-## Tools Used
+## 使用工具
 
-- **Web Browser:** To interact with the Juice Shop application.
-- **Code Review:** Analysis of the package.json and related scripts.
+- **Web 浏览器：** 用于与 Juice Shop 应用交互。
+- **代码审查：** 分析 package.json 及相关脚本。
 
-## Methodology and Solution
+## 方法与解题过程
 
-### Step 1: Initial Analysis
+### 步骤 1：初步分析
 
-Given that the challenge hinted at its non-existence, I started by investigating the infrastructure of the Juice Shop, focusing on how challenges are typically resolved—specifically looking at the mechanics of "ContinueCodes" used to validate challenge completions.
+由于提示暗示挑战可能并不存在，我开始调查 Juice Shop 的基础设施，重点研究挑战通常如何完成，尤其是用于验证挑战完成情况的“ContinueCodes”机制。
 
-### Step 2: Investigating `package.json`
+### 步骤 2：调查 `package.json`
 
-Upon reviewing `package.json`, I discovered a dependency called `hashid`, which is used for encoding and decoding hash-like identifiers. This was a potential tool for generating or decoding `ContinueCodes`.
+审查 `package.json` 后，我发现了一个名为 `hashid` 的依赖，它用于对类似哈希的标识符进行编码和解码。这可能是生成或解码 `ContinueCodes` 的工具。
 
-### Step 3: Research and External Write-up Consultation
+### 步骤 3：研究并参考社区解题文档
 
-Since no direct approach yielded results, I turned to existing community write-ups for insights. It was noted that the challenge initially depended on functionality provided by `hashid` which no longer existed in its original form. In fact, they have a website, and on this website, few years ago, they were displaying a link to a codepen that allow to test hashid. Actually, hashid was sell to another company, and the webpage was redesign, and the codepen removed. 
+由于没有直接找到解决方法，我查阅了社区已有的解题文档。资料指出，该挑战最初依赖 `hashid` 提供的功能，但该功能现已不再以原来的形式存在。该项目曾有一个网站，几年前网站上展示了一个可用于测试 hashid 的 CodePen 链接。后来 hashid 被出售给另一家公司，网页重新设计，CodePen 也被移除。
 
-### Step 4: Theoretical Solution
+### 步骤 4：理论上的解法
 
-The original solution would have been the following:
-- Using the `hashid` demonstration to encode the number 999 with the specific salt by default givent by the demonstration.
-- This would generate a `ContinueCode`.
-- Applying this `ContinueCode` via a PUT request to:
+原本的解决方法应为：
+- 使用 `hashid` 演示工具，以演示工具默认提供的特定盐值对数字 999 进行编码。
+- 这将生成一个 `ContinueCode`。
+- 通过 PUT 请求将该 `ContinueCode` 提交至：
   ```
   http://localhost:3000/rest/continue-code/apply/{ContinueCode}
   ```
-  where `{ContinueCode}` would be the output from the `hashid` encoding.
+  其中 `{ContinueCode}` 是 `hashid` 编码的输出。
 
+## 解题说明
 
-## Solution Explanation
+该挑战表明，在安全场景中使用软件默认值可能会带来风险。
 
-The challenges shows that it can be dangerous to keep default values of softwares, especially if they are use in a security context.
+## 修复建议
 
-## Remediation
-
-- **Default Values:** When using a tool, never use his defaults values.
+- **默认值：** 使用工具时，切勿直接使用其默认值。

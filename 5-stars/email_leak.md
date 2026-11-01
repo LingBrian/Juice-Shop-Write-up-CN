@@ -1,51 +1,50 @@
-# Juice-Shop Write-up: Email Leak
+# Juice-Shop Write-up: 邮件泄露
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** Email Leak  
-**Category:** Security Misconfiguration  
-**Difficulty:** ⭐⭐⭐⭐⭐ (5/6)
+**标题：** Email Leak  
+**类别：** 安全配置错误  
+**难度：** ⭐⭐⭐⭐⭐ (5/6)
 
-The objective of this challenge is to exploit improper access control in the Juice Shop application to retrieve sensitive user information without proper authorization.
+本挑战的目标是利用 Juice Shop 应用中的访问控制不当问题，在未经适当授权的情况下获取敏感用户信息。
 
-## Tools Used
+## 使用工具
 
-- **Web Browser:** Used to interact with the application and observe HTTP requests.
-- **Network Sniffer (e.g., Burp Suite):** To capture and manipulate HTTP requests.
+- **Web 浏览器：** 用于与应用交互并观察 HTTP 请求。
+- **网络嗅探工具（例如 Burp Suite）：** 用于捕获和操纵 HTTP 请求。
 
-## Methodology and Solution
+## 方法与解题过程
 
-### Step 1: Exploring the `/rest/user/whoami` Endpoint
+### 步骤 1：探索 `/rest/user/whoami` 端点
 
-Initially, by analyzing the network traffic during various interactions with the application since the start of this walkthrough, the `/rest/user/whoami` endpoint was identified as potentially interesting because it provides user data in response to requests.
+在本次演练开始后分析应用各种交互过程中的网络流量时，我们发现 `/rest/user/whoami` 端点可能值得关注，因为它会在收到请求时返回用户数据。
 
 <img src="../assets/difficulty5/email_leak_1.png" alt="screenshot of the endpoint" width="500px">
 
-### Step 2: Unauthorized Data Access
+### 步骤 2：未授权访问数据
 
-To test the endpoint for security flaws, the following steps were taken:
+为测试该端点是否存在安全缺陷，我们执行了以下操作：
 
-1. **Request without Authentication:** The token from a legitimate request to `/rest/user/whoami` was removed to see if the endpoint enforced authentication. Surprisingly, the endpoint responded with user data even without an authentication token, which is a significant security vulnerability.
+1. **不带身份验证的请求：** 删除对 `/rest/user/whoami` 发出的合法请求中的 token，以检查端点是否强制进行身份验证。令人意外的是，即使没有身份验证 token，端点也返回了用户数据，这是一个严重的安全漏洞。
+2. **返回的数据：** 响应包含电子邮件地址等敏感用户详情，表明无需适当的用户身份验证即可访问敏感数据。
 
-2. **Data Returned:** The response included sensitive user details such as email address, indicating that sensitive data could be accessed without proper user authentication.
+### 步骤 3：测试 JSONP 利用
 
-### Step 3: Testing for JSONP Exploitation
+考虑到数据泄露情况和访问控制缺失，我们进一步考虑了 JSONP（带填充的 JSON）利用的可能性。JSONP 常用于通过回调函数包装 JSON 数据来绕过跨域策略：
 
-Given the nature of the data leak and the lack of proper access controls, the potential for a JSONP (JSON with Padding) exploit was considered. JSONP is often used to bypass cross-domain policies by wrapping JSON data in a callback function:
-
-- **Callback Injection:** By modifying the request to include a `callback` parameter (`/rest/user/whoami?callback=test`), it was observed whether the application improperly wrapped JSON data in a JavaScript function, potentially leading to Cross-Site Scripting (XSS) or data exfiltration scenarios.
+- **回调注入：** 在请求中添加 `callback` 参数（`/rest/user/whoami?callback=test`），观察应用是否会将 JSON 数据错误地包装在 JavaScript 函数中，从而可能导致跨站脚本（XSS）或数据外泄。
 
 <img src="../assets/difficulty5/email_leak_2.png" alt="url" width="500px">
 
-### Step 4: Exploitation
+### 步骤 4：利用漏洞
 
-The application indeed responded by wrapping the JSON data in the specified callback function, confirming that the endpoint was vulnerable to JSONP exploitation. This could allow an attacker to inject a script to exfiltrate data by forcing the application to execute the callback function with sensitive data as parameters.
+应用确实使用指定的回调函数包装 JSON 数据响应，证实该端点容易受到 JSONP 利用。攻击者可能注入脚本，让应用以敏感数据为参数执行回调函数，从而外泄数据。
 
-## Solution Explanation
+## 解题说明
 
-The vulnerability was successfully exploited by proving that the endpoint improperly handled JSONP requests, allowing data to be accessed and potentially exfiltrated through a malicious website or script.
+通过证明端点错误处理 JSONP 请求，成功利用了此漏洞。攻击者可通过恶意网站或脚本访问并可能外泄数据。
 
-## Security Implications and Recommendations
+## 安全影响与建议
 
-- **Enforce Authentication Checks:** Ensure that all endpoints, especially those returning sensitive data, properly enforce authentication checks.
-- **Securely Handle JSONP:** If JSONP is necessary, securely implement it to avoid common pitfalls that lead to security vulnerabilities, such as unvalidated callback functions.
+- **强制身份验证：** 确保所有端点，尤其是返回敏感数据的端点，都正确强制执行身份验证。
+- **安全处理 JSONP：** 如确有必要使用 JSONP，应安全实现，避免未验证回调函数等常见问题导致安全漏洞。

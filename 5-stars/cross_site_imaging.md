@@ -1,71 +1,68 @@
-# Juice-Shop Write-up: Cross-Site Imaging
+# Juice-Shop Write-up: 跨站图像
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** Cross-Site Imaging  
-**Category:** Cross-Site Request Forgery (CSRF)  
-**Difficulty:** ⭐⭐⭐⭐⭐ (5/6)
+**标题：** Cross-Site Imaging  
+**类别：** 跨站请求伪造（CSRF）  
+**难度：** ⭐⭐⭐⭐⭐ (5/6)
 
-The objective of this challenge is to manipulate the source URL for images used in the deluxe membership package display on the Juice Shop website to inject an external image.
+本挑战的目标是操纵 Juice Shop 网站豪华会员套餐展示所用图片的源 URL，以注入外部图像。
 
-## Tools Used
+## 使用工具
 
-- **Web Browser:** For navigating to the Juice Shop application and modifying URLs.
-- **Developer Tools:** Used to inspect and manipulate HTML and JavaScript code running in the Juice Shop.
+- **Web 浏览器：** 用于访问 Juice Shop 应用并修改 URL。
+- **开发者工具：** 用于检查和操纵 Juice Shop 中运行的 HTML 与 JavaScript 代码。
 
-## Methodology and Solution
+## 方法与解题过程
 
-### Step 1: Analyzing the Page
+### 步骤 1：分析页面
 
-Accessed the Deluxe Membership page at `http://127.0.0.1:3000/#/deluxe-membership` and observed that it displayed several images of deluxe boxes which are styled with various decals.
+访问 `http://127.0.0.1:3000/#/deluxe-membership` 豪华会员页面，观察到页面展示了几张带有各种贴花装饰的豪华盒子图片。
 
 <img src="../assets/difficulty5/cross_site_imaging_1.png" alt="Deluxe Membership Boxes" width="500px">
 
+### 步骤 2：识别图片源操纵方式
 
-### Step 2: Identifying Image Source Manipulation
-
-Inspected the source code of the page to understand how images are loaded and displayed. Discovered that images are dynamically loaded based on the `logoSrc` attribute, which can be manipulated through URL parameters.
+检查页面源代码，了解图片的加载和显示方式。发现图片根据 `logoSrc` 属性动态加载，而该属性可通过 URL 参数操纵。
 
 <img src="../assets/difficulty5/cross_site_imaging_5.png" alt="reference of all images" width="500px">
 
-We can find the default source in the main.js also : 
+也可以在 main.js 中找到默认来源：
 
 <img src="../assets/difficulty5/cross_site_imaging_6.png" alt="sources of main image" width="500px">
 
 <img src="../assets/difficulty5/cross_site_imaging_7.png" alt="sources of stickers images" width="500px">
 
+### 步骤 3：代码审查
 
-### Step 3: Code Review
+分析了负责此功能的 JavaScript：
+- 构造函数会将 `logoSrc` 初始设置为默认图片路径。
+- 根据我对 JS 代码的理解，如果提供了 `testDecal` URL 参数，它就会覆盖默认图片路径；否则使用默认路径。
 
-The JavaScript responsible for this functionality was analyzed:
-- Initial `logoSrc` is set to the default image path in the constructor.
-- According to my reading of the JS code, if a `testDecal` URL parameter is provided, it overrides the default image path. If not, default path is used.
+### 步骤 4：利用重定向
 
-### Step 4: Exploiting with Redirect
+尝试通过 `testDecal` 参数指定外部图片：
 
-Attempted to exploit this by specifying external images via the `testDecal` parameter : 
-
-Constructed the payload to use a relative path escape sequence combined with a redirection to an external image:
+构造的载荷使用相对路径跳转序列，并结合重定向指向外部图像：
 ```plaintext
 http://127.0.0.1:3000/#/deluxe-membership?testDecal=../../../../redirect?to=https://dummyimage.com/600x400/000/fff&x=https://github.com/bkimminich/juice-shop
 ```
 
-1. This payload uses directory traversal (`../../../../`) to reach the server root and then utilizes the internal redirect functionality to point to an external dummy image.
-2. This payload use `&x=https://github.com/bkimminich/juice-shop` to bypass the allowlist. If you don't undestand this step, refer to the allowlist bypass challenge.
+1. 此载荷使用目录遍历（`../../../../`）到达服务器根目录，然后利用内部重定向功能指向外部占位图片。
+2. 此载荷使用 `&x=https://github.com/bkimminich/juice-shop` 绕过允许列表。如果不理解这一步，请参阅允许列表绕过挑战。
 
-### Step 5: Final Exploit
+### 步骤 5：最终利用
 
-Submitted the URL with the crafted `testDecal` parameter, effectively displaying an external image, confirming the vulnerability in handling the image source path.
+提交包含构造好的 `testDecal` 参数的 URL 后，页面成功显示外部图片，证实图片源路径处理存在漏洞。
 
 <img src="../assets/difficulty5/cross_site_imaging_8.png" alt="test of changing sources of stickers images" width="500px">
 
+## 解题说明
 
-## Solution Explanation
+本挑战利用了图片源属性的相对路径处理方式，并结合内部重定向到允许的 URL，再将外部图片 URL 作为参数传入。
 
-The challenge was solved by exploiting the relative path handling in the image source attribute combined with an internal redirect to an allowed URL, which included an external image URL as a parameter.
+## 修复建议
 
-## Remediation
-
-- **Validate and Sanitize Input:** Ensure that all parameters affecting file paths or URLs are strictly validated and sanitized to prevent directory traversal and other injection attacks.
-- **Restrict URL Redirection:** Implement strict whitelisting for redirect targets to ensure only intended destinations are permissible.
-- **Use Absolute Paths:** Modify the application to use absolute paths for internal resources to prevent misuse of relative paths.
+- **验证并清理输入：** 严格验证和清理所有影响文件路径或 URL 的参数，以防止目录遍历及其他注入攻击。
+- **限制 URL 重定向：** 对重定向目标实施严格的允许列表，仅允许预期的目标。
+- **使用绝对路径：** 修改应用以使用内部资源的绝对路径，避免相对路径被滥用。

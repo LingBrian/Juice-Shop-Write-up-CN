@@ -1,22 +1,22 @@
-# Juice-Shop Write-up: Ephemeral Accountant
+# Juice-Shop 攻略：临时会计
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** Ephemeral Accountant  
-**Category:** Injection  
-**Difficulty:** ⭐⭐⭐⭐ (4/6)
+**标题：** Ephemeral Accountant  
+**类别：** 注入  
+**难度：** ⭐⭐⭐⭐ (4/6)
 
-This challenge involves using SQL injection to simulate the login of a non-existent but temporarily created user "acc0unt4nt@juice-sh.op" without actually adding the account to the database permanently.
+本挑战要求使用 SQL 注入，模拟登录一个不存在但临时创建的用户 `"acc0unt4nt@juice-sh.op"`，而不将该账户永久写入数据库。
 
-## Tools Used
+## 使用的工具
 
-- **Interception Proxy (e.g., Burp Suite):** To capture and modify the HTTP requests.
+- **拦截代理（如 Burp Suite）：** 用于捕获和修改 HTTP 请求。
 
-## Methodology and Solution
+## 方法与解法
 
-### Step 1: Analysis of Login Functionality
+### 步骤 1：分析登录功能
 
-Initially, I captured the typical HTTP POST request used for logging in which looks something like this:
+首先，我捕获了常见的登录 HTTP POST 请求，内容大致如下：
 
 ```http
 POST /rest/user/login HTTP/1.1
@@ -29,13 +29,13 @@ Content-Type: application/json
 }
 ```
 
-### Step 2: Crafting the SQL Injection Payload
+### 步骤 2：构造 SQL 注入载荷
 
-Given the constraints of the challenge (no actual account creation and no persistent modification of the database), I opted for an SQL injection using the `UNION SELECT` strategy to mimic the existence of an account temporarily during the query execution time.
+考虑到挑战要求（不实际创建账户，也不永久修改数据库），我选择使用 SQL 注入和 `UNION SELECT` 策略，在查询执行期间临时模拟账户存在。
 
-### Step 3: Injecting the Temporary User in the SQL Query
+### 步骤 3：在 SQL 查询中注入临时用户
 
-I modified the login request payload to include the SQL injection. The key here was to construct a subquery within the UNION SELECT that mimics a legitimate user record:
+我修改了登录请求载荷，通过 UNION SELECT 子查询构造一条模拟合法用户记录：
 
 ```http
 POST /rest/user/login HTTP/1.1
@@ -48,18 +48,18 @@ Content-Type: application/json
 }
 ```
 
-We observe that the server responsde with a JWT token, meaning that he accepted our connection :
+可以看到，服务器返回了 JWT token，这意味着登录成功：
 
 <img src="../assets/difficulty4/ephemeral_accountant_2.png" alt="decrypting coupons" width="500px">
 
-### Solution Explanation
+### 解法说明
 
-This SQL injection effectively creates a temporary row in the database for the duration of the query. The `UNION SELECT` clause constructs a complete user record, mirroring the structure expected by the application's login processing logic. By setting the `email` field in the injection to match the SQL query expected to retrieve a user, the application processes this "ephemeral" user as if it were legitimately present in the database.
+这次 SQL 注入在查询执行期间有效地创建了一条临时数据库记录。`UNION SELECT` 子句构造了一个完整用户记录，与应用登录逻辑所需的结构相匹配。将注入中的 `email` 字段设置为与 SQL 查询预期值一致后，应用就会像处理数据库中真实存在的用户一样处理这个“临时”用户。
 
-The `WHERE '1'='1'` condition ensures that the injection always succeeds in matching the query context, bypassing the normal authentication process, and the comment `--` ensures any subsequent part of the real SQL query is ignored.
+`WHERE '1'='1'` 条件确保注入始终匹配查询上下文，而注释 `--` 则确保真实 SQL 查询后续部分被忽略。
 
-### Remediation
+### 修复建议
 
-- **Use of Prepared Statements:** Always use parameterized queries or prepared statements to handle SQL queries. This approach ensures that the SQL execution engine treats the inputs as data rather than executable code.
-- **Use SQL Server-side verification:** Ensure that the account where user will log really exist in database by double checking it server-side.
-- **Input Validation:** Rigorous validation of all user inputs can reduce the risk of injection attacks. Inputs should be checked against expected patterns and sanitized.
+- **使用预处理语句：** 始终使用参数化查询或预处理语句处理 SQL 查询。这样可确保 SQL 执行引擎将输入视为数据而非可执行代码。
+- **在 SQL Server 端验证：** 确保用户登录时对应账户确实存在于数据库中，并在服务器端再次核验。
+- **输入验证：** 严格验证所有用户输入，降低注入风险。输入应符合预期格式并经过清理。

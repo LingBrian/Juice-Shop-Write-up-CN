@@ -1,62 +1,62 @@
-# Juice-Shop Write-Up: Retrieve Blueprint
+# Juice-Shop Write-Up: 获取蓝图
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** Retrieve Blueprint\
-**Category:** Forensic/Recon\
-**Difficulty:** ⭐⭐⭐⭐⭐ (5/6)
+**标题：** Retrieve Blueprint\
+**类别：** 取证/侦察\
+**难度：** ⭐⭐⭐⭐⭐ (5/6)
 
-This challenge requires to locate and retrieve a 3D blueprint related to the OWASP Juice Shop project. 
+本挑战要求找到并获取与 OWASP Juice Shop 项目相关的 3D 蓝图。
 
-## Tools Used
+## 使用工具
 
-- **Aperisolve**: A tool for analyzing images to extract hidden metadata, strings, or other embedded information.
-- **Web Browser**: Used for accessing URLs and inspecting web content.
-- **wget**: Command-line utility for downloading files from the web.
-- **AperiSolv**: Tool for steganography (https://www.aperisolve.com/)
+- **Aperisolve**：用于分析图像并提取隐藏元数据、字符串或其他嵌入信息。
+- **Web 浏览器**：用于访问 URL 并检查网页内容。
+- **wget**：用于从 Web 下载文件的命令行工具。
+- **AperiSolv**：隐写分析工具（https://www.aperisolve.com/）
 
-## Methodology and Solution
+## 方法与解题过程
 
-### Initial Reconnaissance
+### 初步侦察
 
-1. **Image Analysis**:
-   - Using the hints, we know that the blueprint is not found directly within an FTP server but instead, hinted to be related to a 3D-printed item represented in an image.
-   - We also know that we can take for starting point, the OWASP Juice Shop Logo 3D Printed from the product home page. We start by downloading the image of this product.
-   - Analyze `3d_keychain.jpg` image located at `assets/public/images/products/3d_keychain.jpg` using Aperisolve to extract hidden metadata and strings.
+1. **图像分析：**
+   - 根据提示，我们知道蓝图不在 FTP 服务器上，而是与图像中展示的 3D 打印物品有关。
+   - 我们还知道可以从产品主页上的 OWASP Juice Shop Logo 3D 打印商品入手，因此先下载该商品图片。
+   - 使用 Aperisolve 分析位于 `assets/public/images/products/3d_keychain.jpg` 的 `3d_keychain.jpg` 图像，提取隐藏元数据和字符串。
 
-### Extracting Information
+### 提取信息
 
-2. **Follow Up on Clues**:
-   - Investigate strings found in the image, specifically URLs and mentions of software used (OpenSCAD).
+2. **跟进线索：**
+   - 检查图像中发现的字符串，尤其是 URL 和提及的软件 OpenSCAD。
 
    <img src="../assets/difficulty5/retrieve_blueprint_2.png" alt="Aperisolv" width="500px">
 
-   - Check the validity and content of URLs found (Imgur and Adobe links), which led to a dead end.
+   - 检查发现的 URL（Imgur 和 Adobe 链接）是否有效及其内容，但最终没有进展。
 
-### Wrong way to GitHub Repository
+### 误入 GitHub 仓库
 
-3. **Exploring Related Resources**:
-   - Located by accident a GitHub repository (using Google Dork) containing a blueprint file (`JuiceShop_KeyChain.stl`) that matches the product image but does not immediately solve the challenge. In case you need the real 3D model, here is the link : https://github.com/OWASP/owasp-swag/blob/master/projects/juice-shop/3d/JuiceShop_KeyChain.stl
+3. **探索相关资源：**
+   - 偶然通过 Google Dork 找到一个 GitHub 仓库，其中包含与商品图片相符的蓝图文件（`JuiceShop_KeyChain.stl`），但并不能直接解决挑战。如果需要真实的 3D 模型，可访问此链接：https://github.com/OWASP/owasp-swag/blob/master/projects/juice-shop/3d/JuiceShop_KeyChain.stl
 
-### Hypothesis and Brute Forcing
+### 提出假设并暴力猜测
 
-4. **Guessing File Paths**:
-   - Based on the image storage path and file format (.stl), hypothesize potential URLs to directly access corresponding STL files for other related products.
-   - Use common naming conventions and trial and error to guess the correct file name and path.
-   - More specifically, I tried : `JuiceShop.stl`
+4. **猜测文件路径：**
+   - 根据图像存储路径和文件格式（.stl），推测可能存在其他相关商品对应的 STL 文件 URL。
+   - 使用常见命名习惯并逐一尝试，猜测正确的文件名和路径。
+   - 更具体地说，我尝试了：`JuiceShop.stl`
 
-### Successful Retrieval
+### 成功获取
 
-5. **Downloading the Blueprint**:
-   - Successfully retrieve the blueprint using `wget` by accessing the guessed URL: `http://localhost:3000/assets/public/images/products/JuiceShop.stl`.
+5. **下载蓝图：**
+   - 使用 `wget` 访问猜测的 URL，成功获取蓝图：`http://localhost:3000/assets/public/images/products/JuiceShop.stl`。
 
-## Solution Explanation
+## 解题说明
 
-The challenge was resolved by utilizing a combination of image analysis, logical deduction from available metadata, and systematic guessing of file paths. The retrieval of the `JuiceShop.stl` file, not directly listed but logically named based on other files in the repository, was crucial.
+本挑战结合图像分析、对现有元数据进行逻辑推断，以及系统地猜测文件路径来解决。获取未直接列出、但可以根据仓库中其他文件合理推测命名的 `JuiceShop.stl` 文件是关键。
 
-## Remediation
+## 修复建议
 
-To prevent unauthorized access to sensitive files like blueprints:
+为防止蓝图等敏感文件被未授权访问：
 
-- **Secure File Storage**: Restrict public access to directories containing sensitive files and use randomized or non-predictable file names.
-- **Access Controls**: Implement server-side checks to ensure only authorized users can access specific files or directories.
+- **安全存储文件：** 限制对包含敏感文件的目录的公开访问，并使用随机或难以预测的文件名。
+- **访问控制：** 实施服务端检查，确保只有经过授权的用户才能访问特定文件或目录。

@@ -1,74 +1,74 @@
-# Juice-Shop Write-up: Wallet Depletion
+# Juice-Shop Write-up: 钱包余额耗尽
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** Wallet Depletion  
-**Category:** Cryptographic Issues  
-**Difficulty:** ⭐⭐⭐⭐⭐⭐ (6/6)
+**标题：** Wallet Depletion  
+**类别：** 密码学问题  
+**难度：** ⭐⭐⭐⭐⭐⭐ (6/6)
 
-This challenge entails draining or manipulating the balance of a simulated cryptocurrency wallet within the Juice Shop application by intercepting and manipulating blockchain transaction requests.
+本挑战要求通过拦截和操纵区块链交易请求，耗尽或操纵 Juice Shop 应用中模拟加密货币钱包的余额。
 
-## IMPORTANT NOTE
+## 重要说明
 
-**_This challenge is not well completed, please feel free to open a pull request if you have find a way to complete it in a proper manner._**
+**_该挑战尚未完善。如果你找到妥善完成挑战的方法，欢迎提交 pull request。_**
 
-## Tools Used
+## 使用工具
 
-- **Web Browser:** Used to interact with the wallet page of the Juice Shop.
-- **Burp Suite:** Intercepted and manipulated the outgoing HTTP requests to and from the Juice Shop.
+- **Web 浏览器：** 用于操作 Juice Shop 钱包页面。
+- **Burp Suite：** 用于拦截和操纵 Juice Shop 发出和接收的 HTTP 请求。
 
-## Methodology and Solution
+## 方法与解题过程
 
-### Step 1: Exploring the Wallet Functionality
+### 步骤 1：探索钱包功能
 
-I start by visiting the wallet page on the Juice Shop site :
+我先访问 Juice Shop 网站的钱包页面：
 
 <img src="../assets/difficulty6/wallet_depletion_1.png" alt="page wallet" width="500px">
 
-I interacted with the interface to deposit a small amount of ETH (0.001 ETH) to test the functionality :
+我通过界面存入少量 ETH（0.001 ETH），测试钱包功能：
 
 <img src="../assets/difficulty6/wallet_depletion_2.png" alt="filled wallet" width="500px">
 
-### Step 2: Intercepting the Withdrawal Request
+### 步骤 2：拦截提款请求
 
-Using Burp Suite, I intercepted the network request made when attempting to withdraw ETH from the wallet. The request carried transaction data encoded in a hexadecimal format, indicating interaction with blockchain technologies, likely an Ethereum smart contract call.
+使用 Burp Suite 拦截尝试从钱包提取 ETH 时发送的网络请求。请求中包含十六进制格式编码的交易数据，表明它与区块链技术交互，很可能是调用 Ethereum 智能合约。
 
 <img src="../assets/difficulty6/wallet_depletion_3.png" alt="transfer request" width="500px">
 
-### Key Observations from the Request:
+### 请求中的关键观察
 
-- **Function Identifier:** The first part of the data field in the transaction (`0x2e1a7d4d`) identifies which function of the smart contract is called. This ID is a hash slice of the function signature.
-- **Parameters:** Following the function identifier, the second part is the hexadecimal number that represents the amount of wei (sub-unit of ETH) to be withdrawn.
+- **函数标识符：** 交易数据字段的第一部分（`0x2e1a7d4d`）标识调用的智能合约函数。该 ID 是函数签名的哈希片段。
+- **参数：** 函数标识符之后的部分是表示待提取 wei 数量的十六进制数值。
 
-### Step 3: Decoding and Manipulating the Request
+### 步骤 3：解码并操纵请求
 
-The intercepted request had a parameter that represented 0.001 ETH in wei format:
+拦截到的请求包含一个表示 0.001 ETH 的 wei 数量参数：
 
-- **Hexadecimal Value:** `0x38d7ea4c68000`
-- **Decimal Value:** `1,000,000,000,000,000` wei
-- **Ether Conversion:** `0.001 ETH`
+- **十六进制值：** `0x38d7ea4c68000`
+- **十进制值：** `1,000,000,000,000,000` wei
+- **换算为 Ether：** `0.001 ETH`
 
-To test the boundaries of this functionality, I altered the parameter to increase the withdrawal amount. I recalculated the hex value for a larger amount, such as 0.1 ETH, and modified the request accordingly.
+为了测试功能边界，我修改参数以增加提款金额。例如，我重新计算 0.1 ETH 对应的十六进制值，并据此修改请求。
 
-### Step 4: Resending the Modified Request
+### 步骤 4：重新发送修改后的请求
 
-After encoding the desired withdrawal amount (0.1 ETH) into the hexadecimal format required by the transaction data, I updated the request and resent it using Burp Suite.
+将期望的提款金额（0.1 ETH）编码为交易数据所需的十六进制格式后，我更新请求并使用 Burp Suite 重新发送。
 
-Here is the payload used : 
+使用的载荷如下：
 ```
 "data":"0x2e1a7d4d000000000000000000000000000000000000000000000000016345785d8a0000"
 ```
 
-### Challenges Faced:
+### 遇到的问题
 
-Attempting to withdraw 0.1 ETH resulted in an error likely due to insufficient funds or protections against unauthorized withdrawal amounts. The specific error highlighted the transaction could fail due to an "UNPREDICTABLE_GAS_LIMIT."
+尝试提取 0.1 ETH 时出现错误，可能是因为余额不足或存在防止未授权提款金额的保护措施。具体错误指出交易可能因“UNPREDICTABLE_GAS_LIMIT”而失败。
 
 <img src="../assets/difficulty6/wallet_depletion_4.png" alt="transfer request" width="500px">
 
-## Solution Explanation
+## 解题说明
 
-The challenge illustrated the risk associated with client-side controls in cryptocurrency transactions. By intercepting and manipulating transaction data, it is theoretically possible to initiate unauthorized actions if not adequately checked server-side.
+本挑战展示了加密货币交易中客户端控制所带来的风险。如果没有在服务端充分校验，攻击者理论上可以拦截并操纵交易数据，发起未授权操作。
 
-## Remediation
+## 修复建议
 
-- **Server-side Validation:** Always validate transaction requests server-side to ensure that they meet all necessary criteria (e.g., correct parameters, sufficient balance).
+- **服务端验证：** 始终在服务端验证交易请求，确保其符合所有必要条件（例如参数正确、余额充足）。

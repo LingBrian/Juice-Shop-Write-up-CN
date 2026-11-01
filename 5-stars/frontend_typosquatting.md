@@ -1,49 +1,48 @@
-# Juice-Shop Write-up: Frontend Typosquatting
+# Juice-Shop Write-up: 前端拼写仿冒
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** Frontend Typosquatting  
-**Category:** Insecure Deserialization  
-**Difficulty:** ⭐⭐⭐⭐⭐ (5/6)
+**标题：** Frontend Typosquatting  
+**类别：** 不安全反序列化  
+**难度：** ⭐⭐⭐⭐⭐ (5/6)
 
-This challenge involves identifying a typographical error in the naming of a frontend library used by the Juice Shop, which could potentially be exploited by a malicious actor.
+本挑战要求识别 Juice Shop 使用的某个前端库名称中的拼写错误，该问题可能被恶意行为者利用。
 
-## Tools Used
+## 使用工具
 
-- **Web Browser:** Used to access the application's frontend and view third-party library licensing information.
-- **npm Repository:** Checked the legitimacy of the libraries listed in the Juice Shop's frontend.
+- **Web 浏览器：** 用于访问应用前端并查看第三方库许可信息。
+- **npm 仓库：** 用于核查 Juice Shop 前端列出的库是否真实可信。
 
-## Methodology and Solution
+## 方法与解题过程
 
-### Step 1: Accessing License Information
+### 步骤 1：访问许可信息
 
-Navigated to `http://localhost:3000/3rdpartylicenses.txt` on the Juice Shop application to review the licensing and dependency information of third-party libraries included in the frontend built with Angular.
+访问 Juice Shop 应用中的 `http://localhost:3000/3rdpartylicenses.txt`，查看 Angular 构建的前端所包含第三方库的许可和依赖信息。
 
 <img src="../assets/difficulty5/frontend_typosquatting_1.png" alt="Angular Module List" width="500px">
 
-### Step 2: Identifying Suspicious Library
+### 步骤 2：识别可疑库
 
-Reviewed each library mentioned in the `3rdpartylicenses.txt`:
+检查 `3rdpartylicenses.txt` 中提到的每个库：
 
-1. **Library Review:** Each library name and version listed in the license file was verified against the npm repository to confirm their authenticity and check for any known vulnerabilities or mismatches.
+1. **核查库信息：** 在 npm 仓库中核对许可文件中列出的库名称和版本，确认其真实性，并检查是否存在已知漏洞或不匹配。
+2. **发现拼写错误：** 注意到本应为“angular2-qrcode”的名称却写成了“anuglar2-qrcode”。这促使我进一步调查。
 
-2. **Spotting the Typo:** Noticed an unusual spelling for what should have been "angular2-qrcode" but was listed as "anuglar2-qrcode." This prompted a further investigation.
+### 步骤 3：在 npm 上验证
 
-### Step 3: Verifying on npm
+在 npm 上搜索“anuglar2-qrcode”，核查它是否为合法软件包：
 
-Searched for "anuglar2-qrcode" on npm to verify if it was a legitimate package:
+- **npm 搜索：** 搜索结果确认“anuglar2-qrcode”确实是拼写错误，也可能是一个仿冒包，意图通过模仿知名软件包名称欺骗用户。
 
-- **npm Search:** The search confirmed that the library "anuglar2-qrcode" was indeed a typo and potentially a typosquatted package, intended to deceive users by mimicking the name of a well-known package.
+### 步骤 4：报告问题
 
-### Step 4: Reporting the Issue
+通过应用内的联系页面向 Juice Shop 团队报告该拼写错误，以及仿冒包可能带来的安全风险。
 
-Reported the typo and the potential security risk associated with the typosquatted package to the Juice Shop team via the contact page within the application.
+## 解题说明
 
-## Solution Explanation
+库名称中的拼写错误是关键发现。通过仔细审查并与 npm 上的条目交叉核对，成功发现并报告了可能恶意或错误引入的仿冒软件包。
 
-The typographical error in the library name was a crucial discovery that led to identifying a potential security threat. By carefully reviewing and cross-referencing the third-party libraries with npm, the malicious or mistaken inclusion of a typosquatted package was successfully identified and reported.
+## 安全影响与建议
 
-## Security Implications and Recommendations
-
-- **Thorough Validation:** Ensure that all third-party dependencies are thoroughly validated against reputable sources before inclusion in the project.
-- **Automated Scanning:** Implement automated tools to scan and flag any discrepancies in library names, versions, and checksums.
+- **彻底核验：** 在将第三方依赖纳入项目之前，务必通过可信来源彻底核验。
+- **自动化扫描：** 使用自动化工具扫描并标记库名称、版本和校验和中的差异。

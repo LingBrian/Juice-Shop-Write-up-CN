@@ -1,40 +1,39 @@
-# Juice-Shop Write-up: Forgotten Sales Backup Challenge
+# Juice-Shop 攻略：遗忘的销售备份挑战
 
-## Challenge Overview
+## 挑战概述
 
-**Title:** Forgotten Sales Backup\
-**Category:** Sensitive Data Exposure\
-**Difficulty:** ⭐⭐⭐⭐ (4/6)
+**标题：** Forgotten Sales Backup\
+**类别：** 敏感数据泄露\
+**难度：** ⭐⭐⭐⭐ (4/6)
 
-This challenge involves accessing a backup file left forgotten on a vendor's server. The task highlights the risk of sensitive data exposure due to improperly secured backup files accessible via a public interface.
+本挑战要求访问遗留在供应商服务器上的备份文件，旨在展示备份文件保护不当并通过公共接口访问时所带来的敏感数据泄露风险。
 
-## Tools Used
+## 使用的工具
 
-- Web browser
+- Web 浏览器
 
-## Methodology and Solution
+## 方法与解法
 
-To successfully complete the "Forgotten Sales Backup" challenge, the following steps were taken:
+要完成“Forgotten Sales Backup”挑战，我们采取了以下步骤：
 
-1. **Access the FTP Server**: Navigated to the FTP server directory listing at `127.0.0.1:3000/ftp`, which was discovered in a previous challenge (Privacy Policy). This server hosted various files, including backups and configuration files.
+1. **访问 FTP 服务器**：访问 FTP 目录列表 `127.0.0.1:3000/ftp`。我们在之前的挑战（Privacy Policy）中发现了该目录。服务器托管了各种文件，包括备份和配置文件。
 
-2. **Identify the Target File**: Scanned through the list of files and identified `coupons_2013.md.bak` as a likely candidate for containing sensitive sales data due to its naming convention indicating it's a backup file.
+2. **确定目标文件**：浏览文件列表后，发现 `coupons_2013.md.bak` 可能包含敏感销售数据，因为其名称表明它是备份文件。
 
 <img src="../assets/difficulty4/forgotten_sales_backup.png" alt="ftp" width="500px">
 
-3. **Exploit NULL Byte Injection**: Utilized a NULL byte injection technique to access the backup file. Many web applications do not properly sanitize input, allowing for directory traversal or file inclusion attacks if the application is improperly handling file names.
-   - **Construct the URL**: Appended a NULL byte character, represented in URL encoding as `%00`, to the file request to potentially bypass any restrictions or parsing issues by the server. This was tried because older or misconfigured servers might treat the NULL byte as a string terminator, thus ignoring any file extension checks or other controls.
-   - **Request the File**: Accessed the URL `http://127.0.0.1:3000/ftp/coupons_2013.md.bak%00.md` in a browser.
+3. **利用 NULL 字节注入**：使用 NULL 字节注入访问备份文件。许多 Web 应用未正确清理输入，若处理文件名不当，可能因此遭受目录遍历或文件包含攻击。
+   - **构造 URL**：在文件请求中附加 NULL 字节字符，其 URL 编码形式为 `%00`，尝试绕过服务器限制或解析问题。旧版或配置不当的服务器可能把 NULL 字节视为字符串终止符，从而忽略文件扩展名检查或其他控制。
+   - **请求文件**：在浏览器中访问 URL `http://127.0.0.1:3000/ftp/coupons_2013.md.bak%00.md`。
 
-4. **Review the Data**: Upon successful retrieval, reviewed the content of `coupons_2013.md.bak` for any sensitive information, confirming the exposure of sales data or discount coupons that should not have been publicly accessible.
+4. **检查数据**：成功获取文件后，检查 `coupons_2013.md.bak` 的内容，确认其中包含不应公开访问的销售数据或折扣券等敏感信息。
 
-## Solution Explanation
+## 解法说明
 
-The challenge demonstrated an exposure of sensitive data due to a misconfigured FTP server that allowed public access to backup files. The use of NULL byte injection to access the file underscored a common vulnerability in how servers handle file paths and extensions, particularly in systems not properly sanitizing user inputs or correctly handling file strings.
+本挑战展示了 FTP 服务器配置错误导致敏感数据暴露的问题：备份文件可被公众访问。利用 NULL 字节注入访问文件，也体现了服务器处理文件路径和扩展名时的常见漏洞，尤其是在未正确清理用户输入或处理文件字符串的系统中。
 
-## Remediation
+## 修复建议
 
-- **Proper Access Controls**: Ensure that backup files are not stored in publicly accessible directories. Use proper access control mechanisms to restrict access.
-- **Regular Audits and Cleanups**: Perform regular audits of storage locations and cleanup legacy or unused files to prevent accidental exposure.
-- **Input Sanitization**: Enhance security measures to sanitize user inputs, especially in file retrieval functionalities, to prevent directory traversal or file inclusion attacks.
-
+- **实施适当的访问控制**：不要将备份文件存放在可公开访问的目录中，并通过适当的访问控制机制限制访问。
+- **定期审计和清理**：定期审计存储位置，清理遗留或未使用的文件，以防意外暴露。
+- **清理输入**：加强输入清理，尤其是文件读取功能中的输入，以防目录遍历或文件包含攻击。

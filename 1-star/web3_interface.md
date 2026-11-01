@@ -1,39 +1,36 @@
-# Juice-Shop Write-up: Web3 Sandbox Challenge
+# Juice-Shop Write-up：Web3 Sandbox Challenge
 
-## Challenge Overview
+## 挑战概述
 
 **Title:** Web3 Sandbox\
 **Category:** Broken Access Control\
 **Difficulty:** ⭐ (1/6)
 
-This challenge requires discovering an accidentally deployed Web3 code sandbox that allows on-the-fly writing and testing of smart contracts. It explores the concept of broken access controls within web applications, particularly in environments involving Web3 technologies.
+本挑战要求发现一个意外部署的 Web3 代码沙盒，该沙盒允许即时编写和测试智能合约。本挑战探讨 Web 应用中的访问控制失效，尤其是涉及 Web3 技术的环境。
 
-## Tools Used
+## 使用的工具
 
 - Web browser
 
-## Methodology and Solution
+## 方法与解决方案
 
-The process to complete the Web3 Sandbox challenge was relatively straightforward:
+完成 Web3 Sandbox 挑战的过程相对简单：
 
-1. **Discovery**: Began by exploring different URLs related to Web3 functionalities on the application, suspecting that the sandbox might be located at a somewhat obscure or less obvious path.
-   
-2. **Guessing URL**: Utilized a simple guessing approach, inspired by common directory names associated with testing or development environments like `/sandbox`, `/test`, `/dev`, or similar. In this case, it involved trying variations until hitting the correct URL: `http://127.0.0.1:3000/#/web3-sandbox`.
-
-3. **Accessing the Sandbox**: Upon navigating to the correct URL, found a fully functional Web3 code sandbox environment. This sandbox included features for editing, compiling, and deploying Ethereum smart contracts directly from the browser.
+1. **发现**：开始探索应用中与 Web3 功能相关的不同 URL，推测沙盒可能位于较隐蔽或不明显的路径。
+2. **猜测 URL**：参考常见测试或开发环境目录名称（例如 `/sandbox`、`/test`、`/dev` 等）进行简单猜测，逐一尝试后找到正确 URL：`http://127.0.0.1:3000/#/web3-sandbox`。
+3. **访问沙盒**：访问正确 URL 后，发现了功能完整的 Web3 代码沙盒环境。该沙盒支持直接在浏览器中编辑、编译和部署 Ethereum 智能合约。
 
 <img src="../assets/difficulty1/web3_interface_1.png" alt="interface" width="500px">
 
+## 解决方案说明
 
-## Solution Explanation
+本挑战利用了一类常见的安全疏忽：开发工具或实验性功能意外地在生产环境中保持可访问。直接访问该 URL 即可不受限制地使用原本只应在受控环境中使用的强大功能，从而带来显著安全风险。
 
-The challenge exploited a typical security oversight where development tools or experimental features are inadvertently left accessible in production environments. Accessing the URL directly provided unrestricted access to powerful functionalities intended for controlled use, posing significant security risks.
+## 修复建议
 
-## Remediation
+为防止此类问题并保护 Web 应用免受类似漏洞影响：
 
-To prevent such issues and secure web applications from similar vulnerabilities:
-
-- **Environment Segregation**: Ensure that development, testing, and production environments are strictly segregated. Tools and features that are used for development and testing should not be available on production servers.
-- **Access Controls**: Implement robust access controls to restrict access to administrative or sensitive functionalities only to authorized users.
-- **URL Guessing Mitigation**: Employ techniques like URL obfuscation or better yet, disable directory listing and ensure sensitive URLs are not easily guessable.
-- **Regular Audits**: Conduct regular security audits and penetration testing to identify and rectify security lapses such as exposed internal tools or functionalities.
+- **环境隔离**：确保开发、测试和生产环境严格隔离。开发和测试工具及功能不应出现在生产服务器上。
+- **访问控制**：实施完善的访问控制，仅允许授权用户使用管理或敏感功能。
+- **降低 URL 被猜中的风险**：可采用 URL 混淆等技术；更好的做法是禁用目录列表，并确保敏感 URL 不容易被猜到。
+- **定期审计**：定期开展安全审计和渗透测试，发现并修复暴露内部工具或功能等安全问题。
