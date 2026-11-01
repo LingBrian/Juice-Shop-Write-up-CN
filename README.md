@@ -25,12 +25,12 @@
 
 进入对应文件夹，查看该难度等级的挑战与解法：
 
-- [⭐ 1 星挑战](https://github.com/whyiest/juice-shop-write-up/tree/main/1-star)
-- [⭐⭐ 2 星挑战](https://github.com/whyiest/juice-shop-write-up/tree/main/2-stars)
-- [⭐⭐⭐ 3 星挑战](https://github.com/whyiest/juice-shop-write-up/tree/main/3-stars)
-- [⭐⭐⭐⭐ 4 星挑战](https://github.com/whyiest/juice-shop-write-up/tree/main/4-stars)
-- [⭐⭐⭐⭐⭐ 5 星挑战](https://github.com/whyiest/juice-shop-write-up/tree/main/5-stars)
-- [⭐⭐⭐⭐⭐⭐ 6 星挑战](https://github.com/whyiest/juice-shop-write-up/tree/main/6-stars)
+- [⭐ 1 星挑战](./1-star/)
+- [⭐⭐ 2 星挑战](./2-stars/)
+- [⭐⭐⭐ 3 星挑战](./3-stars/)
+- [⭐⭐⭐⭐ 4 星挑战](./4-stars/)
+- [⭐⭐⭐⭐⭐ 5 星挑战](./5-stars/)
+- [⭐⭐⭐⭐⭐⭐ 6 星挑战](./6-stars/)
 
 ## 建议
 
@@ -142,7 +142,7 @@
 - [Two-Factor Authentication Bypass](5-stars/two_factor_authentification.md) - 身份验证失效
 - [Unsigned JWT](5-stars/unsigned_jwt.md) - 身份验证失效
 - [Local File Read](5-stars/local_file_read.md) - 服务端注入
-- [NoSQL Exfiltration](5-stars/nosql_exfiltration.md) - NoSQL 注入
+- [NoSQL Exfiltration](5-stars/nosql_exflitration.md) - NoSQL 注入
 - [Blocked RCE Dos](5-stars/blocked_rce_dos.md) - 不安全的反序列化
 
 ### ➤ 难度：6 星（⭐⭐⭐⭐⭐⭐）
